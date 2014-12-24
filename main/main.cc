@@ -31,6 +31,8 @@ double getFromBeFile();
  ofstream impactParameterFileBefore;
  ofstream deltaPtOutput;
  ofstream incidentParticlePt;
+ const gsl_rng_type *gslRandomGeneratorType;
+ gsl_rng *gslRandomGenerator;
 
 int main() {
 char ch;
@@ -58,6 +60,11 @@ TMacro m("/home/guest/programs/build/macros_/getEvent.C");
 m.Exec();
 cin>>ch;
 */
+//const gsl_rng_type *gslRandomGeneratorType;
+//gsl_rng *gslRandomGenerator;
+gslRandomGeneratorType = gsl_rng_default;
+gsl_rng_env_setup ();
+gslRandomGenerator= gsl_rng_alloc (gslRandomGeneratorType);
 _randomFile.open("/home/dsuetin/workspace/Pythia8180/Debug/randomNumbersFile.txt");
 //W_File.open("/home/dsuetin/workspace/Hardping_201401/Debug/02.06.14/WnCol_fort.txt");
 W_File.open("/home/dsuetin/workspace/Hardping_newold/Debug/08.10.14/W1nCol_fort.txt");

@@ -119,7 +119,8 @@ Hardping::Hardping(nucleus projectileNucleus,
 	  _fortranHardping(false),
 	  _verbose(0),
 	  _cutMass(true),
-	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")
+	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")//,
+	 // _gslRandomGeneratorType(gsl_rng_default)
 	 // _randomFile("/home/dsuetin/workspace/Pythia8180/Debug/randomNumbersFile.txt"),
 	//  _file(0),
 //	  _time(),
@@ -138,8 +139,8 @@ Hardping::Hardping(nucleus projectileNucleus,
 	  _BQ = 2./0.7;
 	  _BP = 2./1.3;
 	  _BN = 2./0.1;
-
-
+	  //gsl_rng_env_setup ();
+	  //_gslRandomGenerator= gsl_rng_alloc (_gslRandomGeneratorType);
 	//cout<<"time stop = "<<ts<<endl;
 	//time1.printTime(ts);
 	char ch;
@@ -1302,6 +1303,7 @@ char ch;
 
 
 					isScattering = pathInNucleus2(particleA,zCoordinateOfCollisions);
+					//isScattering = 1;
 				//	cout<<"particleA "<<particleA->vProd();
 					cout.precision(12);
 			//		cout<<"particleA pt = "<<particleA->vProd().pT()<<endl;

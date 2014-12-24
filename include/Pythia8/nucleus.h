@@ -40,10 +40,14 @@
 #include "Pythia.h"
 #include "timer.h"
 #include <vector>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
 extern ofstream pathInNucleiOutput;
 extern ofstream softCollisionsNumberOutput;
 extern ofstream deltaPtOutput;
 extern  double getRandomFromFile();
+extern  const gsl_rng_type *gslRandomGeneratorType;
+extern  gsl_rng *gslRandomGenerator;
  //class Pythia8::Pythia;
 //This class holds the information for a target nucleus
 namespace Pythia8{
@@ -1244,6 +1248,14 @@ cout<<"phi "<<_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(
 void setInitinalImpactAndIndex(hardpingParticle* particleA){
 
 	char ch;
+
+		  cout<<"gsl_ran_gaussian "<<gsl_ran_gaussian (gslRandomGenerator, 1)<<endl;
+		  cout<<"gsl_ran_gaussian "<<gsl_ran_gaussian_pdf (1, 1)<<endl;
+		  cin>>ch;
+		  // Function: double gsl_ran_gaussian_pdf (double x, double sigma).
+		  //This function computes the probability density p(x) at x for a Gaussian distribution with standard deviation sigma, using the formula given above.
+
+
 	////////// calculating impact parameter of incident particles//////////////////////////////////////////
 	double xImpact = 0, yImpact = 0;
 	getImpactParameter(xImpact,yImpact);
@@ -1524,6 +1536,7 @@ private:
 	std::vector<unsigned int> _indexOfDrellYanChain;
 	TMacro _pythia6Event;
 	ifstream* _pythia6File;
+
 }; // end nucleus class
 
 }// end of namespace pythia8
