@@ -1249,16 +1249,29 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 
 	char ch;
 
-		  cout<<"gsl_ran_gaussian "<<gsl_ran_gaussian (gslRandomGenerator, 1)<<endl;
-		  cout<<"gsl_ran_gaussian "<<gsl_ran_gaussian_pdf (1, 1)<<endl;
-		  cin>>ch;
+	//particleA->vProd().px(gsl_ran_gaussian (gslRandomGenerator, 1));
+	//particleA->vProd().py(gsl_ran_gaussian (gslRandomGenerator, 1));
+
+	//cout<<"gsl_ran_gaussian "<<particleA->vProd();
+
+//	cin>>ch;
 		  // Function: double gsl_ran_gaussian_pdf (double x, double sigma).
 		  //This function computes the probability density p(x) at x for a Gaussian distribution with standard deviation sigma, using the formula given above.
 
 
 	////////// calculating impact parameter of incident particles//////////////////////////////////////////
-	double xImpact = 0, yImpact = 0;
-	getImpactParameter(xImpact,yImpact);
+	double xImpact = 0, yImpact = 0, zCoordinate = 0;
+	if(particleA->isLepton()){
+
+		xImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
+		yImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
+		zCoordinate = gsl_ran_gaussian (gslRandomGenerator, 1);
+	}else{
+
+		getNucleusImpactParameter(xImpact,yImpact);
+		zCoordinate = -_maxZCoordinate;
+	}
+
 	Vec4 vecCoordinate(0);
 	//////////end of calculating impact parameter of incident particles//////////////////////////////////////////
 
@@ -1266,7 +1279,7 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 
 	vecCoordinate.px(xImpact);
 	vecCoordinate.py(yImpact);
-	vecCoordinate.pz(-_maxZCoordinate);
+	vecCoordinate.pz(zCoordinate);
 	particleA->vProd(vecCoordinate);
 
 	//////// end of set coordinate of incident particle ////////////////////
@@ -1278,7 +1291,9 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 //	cout<<" initial index particle "<<particleA->getHistory()->back()<<endl;
 	//cin>>ch;
 	_indexParticle++;
+	cout<<"gsl_ran_gaussian "<<particleA->vProd();
 
+	//cin>>ch;
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 void softToHard(hardpingParticle* particleA,hardpingParticle* particleB){
@@ -1436,7 +1451,7 @@ void finalOutput(void){
 
 
 	//double ::getRandomFromFile();
-	void getImpactParameter(double &impactX,double &impactY){
+	void getNucleusImpactParameter(double &impactX,double &impactY){
 	//	double impactParameterMax = min(3*_targetNucleus.getNuclearRadius(),_maxZCoordinate + 6.06); // from Fortran version. 6.06 fm - is proton characteristic
 
 		//BB=DSQRT(BMIN**2+RAN(NSEED)*(BMAX**2-BMIN**2))

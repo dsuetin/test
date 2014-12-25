@@ -614,7 +614,10 @@ bool
 Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCollision){
 	_isScattering = false;
 
-
+	if(particleA->isLepton()&&_firstCall){
+		_isScattering = true;
+		return _isScattering;
+	}
 	if(particleA->idAbs() <= 23)return _isScattering;
 
 	int numOfCollisions = 0;
@@ -770,7 +773,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             if(_verbose)cout<<"xMinP =  "<<xMinP<<" yMaxP = "<<yMaxP<<endl;
             // if first collision do not happened we set new impact parameter for incident particle and try again
         	if(/*!_isScattering && _firstCall*/0){
-        		getImpactParameter(xCoord,yCoord);
+        		getNucleusImpactParameter(xCoord,yCoord);
         		particleA->vProd().px(xCoord);
         		particleA->vProd().py(yCoord);
         		impactParameter = particleA->vProd().pT();
@@ -1203,7 +1206,8 @@ char ch;
 	bool isScattering = false;
 	bool softToHardFlag = false;
 	double x1 = 0;
-
+	int numberOfIncidentParticles = 0;
+	numberOfIncidentParticles = (particleA->isLepton())? 1 : _projectileNucleus.A();
 	if(true)do{
 //		/cout<<" begin " <<endl;
 		//cin>>ch;
@@ -1226,15 +1230,16 @@ char ch;
 
 			 particleIndexation(numberOfGeneration, numberOfParticlesAtPreviousGeneration);
 			//////////////////////////////////////////////////
-			(_firstCall)? initGeteration(numberOfGeneration,_projectileNucleus.A()) : initGeteration(numberOfGeneration,numberOfParticlesAtPreviousGeneration) ;
-
+			(_firstCall)? initGeteration(numberOfGeneration,numberOfIncidentParticles) : initGeteration(numberOfGeneration,numberOfParticlesAtPreviousGeneration) ;
 			addGeneration();
 
-			(_firstCall)? iMax = _projectileNucleus.A() : iMax = numberOfParticlesAtPreviousGeneration;
+			(_firstCall)? iMax = numberOfIncidentParticles : iMax = numberOfParticlesAtPreviousGeneration;
+			cout<<" numberOfIncidentParticles "<<numberOfIncidentParticles<<endl;
 			for(int i_init = 0; i_init < iMax ; i_init++){
 				// i_init - index number of particle in current generation
 
 				if(_firstCall){
+
 					setInitinalImpactAndIndex(particleA);
 				}else{
 					particleA->setNumberOfCurrentGeneration(numberOfGeneration);
@@ -1303,6 +1308,7 @@ char ch;
 
 
 					isScattering = pathInNucleus2(particleA,zCoordinateOfCollisions);
+
 					//isScattering = 1;
 				//	cout<<"particleA "<<particleA->vProd();
 					cout.precision(12);
@@ -1319,7 +1325,7 @@ char ch;
 					if(_firstCall){
 						if(!isScattering)return;
 						vecCoordinate.p(particleA->vProd());
-						vecCoordinate.pz(zCoordinateOfCollisions);
+						if(!particleA->isLepton())vecCoordinate.pz(zCoordinateOfCollisions);
 						_initialParticle.vProd(vecCoordinate);
 						_initialParticle.getHistory()->clear();
 						_initialParticle.getHistory()->push_back(particleA->getHistory()->back());
