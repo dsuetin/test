@@ -117,7 +117,7 @@ Hardping::Hardping(nucleus projectileNucleus,
 	  _hardInteractionCount(0),
 	  _softInteractionCount(0),
 	  _fortranHardping(false),
-	  _verbose(0),
+	  _verbose(1),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")//,
 	 // _gslRandomGeneratorType(gsl_rng_default)
@@ -240,7 +240,7 @@ Hardping::Hardping(hardpingParticle incidentParticle,
 	  _hardInteractionCount(0),
 	  _softInteractionCount(0),
 	  _fortranHardping(false),
-	  _verbose(0),
+	  _verbose(1),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")
 	 // _randomFile("/home/dsuetin/workspace/Pythia8180/Debug/randomNumbersFile.txt"),
@@ -1173,7 +1173,7 @@ char ch;
 	particleB->e(particleB->getRestMass());
 	cout<<"particleA p "<<particleA->p();
 	cout<<"particleB p "<<particleB->p();
-	cin>>ch;
+	//cin>>ch;
 
 	int pythiaNextFlag = 0;
 
@@ -1343,7 +1343,7 @@ char ch;
 						//if interaction occurred beyond boundary of nucleus hardron does not lose energy
 						//if gotten coordinate above nuclear radius we assume that particle loosing energy until it reach nuclear radius
 						zCoordinateOfCollisionsTemp = (zCoordinateOfCollisions >= _targetNucleus.getNuclearRadius()) ? _targetNucleus.getNuclearRadius() : zCoordinateOfCollisions;
-
+						cout<<" zCoordinateOfCollisionsTemp = "<<zCoordinateOfCollisionsTemp<<endl;
 
 
 						// energy loss will occur up to zCoordinateOfCollisionsTemp
@@ -1384,7 +1384,7 @@ char ch;
 							_outOfNucleus->push_back(*particleA);
 							// massive with index of particles which not initialize next wave
 							_indexBadInitializations->push_back(particleA->getIndexNumber());
-						}
+						}//todo may be i should add particle in _indexBadInitializations
 						continue;
 					}
 
@@ -1415,7 +1415,7 @@ char ch;
 
 
 
-					if( false ){
+					if( particleA->isLepton() && _firstCall ){
 
 						particleA->setHard();
 						particleA->setSoft(false);
@@ -1444,17 +1444,18 @@ char ch;
 
 				if(_verbose)cout<<"momentum before rotate "<<particleA->p();
 
-				if(!_softToHard&&_fortranHardping){
+
+				if(!particleA->isLepton()){
+					if((!softToHardFlag)&&_fortranHardping){
 
 
-					//	if(1||_verbose)cout<<"momentum after 0 rotate "<<particleA->p();
-						getNewPtInitialState(particleA,1);
-					//	if(1||_verbose)cout<<"momentum after 1 rotate "<<particleA->p();
-						getNewPtInitialState(particleA,2);
-					//	if(1||_verbose)cout<<"momentum after 2 rotate "<<particleA->p();
+							if(_verbose)cout<<"momentum after 0 rotate "<<particleA->p();
+							getNewPtInitialState(particleA,1);
+							if(_verbose)cout<<"momentum after 1 rotate "<<particleA->p();
+							getNewPtInitialState(particleA,2);
+							if(_verbose)cout<<"momentum after 2 rotate "<<particleA->p();
 
-
-
+					}
 				}
 				particleA->setAngles();
 			//	cout<<"momentum after rotate "<<particleA->p();
@@ -1491,8 +1492,14 @@ char ch;
 
 
 				}else{
-					pythiaNextFlag = pythia->next();
-					particleA->setXBjorkenProjectile( pythia->info.x1());
+					if(particleA->isLepton()){
+						pythiaNextFlag = 1;
+						particleA->setXBjorkenProjectile(1.);//todo неправильно. переделать.
+					}else{
+						pythiaNextFlag = pythia->next();//todo change for leptons
+						particleA->setXBjorkenProjectile( pythia->info.x1());
+					}
+
 					//pythiaNextFlag = 1;
 				}
 				if(_verbose)cout<<"name of processes "<< pythia->info.name()<<endl;//todo when hard collision occurred and we have some soft collisions pythia process correspond to hard collision happened before/
@@ -1614,7 +1621,6 @@ char ch;
 			} // ind i_init cicle
 			if(_verbose)cout<< "_generations size before = "<<_generations->at(numberOfGeneration).getMatrix()->size()<<endl;
 			if(_verbose)cout<<"_indexBadInitializations->size() = "<<_indexBadInitializations->size()<<endl;
-//todo необходимо понять почему размер предидущего поколения 1 а _indexBadInitializations =2
 			///// deleting from new generation all particles which can no initialize new wave///////
 			deleteBadInitializationParticlesFromNewGeneration(numberOfGeneration);
 			////////////////////////////////////////////////////////////////////////////////////////
@@ -1758,7 +1764,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 
 			_pythia6File->close();
 		//	_hardInteractionCount++;
-			cin>>ch;
+			//cin>>ch;
 			return 1;
 		}
 		//pythia->settings.resetAll();
@@ -1889,7 +1895,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 					//partA.phi();
 					partA.status(1);
 
-					pythia->event.clear();
+					pythia->event.clear();//todo make in pythia standart
 					pythia->event.append(0);
 					pythia->event.append(0);
 					pythia->event.append(0);
@@ -1983,7 +1989,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 
 				tempHardpingParticle->setPhiHardping(particleA->getPhiHardping());
 				tempHardpingParticle->setThetaHardping(particleA->getThetaHardping());
-				//.todo add coordinate
+
 				//cout<<"before "<<tempHardpingParticle->p();
 
 				tempHardpingParticle->rotateHardping();

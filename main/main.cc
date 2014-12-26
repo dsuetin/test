@@ -224,7 +224,7 @@ if(coordinateHardOutput.is_open()){
 
 
 			fileDrellYan<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).p();
-			cout<<"in main n = "<<iop<<" "<<"id = "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).p();
+			cout<<"in main n = "<<iop<<" "<<"id = "<<hardping->_finalState->at(ih).id()<<" "<<" isHardron "<<hardping->_finalState->at(ih).isHadron()<<hardping->_finalState->at(ih).p();
 
 		}
 
