@@ -316,6 +316,28 @@ public:
 	void setXBjorkenProjectile(double x1){
 		 _x1 = x1;
 	}
+
+	Vec4 getTransferred4Momentum(void){
+		return _transferred4Momentum;
+	}
+	void setTransferred4Momentum(Vec4 transferred4Momentum){
+		_transferred4Momentum = transferred4Momentum;
+	}
+	double getVirtualPhotonEnergy(void){
+		return _virtualPhotonEnergy;
+		//return _transferred4Momentum.e();
+	}
+	void setVirtualPhotonEnergy(double virtualPhotonEnergy){
+		_virtualPhotonEnergy = virtualPhotonEnergy;
+	}
+	double getAbsQ2(void){
+		//return abs(_transferred4Momentum*_transferred4Momentum);
+		return abs(_transferred4Momentum.m2Calc());
+	}
+	double getQ2(void){
+		//return abs(_transferred4Momentum*_transferred4Momentum);
+		return _transferred4Momentum.m2Calc();
+	}
 private:
 	vector <unsigned int> * _history;
 	bool _hardInteraction;
@@ -326,6 +348,8 @@ private:
 	double _phiHardping;
 	unsigned int _indexInGeneration;// i_init - index number of particle in current generation
 	unsigned int _numberOfCurrentGeneration;
+	Vec4 _transferred4Momentum;
+	double _virtualPhotonEnergy;
 	double _x1;
 	//Rndm * _random;
 

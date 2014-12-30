@@ -1745,9 +1745,9 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			while(*_pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6){
 				countParticles++;
 				if(countParticles <= 3 ){
-					statusCode = 0;
+					statusCode = 0; // not final state
 				}else{
-					statusCode = 1;
+					statusCode = 1; // final state
 				}
 				partB.px(pxPythia6);
 				partB.py(pyPythia6);
@@ -1761,6 +1761,31 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 
 			};
 			pythia->event.list();
+
+			int scatteringLeptonPosition = 0;
+
+			for(unsigned i = 3; i < pythia->event.size(); i++){
+
+				if(pythia->event.at(i).isLepton()){
+					scatteringLeptonPosition = i;
+					break;
+				}
+
+			}
+
+			if(scatteringLeptonPosition){
+				particleA->setTransferred4Momentum(particleA->p()-pythia->event.at(scatteringLeptonPosition).p());
+				particleA->setVirtualPhotonEnergy(particleA->getTransferred4Momentum()*pythia->event.at(2).p()/pythia->event.at(2).m());
+				//todo спросить у леши, почему энергия виртуальнго фотона, вычесленная разными способами совпадаетая
+			}
+
+			if(_verbose){
+				cout<<"Q2 "<<particleA->getAbsQ2()<<endl;
+				cout<<"q "<<particleA->getTransferred4Momentum()<<endl;
+				cout<<"nu "<<particleA->getVirtualPhotonEnergy()<<endl;
+				cout<<"q "<<particleA->getTransferred4Momentum().m2Calc()<<endl;
+				cin>>ch;
+			}
 
 			_pythia6File->close();
 		//	_hardInteractionCount++;
