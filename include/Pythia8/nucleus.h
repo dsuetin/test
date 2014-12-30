@@ -142,32 +142,11 @@ public:
 
 	double getRestMass2(void){
 
+		double restMass = 0;
+		restMass = getRestMass();
+		return restMass*restMass;
 
-			switch (this->id()) {
-			case 2212:
-
-			  return protonMass*protonMass;
-
-			  break;
-			case 2112:
-				return neutronMass*neutronMass;
-				//this->e(neutronMass);
-			  break;
-			case -13:
-				return muonMass*muonMass;
-
-			  break;
-
-			case 13:
-				return muonMass*muonMass;
-
-			  break;
-
-			default:
-				return 0;
-			  break;
-			}
-		}
+	}
 
 	std::string getParticleName(){
 		std::string	ElementName;
@@ -316,7 +295,12 @@ public:
 	void setXBjorkenProjectile(double x1){
 		 _x1 = x1;
 	}
-
+	double getXBjorkenTarget(void){
+		return _x2;
+	}
+	void setXBjorkenTarget(double x2){
+		 _x2 = x2;
+	}
 	Vec4 getTransferred4Momentum(void){
 		return _transferred4Momentum;
 	}
@@ -335,9 +319,34 @@ public:
 		return abs(_transferred4Momentum.m2Calc());
 	}
 	double getQ2(void){
-		//return abs(_transferred4Momentum*_transferred4Momentum);
 		return _transferred4Momentum.m2Calc();
 	}
+	unsigned int getMotherParticleHistoryIndex(void){
+		return _motherParticleHistoryIndex;
+	}
+	void setMotherParticleHistoryIndex(unsigned int index){
+		_motherParticleHistoryIndex = index;
+	}
+
+	double getParticleNucleonCrossSection(void){
+		return _particleNucleonCrossSection;
+	}
+	void setParticleNucleonCrossSection(double crossSection){
+		_particleNucleonCrossSection = crossSection;
+	}
+	double getHardronEnergyFraction(void){
+		return _hardronEnergyFraction;
+	}
+	void setHardronEnergyFraction(double fraction){
+		_hardronEnergyFraction = fraction;
+	}
+	double getFormationLength(void){
+		return _formationLength;
+	}
+	void setFormationLength(double formationLength){
+		_formationLength = formationLength;
+	}
+	//todo написать функцию, которая по индексу частицы в истории возвращала бы указатель на эту частицу.
 private:
 	vector <unsigned int> * _history;
 	bool _hardInteraction;
@@ -351,6 +360,11 @@ private:
 	Vec4 _transferred4Momentum;
 	double _virtualPhotonEnergy;
 	double _x1;
+	double _x2;
+	double _particleNucleonCrossSection;
+	double _hardronEnergyFraction;
+	unsigned int _motherParticleHistoryIndex;
+	double _formationLength;
 	//Rndm * _random;
 
 };

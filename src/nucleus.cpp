@@ -1495,9 +1495,11 @@ char ch;
 					if(particleA->isLepton()){
 						pythiaNextFlag = 1;
 						particleA->setXBjorkenProjectile(1.);//todo неправильно. переделать.
-					}else{
+					}
+					if(particleA->isHadron()){
 						pythiaNextFlag = pythia->next();//todo change for leptons
 						particleA->setXBjorkenProjectile( pythia->info.x1());
+						particleA->setXBjorkenTarget(     pythia->info.x2());
 					}
 
 					//pythiaNextFlag = 1;
@@ -1779,6 +1781,10 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 				//todo спросить у леши, почему энергия виртуальнго фотона, вычесленная разными способами совпадаетая
 			}
 
+
+
+			cout<<"ecv "<<pythia->event.at(0).m()<<endl;// ECM of system
+
 			if(_verbose){
 				cout<<"Q2 "<<particleA->getAbsQ2()<<endl;
 				cout<<"q "<<particleA->getTransferred4Momentum()<<endl;
@@ -1786,7 +1792,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 				cout<<"q "<<particleA->getTransferred4Momentum().m2Calc()<<endl;
 				cin>>ch;
 			}
-
+			double virtualPhotonEnergyOverEnergyLoss = particleA->getVirtualPhotonEnergy()/_kEnergyLoss;
 			_pythia6File->close();
 		//	_hardInteractionCount++;
 			//cin>>ch;
@@ -2028,9 +2034,72 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				//cout<<tempHardpingParticle->vProd();
 				//cout<<tempHardpingParticle->getPhiHardping()<<endl;
 				//cout<<tempHardpingParticle->getThetaHardping()<<endl;
+				tempHardpingParticle->setMotherParticleHistoryIndex(particleA->getHistory()->back());// запоминаем индекс в history материнской частицы.
+				tempHardpingParticle->getHistory()->assign(particleA->getHistory()->begin(),particleA->getHistory()->end()); //копируем историю маеринской частицы
+				tempHardpingParticle->getHistory()->push_back(_indexParticle);// присваиваем индекс history данной частице.
 
-				tempHardpingParticle->getHistory()->assign(particleA->getHistory()->begin(),particleA->getHistory()->end());
-				tempHardpingParticle->getHistory()->push_back(_indexParticle);
+				double z2 = 0;
+				double z = 0;
+				double formationLength = 0;
+				double bl = 0;
+				if(particleA->isHard() && tempHardpingParticle->isHadron()){//в случае жесткого столкновения для вторичных адронов вычисляется длина формирования и сопутствующие величины
+					if(particleA->isLepton()){
+
+						tempHardpingParticle->setHardronEnergyFraction(tempHardpingParticle->e()/particleA->getVirtualPhotonEnergy());
+
+						bl = particleA->getVirtualPhotonEnergy()/_kEnergyLoss;
+
+						formationLength = bl*tempHardpingParticle->getHardronEnergyFraction();
+						cout<<"form lenght "<<formationLength<<endl;
+
+
+
+						z = tempHardpingParticle->getHardronEnergyFraction();
+						z2 = tempHardpingParticle->getHardronEnergyFraction()*tempHardpingParticle->getHardronEnergyFraction();
+						formationLength = (log(1/z2) - 1 + z2 )*z*bl/(1-z2);
+						cout<<"form lenght "<<formationLength<<endl;
+
+
+						tempHardpingParticle->setFormationLength(formationLength);
+						cin>>ch;
+					}
+					//todo проверить в случае налетающего ядра, определяется ли налетающая частица как isHardron
+					if(particleA->isHadron()){
+						//tempHardpingParticle->setHardronEnergyFraction(tempHardpingParticle->e()/particleA->getVirtualPhotonEnergy());
+
+						//pythia->info.eCM();
+						//todo непонятно в какой системе считать. в фортране используется сцм
+
+						// z = pt/pmax
+						double energyOfPartonSystemCM = 0;
+						//pythia->event.at(0).m() - ECM of system
+						energyOfPartonSystemCM = sqrt(particleA->getXBjorkenProjectile()*particleA->getXBjorkenTarget()*pythia->event.at(0).m2());
+
+						tempHardpingParticle->setHardronEnergyFraction(2*tempHardpingParticle->pT()/energyOfPartonSystemCM);
+
+						//fix from old hardping
+						if(tempHardpingParticle->getHardronEnergyFraction() >= 1)tempHardpingParticle->setHardronEnergyFraction(0.98);
+
+						double snu = tempHardpingParticle->pAbs()/tempHardpingParticle->getHardronEnergyFraction();//todo WTF?
+						bl = snu/_kEnergyLoss;
+
+
+						formationLength = bl*tempHardpingParticle->getHardronEnergyFraction();
+
+						tempHardpingParticle->setFormationLength(formationLength);
+
+						cout<<"form lenght "<<formationLength<<endl;
+
+
+
+						z = tempHardpingParticle->getHardronEnergyFraction();
+						z2 = tempHardpingParticle->getHardronEnergyFraction()*tempHardpingParticle->getHardronEnergyFraction();
+						formationLength = (log(1/z2) - 1 + z2 )*z*bl/(1-z2);
+						cout<<"form lenght "<<formationLength<<endl;
+
+					}
+
+				}
 				if(/*pythia->event.size() != 4*/1){
 					//cout<<"here i am "<<endl;
 
