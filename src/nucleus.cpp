@@ -1290,7 +1290,7 @@ char ch;
 					//particleA->rot(0,-phi);
 					//particleA->rot(-theta,0);
 					particleA->rotateBackHardping();
-					if(0){
+					if(1){
 
 						cout<<"pxa 2= "<<particleA->p().px()<<endl;
 
@@ -1306,6 +1306,9 @@ char ch;
 					vecCoordinate = particleA->vProd();
 
 
+					vecCoordinate.pz(vecCoordinate.pz() + particleA->getFormationLength());// проверить правильно ли работает
+
+					particleA->vProd(vecCoordinate);
 
 					isScattering = pathInNucleus2(particleA,zCoordinateOfCollisions);
 
@@ -1325,7 +1328,7 @@ char ch;
 					if(_firstCall){
 						if(!isScattering)return;
 						vecCoordinate.p(particleA->vProd());
-						if(!particleA->isLepton())vecCoordinate.pz(zCoordinateOfCollisions);
+						if(!particleA->isLepton())vecCoordinate.pz(zCoordinateOfCollisions);// в случае, когда налетающая частица лептон, координата столкновения разыгрывается сразу, и ее z составляющая не меняется после вызова функции pathInNucleus2()
 						_initialParticle.vProd(vecCoordinate);
 						_initialParticle.getHistory()->clear();
 						_initialParticle.getHistory()->push_back(particleA->getHistory()->back());
@@ -1714,7 +1717,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			ss << particleA->getIdscatteringParticle()<<", ";
 			ss << particleA->e();
 			TString str = ss.str();
-
+			//cout<<"str "<<str<<endl;
 			_pythia6Event.Exec(str);
 			_pythia6File = new ifstream("/home/guest/workspace/HARDPING++/pythia6Event.txt");
 			if(_pythia6File->is_open()){

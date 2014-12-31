@@ -43,9 +43,9 @@ ofstream fileDrellYan;
 std::string outputFilename,softCollisionsNumberFilename, randomGeneratorStateFilename,impactParameterAfterFilename,impactParameterBeforeFilename, pathInNucleusFilename, coordinateSoftFilename, coordinateHardFilename, targetElementName,projectileElementName, probabilityOutputFilename, deltaPtOutputFilename;
 std::string incidentParticlePtFilename;
 int Aproj = 0, Zproj = 0, Atarg = 0, Ztarg = 0, incidentParticleId = 0;
-double initialProjectileLabMomentum = 800.;
+double initialProjectileLabMomentum = 280.;
 
-incidentParticleId = 13;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
+incidentParticleId = -13;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 
 numEvent = 100000000;
 

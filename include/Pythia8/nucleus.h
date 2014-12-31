@@ -217,7 +217,7 @@ public:
 	}
 	void rotateBackHardping(void){
 		//if(_verbose)cout<<"theta = "<<_thetaHardping<<" phi = "<<_phiHardping<<endl;
-		//set particle momentum along z' direction
+		//set particle momentum along z' direction (moving along z' direction, px = py = 0)
 		this->rot(0,-_phiHardping);
 		this->rot(-_thetaHardping,0);
 	//	rotateAroundZ(-_phiHardping);
