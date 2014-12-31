@@ -58,22 +58,30 @@ struct index {
 //Pythia* pythia;
 class hardpingParticle : public Particle{
 public:
-	hardpingParticle():Particle(0){
-		_history = NULL;
-		_hardInteraction = false;
-		_softInteraction = false;
-		_outOfNucleus = false;
-		_scatteringOnparticle = 0;
+	hardpingParticle():
+		Particle(0),
+		_transferred4Momentum(0),
+		_virtualPhotonEnergy(0),
+		_x1(0),
+		_x2(0),
+		_hardronEnergyFraction(0),
+		_motherParticleHistoryIndex(0),
+		_formationLength(0),
+		_history(0),
+		_hardInteraction(false),
+		_softInteraction(false),
+		_outOfNucleus(false),
+		_scatteringOnparticle(0),
+		_numberOfCurrentGeneration(0),
+		_indexInGeneration(0),
+		_thetaHardping(0),
+		_phiHardping(0)
+	{
 		_history = new vector <unsigned int>;
-		_numberOfCurrentGeneration = 0;
-		_indexInGeneration = 0;
-		_thetaHardping = 0;
-		_phiHardping = 0;
-		_x1 = 0;
-
-
+		_particleNucleonCrossSection = 0;
 
 	}
+	//todo Написать конструктор, копирующий hardpingParticle;
 	hardpingParticle(Particle &particle):Particle(particle){
 		_history = NULL;
 		_hardInteraction = false;
