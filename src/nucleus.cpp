@@ -623,7 +623,11 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
 	int numOfCollisions = 0;
 	int numCollisions = 0;
 //	cout<<"parA "<<particleA->vProd();
-	double crossSection1 = 10.0, crossSection2 = 10.0;
+	double hadronNucleonCrossSection = 10.0, preHadronNucleonCrossSection = 10.0;
+
+	//todo выяснить в каких случаях какие использовать сечения
+	hadronNucleonCrossSection = particleA->getHadronNucleonCrossSection();
+	preHadronNucleonCrossSection = particleA->getPreHadronNucleonCrossSection();
 	double impactParameter;
 	double path = 0.;
 	double totalPath =0;
@@ -688,7 +692,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             	if(numOfCollisions == 0){
             	//	cout<<"impactParameter "<<impactParameter<< " zCoord = "<<zCoord<<" HIPR135 = "<<HIPR135<<endl;
             	//	cout<<"huinya = "<<_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135)<<endl;
-            		 P0 = exp(-0.1*crossSection1*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135));//probability of zero scattering
+            		 P0 = exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135));//probability of zero scattering
             		 //probabilityOutput<<P0<<endl;
             		 cout.precision(16);
             		// cout<< "P01 = "<<P0<<endl;
@@ -696,7 +700,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             	}else{
            // 		cout<<"2impactParameter "<<impactParameter<< " zCoord = "<<zCoord<<" HIPR135 = "<<HIPR135<<endl;
             //		cout<<"2huinya = "<<_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135)<<endl;
-            		 P0 = exp(-0.1*crossSection2*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135));
+            		 P0 = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135));
          //   		 cout<< "P02 = "<<P0<<endl;
             		// cin>>ch;
             	}
@@ -804,14 +808,14 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             	if(/*numCollisions*/INCOLL == 0){
             //		cout<<"im in numCollisions = 0"<<endl;
 
-            		path = exp(-0.1*crossSection1*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,z)) - P0;
+            		path = exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,z)) - P0;
             		 probabilityOutput<<path<<endl;
          //   		 cout<<"path1 = "<<path<<endl;
             		 if(path< -0.1)cin>>ch;
             	//	cout<<"path = "<<path<<endl;
             	}else{
           //  		cout<<"im in numCollisions != 0"<<endl;
-            		path = exp(-0.1*crossSection2*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,z)) - P0;
+            		path = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,z)) - P0;
             		 probabilityOutput<<path<<endl;
            // 		 cout<<"path2 = "<<path<<endl;
             		 if(path< -0.1)cin>>ch;
