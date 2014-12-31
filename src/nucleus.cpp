@@ -2048,17 +2048,17 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				if(particleA->isHard() && tempHardpingParticle->isHadron()){//в случае жесткого столкновения для вторичных адронов вычисляется длина формирования и сопутствующие величины
 					if(particleA->isLepton()){
 
-						tempHardpingParticle->setHardronEnergyFraction(tempHardpingParticle->e()/particleA->getVirtualPhotonEnergy());
+						tempHardpingParticle->setHadronEnergyFraction(tempHardpingParticle->e()/particleA->getVirtualPhotonEnergy());
 
 						bl = particleA->getVirtualPhotonEnergy()/_kEnergyLoss;
 
-						formationLength = bl*tempHardpingParticle->getHardronEnergyFraction();
+						formationLength = bl*tempHardpingParticle->getHadronEnergyFraction();
 						cout<<"form lenght "<<formationLength<<endl;
 
 
 
-						z = tempHardpingParticle->getHardronEnergyFraction();
-						z2 = tempHardpingParticle->getHardronEnergyFraction()*tempHardpingParticle->getHardronEnergyFraction();
+						z = tempHardpingParticle->getHadronEnergyFraction();
+						z2 = tempHardpingParticle->getHadronEnergyFraction()*tempHardpingParticle->getHadronEnergyFraction();
 						formationLength = (log(1/z2) - 1 + z2 )*z*bl/(1-z2);
 						cout<<"form lenght "<<formationLength<<endl;
 
@@ -2078,16 +2078,16 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 						//pythia->event.at(0).m() - ECM of system
 						energyOfPartonSystemCM = sqrt(particleA->getXBjorkenProjectile()*particleA->getXBjorkenTarget()*pythia->event.at(0).m2());
 
-						tempHardpingParticle->setHardronEnergyFraction(2*tempHardpingParticle->pT()/energyOfPartonSystemCM);
+						tempHardpingParticle->setHadronEnergyFraction(2*tempHardpingParticle->pT()/energyOfPartonSystemCM);
 
 						//fix from old hardping
-						if(tempHardpingParticle->getHardronEnergyFraction() >= 1)tempHardpingParticle->setHardronEnergyFraction(0.98);
+						if(tempHardpingParticle->getHadronEnergyFraction() >= 1)tempHardpingParticle->setHadronEnergyFraction(0.98);
 
-						double snu = tempHardpingParticle->pAbs()/tempHardpingParticle->getHardronEnergyFraction();//todo WTF?
+						double snu = tempHardpingParticle->pAbs()/tempHardpingParticle->getHadronEnergyFraction();//todo WTF?
 						bl = snu/_kEnergyLoss;
 
 
-						formationLength = bl*tempHardpingParticle->getHardronEnergyFraction();
+						formationLength = bl*tempHardpingParticle->getHadronEnergyFraction();
 
 						tempHardpingParticle->setFormationLength(formationLength);
 
@@ -2095,8 +2095,8 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 
 
 
-						z = tempHardpingParticle->getHardronEnergyFraction();
-						z2 = tempHardpingParticle->getHardronEnergyFraction()*tempHardpingParticle->getHardronEnergyFraction();
+						z = tempHardpingParticle->getHadronEnergyFraction();
+						z2 = tempHardpingParticle->getHadronEnergyFraction()*tempHardpingParticle->getHadronEnergyFraction();
 						formationLength = (log(1/z2) - 1 + z2 )*z*bl/(1-z2);
 						cout<<"form lenght "<<formationLength<<endl;
 

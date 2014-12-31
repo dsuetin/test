@@ -64,7 +64,7 @@ public:
 		_virtualPhotonEnergy(0),
 		_x1(0),
 		_x2(0),
-		_hardronEnergyFraction(0),
+		_hadronEnergyFraction(0),
 		_motherParticleHistoryIndex(0),
 		_formationLength(0),
 		_history(0),
@@ -78,23 +78,82 @@ public:
 		_phiHardping(0)
 	{
 		_history = new vector <unsigned int>;
-		_particleNucleonCrossSection = 0;
+		_hadronNucleonCrossSection = 0;
+		_preHadronNucleonCrossSection = 0;
 
 	}
 	//todo Написать конструктор, копирующий hardpingParticle;
-	hardpingParticle(Particle &particle):Particle(particle){
-		_history = NULL;
-		_hardInteraction = false;
-		_softInteraction = false;
-		_outOfNucleus = false;
-		_scatteringOnparticle = 0;
+	hardpingParticle(Particle &particle):
+		Particle(particle),
+		_transferred4Momentum(0),
+		_virtualPhotonEnergy(0),
+		_x1(0),
+		_x2(0),
+		_hadronEnergyFraction(0),
+		_motherParticleHistoryIndex(0),
+		_formationLength(0),
+		_history(0),
+		_hardInteraction(false),
+		_softInteraction(false),
+		_outOfNucleus(false),
+		_scatteringOnparticle(0),
+		_numberOfCurrentGeneration(0),
+		_indexInGeneration(0),
+		_thetaHardping(0),
+		_phiHardping(0)
+	{
 		_history = new vector <unsigned int>;
-		_numberOfCurrentGeneration = 0;
-		_indexInGeneration = 0;
-		_thetaHardping = 0;
-		_phiHardping = 0;
-		_x1 = 0;
+		_hadronNucleonCrossSection = 0;
+
+		switch (this->id()) {
+				case 2212:
+
+					_hadronNucleonCrossSection = 25;
+					_preHadronNucleonCrossSection = 10;
+
+				break;
+
+				case 2112:
+					_hadronNucleonCrossSection = 25;
+					_preHadronNucleonCrossSection = 10;
+					//this->e(neutronMass);
+				break;
+
+				case 211:
+					_hadronNucleonCrossSection = 15;
+					_preHadronNucleonCrossSection = 7;
+
+				break;
+
+				case -211:
+					_hadronNucleonCrossSection = 15;
+					_preHadronNucleonCrossSection = 7;
+				break;
+
+				case 321:
+					_hadronNucleonCrossSection = 10;
+					_preHadronNucleonCrossSection = 5;
+				break;
+
+				case -321:
+					_hadronNucleonCrossSection = 10;
+					_preHadronNucleonCrossSection = 5;
+
+				break;
+
+				default:
+					_hadronNucleonCrossSection =  0;
+					_preHadronNucleonCrossSection = 0;
+				break;
+		}
+
+
+
 	}
+
+
+
+
 	//todo написать деструктор
 	vector <unsigned int> * getHistory(void){
 		return _history;
@@ -336,17 +395,24 @@ public:
 		_motherParticleHistoryIndex = index;
 	}
 
-	double getParticleNucleonCrossSection(void){
-		return _particleNucleonCrossSection;
+	double getHadronNucleonCrossSection(void){
+		return _hadronNucleonCrossSection;
 	}
-	void setParticleNucleonCrossSection(double crossSection){
-		_particleNucleonCrossSection = crossSection;
+	void setHadronParticleNucleonCrossSection(double crossSection){
+		_hadronNucleonCrossSection = crossSection;
 	}
-	double getHardronEnergyFraction(void){
-		return _hardronEnergyFraction;
+
+	double getPreHadronNucleonCrossSection(void){
+		return _preHadronNucleonCrossSection;
 	}
-	void setHardronEnergyFraction(double fraction){
-		_hardronEnergyFraction = fraction;
+	void setPreHadronNucleonCrossSection(double crossSection){
+		_preHadronNucleonCrossSection = crossSection;
+	}
+	double getHadronEnergyFraction(void){
+		return _hadronEnergyFraction;
+	}
+	void setHadronEnergyFraction(double fraction){
+		_hadronEnergyFraction = fraction;
 	}
 	double getFormationLength(void){
 		return _formationLength;
@@ -369,8 +435,9 @@ private:
 	double _virtualPhotonEnergy;
 	double _x1;
 	double _x2;
-	double _particleNucleonCrossSection;
-	double _hardronEnergyFraction;
+	double _hadronNucleonCrossSection;
+	double _preHadronNucleonCrossSection;
+	double _hadronEnergyFraction;
 	unsigned int _motherParticleHistoryIndex;
 	double _formationLength;
 	//Rndm * _random;
