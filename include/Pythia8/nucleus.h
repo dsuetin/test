@@ -420,6 +420,12 @@ public:
 	void setFormationLength(double formationLength){
 		_formationLength = formationLength;
 	}
+	double getPreHadronFormationLength(void){
+		return _preHadronFormationLength;
+	}
+	void setPreHadronFormationLength(double preHadronFormationLength){
+		_preHadronFormationLength = preHadronFormationLength;
+	}
 	//todo написать функцию, которая по индексу частицы в истории возвращала бы указатель на эту частицу.
 private:
 	vector <unsigned int> * _history;
@@ -440,6 +446,7 @@ private:
 	double _hadronEnergyFraction;
 	unsigned int _motherParticleHistoryIndex;
 	double _formationLength;
+	double _preHadronFormationLength;
 	//Rndm * _random;
 
 };

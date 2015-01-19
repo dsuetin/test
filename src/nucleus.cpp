@@ -1391,7 +1391,7 @@ char ch;
 							_outOfNucleus->push_back(*particleA);
 							// massive with index of particles which not initialize next wave
 							_indexBadInitializations->push_back(particleA->getIndexNumber());
-						}//todo may be i should add particle in _indexBadInitializations
+						}
 						continue;
 					}
 
@@ -1802,7 +1802,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			double virtualPhotonEnergyOverEnergyLoss = particleA->getVirtualPhotonEnergy()/_kEnergyLoss;
 			_pythia6File->close();
 		//	_hardInteractionCount++;
-			//cin>>ch;
+			cin>>ch;
 			return 1;
 		}
 		//pythia->settings.resetAll();
@@ -2048,6 +2048,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				double z2 = 0;
 				double z = 0;
 				double formationLength = 0;
+				double preHadronFormationLength = 0;
 				double bl = 0;
 				if(particleA->isHard() && tempHardpingParticle->isHadron()){//в случае жесткого столкновения для вторичных адронов вычисляется длина формирования и сопутствующие величины
 					if(particleA->isLepton()){
@@ -2056,18 +2057,24 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 
 						bl = particleA->getVirtualPhotonEnergy()/_kEnergyLoss;
 
-						formationLength = bl*tempHardpingParticle->getHadronEnergyFraction();
-						cout<<"form lenght "<<formationLength<<endl;
-
-
-
 						z = tempHardpingParticle->getHadronEnergyFraction();
-						z2 = tempHardpingParticle->getHadronEnergyFraction()*tempHardpingParticle->getHadronEnergyFraction();
-						formationLength = (log(1/z2) - 1 + z2 )*z*bl/(1-z2);
-						cout<<"form lenght "<<formationLength<<endl;
 
+						formationLength = bl*z;
 
 						tempHardpingParticle->setFormationLength(formationLength);
+
+						cout<<"form lenght "<<formationLength<<endl;
+
+
+
+
+						//z2 = tempHardpingParticle->getHadronEnergyFraction()*tempHardpingParticle->getHadronEnergyFraction();
+						z2 = z*z;
+						preHadronFormationLength = (log(1/z2) - 1 + z2 )*z*bl/(1-z2);
+						cout<<"form lenght "<<preHadronFormationLength<<endl;
+
+						//tempHardpingParticle->setFormationLength(formationLength);
+						tempHardpingParticle->setPreHadronFormationLength(preHadronFormationLength);
 						cin>>ch;
 					}
 					//todo проверить в случае налетающего ядра, определяется ли налетающая частица как isHardron
@@ -2090,19 +2097,21 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 						double snu = tempHardpingParticle->pAbs()/tempHardpingParticle->getHadronEnergyFraction();//todo WTF?
 						bl = snu/_kEnergyLoss;
 
+						z = tempHardpingParticle->getHadronEnergyFraction();
 
-						formationLength = bl*tempHardpingParticle->getHadronEnergyFraction();
+						formationLength = bl*z;
 
 						tempHardpingParticle->setFormationLength(formationLength);
 
 						cout<<"form lenght "<<formationLength<<endl;
 
+						z2 = z*z;
+						//z2 = tempHardpingParticle->getHadronEnergyFraction()*tempHardpingParticle->getHadronEnergyFraction();
+						preHadronFormationLength = (log(1/z2) - 1 + z2 )*z*bl/(1-z2);
 
+						tempHardpingParticle->setPreHadronFormationLength(preHadronFormationLength);
 
-						z = tempHardpingParticle->getHadronEnergyFraction();
-						z2 = tempHardpingParticle->getHadronEnergyFraction()*tempHardpingParticle->getHadronEnergyFraction();
-						formationLength = (log(1/z2) - 1 + z2 )*z*bl/(1-z2);
-						cout<<"form lenght "<<formationLength<<endl;
+						cout<<"form lenght "<<preHadronFormationLength<<endl;
 
 					}
 
