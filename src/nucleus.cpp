@@ -99,7 +99,7 @@ Hardping::Hardping(nucleus projectileNucleus,
 	   _BP (2./1.3),
 	   _BN (2./0.1),
 	  _randomSeed(19780503),
-	  _energyCut(5.),
+	  _energyCut(0.1),
 	  _firstCall(true),
 	  _isScattering(false),
 	  _kEnergyLoss(3.0),
@@ -222,7 +222,7 @@ Hardping::Hardping(hardpingParticle incidentParticle,
 	   _BP (2./1.3),
 	   _BN (2./0.1),
 	  _randomSeed(19780503),
-	  _energyCut(5.),
+	  _energyCut(0.1),
 	  _firstCall(true),
 	  _isScattering(false),
 	  _kEnergyLoss(3.0),
@@ -623,20 +623,21 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
 	int numOfCollisions = 0;
 	int numCollisions = 0;
 //	cout<<"parA "<<particleA->vProd();
-	double hadronNucleonCrossSection = 10.0, preHadronNucleonCrossSection = 10.0;
+	double hadronNucleonCrossSection = 10.0, preHadronNucleonCrossSection = 10.0, quarkNucleonCrossSection = 10.0;
 
-	//todo выяснить в каких случаях какие использовать сечения
+
 	hadronNucleonCrossSection = particleA->getHadronNucleonCrossSection();
 	preHadronNucleonCrossSection = particleA->getPreHadronNucleonCrossSection();
+	quarkNucleonCrossSection = particleA->getQuarkNucleonCrossSection();
 	double impactParameter;
 	double path = 0.;
 	double totalPath =0;
     int count = 0;
     int countInfinityLoop = 0;
     double xCoord = 0, yCoord = 0, zCoord = 0;
-    double HIPR135 = 0;
+    double integrationCoordinateBound = 0;
     char ch;
-    HIPR135 = _maxZCoordinate;
+    integrationCoordinateBound = _maxZCoordinate;
     //cout<<" HIPR135 = "<<HIPR135<<endl;
     bool isScattering = false;
 
@@ -671,7 +672,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
     double BQ=2./KQ;
     double BP=2./KP;
     double BN=2./KN;
-    double xMaxP0 = HIPR135;
+    double xMaxP0 = integrationCoordinateBound;
     double yMaxP0 = 1.;
     double P0 = 0.;
     double DIFSC = 1.;
@@ -687,12 +688,14 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
         do{
 
         	if(_verbose)cout<<" r "<<r<<" xMaxP0 = "<<xMaxP0<<" impactParameter = "<<impactParameter<<endl;
-            if ( true || zCoord < 0){
+            if (  true || zCoord < 0 ){ //todo хз какое сечение брать. скорее всего нужно брать полное
             	//cout<<"r < xMaxP0 || zCoord < 0"<<endl;
-            	if(numOfCollisions == 0){
+            	if(numOfCollisions == 0 && particleA->getPreHadronFormationLength() < integrationCoordinateBound - zCoord){//todo DY hcs,
             	//	cout<<"impactParameter "<<impactParameter<< " zCoord = "<<zCoord<<" HIPR135 = "<<HIPR135<<endl;
             	//	cout<<"huinya = "<<_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135)<<endl;
-            		 P0 = exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135));//probability of zero scattering
+            		
+                //    DP0=DEXP(-0.1D0*DSIGMAPH* TA_(DIPA(IN),DZCORD(IN),DZCORD(IN)+DFORMHOST)-0.1D0*DSIGMAH*TA_(DIPA(IN),DZCORD(IN)+DFORMHOST,HIPR1(35)))
+            		 P0 = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getPreHadronFormationLength())-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord+particleA->getPreHadronFormationLength(),integrationCoordinateBound));//probability of zero scattering
             		 //probabilityOutput<<P0<<endl;
             		 cout.precision(16);
             		// cout<< "P01 = "<<P0<<endl;
@@ -700,7 +703,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             	}else{
            // 		cout<<"2impactParameter "<<impactParameter<< " zCoord = "<<zCoord<<" HIPR135 = "<<HIPR135<<endl;
             //		cout<<"2huinya = "<<_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135)<<endl;
-            		 P0 = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135));
+            		 P0 = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,integrationCoordinateBound));
          //   		 cout<< "P02 = "<<P0<<endl;
             		// cin>>ch;
             	}
@@ -759,7 +762,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             ICOUNT = 0;
             //count = 0;
 
-            xMaxP = HIPR135;
+            xMaxP = integrationCoordinateBound;
 
            // xMaxP = -HIPR135/2.;
 
@@ -805,10 +808,11 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             	z = X;
             	ICOUNT++;
             	//count++;
-            	if(/*numCollisions*/INCOLL == 0){
+            	if(/*numCollisions*/INCOLL == 0 && particleA->getPreHadronFormationLength() < z - zCoord){
             //		cout<<"im in numCollisions = 0"<<endl;
 
-            		path = exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,z)) - P0;
+            		path = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getPreHadronFormationLength())-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord + particleA->getPreHadronFormationLength() ,z)) - P0;
+            		//DPATH=DEXP(-0.1D0*DSIGMAPH* TA_(DIPA(IN),DZCORD(IN),(DZCORD(IN)+DFORMHOST))-0.1D0*DSIGMAH*TA_(DIPA(IN),DZCORD(IN)+DFORMHOST,DZ))-DP0
             		 probabilityOutput<<path<<endl;
          //   		 cout<<"path1 = "<<path<<endl;
             		 if(path< -0.1)cin>>ch;
@@ -1149,7 +1153,7 @@ char ch;
 
 	particleA = new hardpingParticle();
 
-	if(_incidentParticle.id() == 0 ){
+	if(_incidentParticle.id() == 0 ){// слуай, когда инициализируется ядром
 
 		particleA->id(2212);
 		projectileRestMass = particleA->getRestMass();
@@ -1159,17 +1163,19 @@ char ch;
 		initialProjectile4Momentum.e(sqrt( projectileRestMass*projectileRestMass + initialProjectile4Momentum.pAbs2() ));
 
 		particleA->p(initialProjectile4Momentum);
+		_initialParticle = *particleA;
+
 	}else{
-		*particleA = _incidentParticle;
-		//todo not work add constructor in hardpingParticle
+		*particleA = _incidentParticle; // слуай, когда инициализируется частицей
+
 	}
 
 
 
-	_initialParticle = *particleA;
+
 	if(_verbose)cout<<"_maxZCoordinate = "<<_maxZCoordinate<<endl;
 
-	//todo add for _initialParticle idB
+
 	//cout<<"vec4 "<<particleA->getVector()->pz()<<" id = "<<particleA->getId()<<endl;
 	particleB = new hardpingParticle();
 
@@ -1310,7 +1316,7 @@ char ch;
 					vecCoordinate = particleA->vProd();
 
 
-					vecCoordinate.pz(vecCoordinate.pz() + particleA->getFormationLength());// проверить правильно ли работает
+					vecCoordinate.pz(vecCoordinate.pz() + particleA->getFormationLength());//todo проверить правильно ли работает
 
 					particleA->vProd(vecCoordinate);
 
@@ -1416,7 +1422,7 @@ char ch;
 					}
 					particleB->id(getIdTargetNucleon());
 
-					//справедливо только для покоящегося нуклона мишени. при учете ферми движения переделать.
+					//todo справедливо только для покоящегося нуклона мишени. при учете ферми движения переделать.
 					particleB->e(particleB->getRestMass());
 					particleA->scatteringOnParticle(particleB->id());
 
@@ -1675,8 +1681,9 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 		char ch;
 		int fff;
 		Timer time;
-		Particle partA;
+		//Particle partA;
 		Particle partB;
+		//Particle partTemp;
 	//	partA.pz(800.);
 	//	pythia->event.reset();
 		if(_verbose)cout<<"pythia->event.size() "<< pythia->event.size()<<endl;
@@ -1923,21 +1930,16 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 		//	  cout<<"_fortranHardping "<< _fortranHardping<<endl;
 			  if(_fortranHardping){
 
-					partA.p(particleA->p());
-					//partA.vProd().p(particleA->vProd());
-					partA.id(particleA->id());
-					partA.vProd(particleA->vProd());
-					//particleA->rotateBackHardping();
-					//partA.theta();
-
-					//partA.phi();
-					partA.status(1);
 
 					pythia->event.clear();//todo make in pythia standart
 					pythia->event.append(0);
-					pythia->event.append(0);
-					pythia->event.append(0);
-					fff = pythia->event.append(partA);
+					pythia->event.append(*particleA->getPythiaParticle());
+					pythia->event.append(*particleB->getPythiaParticle());
+					particleA->setPythiaParticleStatus(1);
+					fff = pythia->event.append(*particleA->getPythiaParticle());
+					particleA->setPythiaParticleStatus(0); //может быть не необходимо
+					pythia->event.list();
+					cin>>ch;
 					if(_verbose)	cout<<" pz = "<< pythia->event.at(fff).pz()<<endl;
 					if(_verbose)cout<<"pythia->event.size() ="<< pythia->event.size()<<endl;
 
@@ -2044,7 +2046,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				tempHardpingParticle->setMotherParticleHistoryIndex(particleA->getHistory()->back());// запоминаем индекс в history материнской частицы.
 				tempHardpingParticle->getHistory()->assign(particleA->getHistory()->begin(),particleA->getHistory()->end()); //копируем историю маеринской частицы
 				tempHardpingParticle->getHistory()->push_back(_indexParticle);// присваиваем индекс history данной частице.
-
+				if(particleA->isHard())tempHardpingParticle->setPreviosCollisionHard();
 				double z2 = 0;
 				double z = 0;
 				double formationLength = 0;
@@ -2094,8 +2096,8 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 						//fix from old hardping
 						if(tempHardpingParticle->getHadronEnergyFraction() >= 1)tempHardpingParticle->setHadronEnergyFraction(0.98);
 
-						double snu = tempHardpingParticle->pAbs()/tempHardpingParticle->getHadronEnergyFraction();//todo WTF?
-						bl = snu/_kEnergyLoss;
+						double virtualFotonEnergy = tempHardpingParticle->pAbs()/tempHardpingParticle->getHadronEnergyFraction();//todo WTF?
+						bl = virtualFotonEnergy/_kEnergyLoss;
 
 						z = tempHardpingParticle->getHadronEnergyFraction();
 
