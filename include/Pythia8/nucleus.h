@@ -75,8 +75,11 @@ public:
 		_numberOfCurrentGeneration(0),
 		_indexInGeneration(0),
 		_thetaHardping(0),
-		_phiHardping(0)
+		_phiHardping(0),
+		_lastHard(false)
+
 	{
+		_pythiaParticle = new Particle(0);
 		_history = new vector <unsigned int>;
 		_hadronNucleonCrossSection = 0;
 		_preHadronNucleonCrossSection = 0;
@@ -100,8 +103,11 @@ public:
 		_numberOfCurrentGeneration(0),
 		_indexInGeneration(0),
 		_thetaHardping(0),
-		_phiHardping(0)
+		_phiHardping(0),
+		_lastHard(false)
+
 	{
+		_pythiaParticle = new Particle(0);
 		_history = new vector <unsigned int>;
 		_hadronNucleonCrossSection = 0;
 
@@ -157,6 +163,16 @@ public:
 	//todo написать деструктор
 	vector <unsigned int> * getHistory(void){
 		return _history;
+	}
+	Particle* getPythiaParticle(void){
+
+		_pythiaParticle->id(this->id());
+		_pythiaParticle->p(this->p());
+		_pythiaParticle->vProd(this->vProd());
+		return _pythiaParticle;
+	}
+	void setPythiaParticleStatus(int status){
+		_pythiaParticle->status(status);
 	}
 	bool isHard(void){	return _hardInteraction;}
 	bool isSoft(void){	return _softInteraction;}
@@ -408,6 +424,12 @@ public:
 	void setPreHadronNucleonCrossSection(double crossSection){
 		_preHadronNucleonCrossSection = crossSection;
 	}
+	double getQuarkNucleonCrossSection(void){
+		return _quarkNucleonCrossSection;
+	}
+	void setQuarkNucleonCrossSection(double crossSection){
+		_quarkNucleonCrossSection = crossSection;
+	}
 	double getHadronEnergyFraction(void){
 		return _hadronEnergyFraction;
 	}
@@ -425,6 +447,12 @@ public:
 	}
 	void setPreHadronFormationLength(double preHadronFormationLength){
 		_preHadronFormationLength = preHadronFormationLength;
+	}
+	bool isPreviosCollisionHard(void){
+		return _lastHard;
+	}
+	void setPreviosCollisionHard(bool lastHard = true){
+		_lastHard = lastHard;
 	}
 	//todo написать функцию, которая по индексу частицы в истории возвращала бы указатель на эту частицу.
 private:
@@ -447,6 +475,9 @@ private:
 	unsigned int _motherParticleHistoryIndex;
 	double _formationLength;
 	double _preHadronFormationLength;
+	bool   _lastHard;
+	double _quarkNucleonCrossSection;
+	Particle* _pythiaParticle;
 	//Rndm * _random;
 
 };
