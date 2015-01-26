@@ -33,9 +33,10 @@
 
 #ifndef NUCLEUS_H
 #define NUCLEUS_H
-#define protonMass 0.93827204621
-#define neutronMass 0.93956537821
-#define muonMass 0.106
+#define protonMass   0.938272046212
+#define neutronMass  0.939565378212
+#define muonMass     0.105658371535
+#define electronMass 0.000510998928
 //#include <cmath>
 #include "Pythia.h"
 #include "timer.h"
@@ -214,6 +215,16 @@ public:
 
 		case 13:
 			return muonMass;
+
+		  break;
+
+		case -11:
+			return electronMass;
+
+		  break;
+
+		case 11:
+			return electronMass;
 
 		  break;
 
@@ -918,10 +929,12 @@ public:
 		bool isNucleon = false;
 		if(particleA->idAbs() == 2212 || particleA->idAbs() == 2112)isNucleon = true;
 		unsigned int i_init = particleA->getIndexNumber();
+		if(_verbose)cout<<" zCoordinateOfCollisions "<<zCoordinateOfCollisions<<endl;
+		if(_verbose)cout<<" current zcoord "<<particleA->vProd().pz()<<endl;
 		double	deltaPath = zCoordinateOfCollisions - particleA->vProd().pz();
 		if(particleA->vProd().pz() == -_maxZCoordinate) return 1;
 //if interaction occurred beyond boundary of nucleus hardron does not lose energy
-		pathInNucleiOutput<<deltaPath<<endl;
+		if(_verbose)cout<<deltaPath<<endl;
 		if(deltaPath > 0 && (particleA->isHadron() || isNucleon)){
 		//pathInNucleiOutput<<deltaPath<<endl;
 		double	deltaE = deltaPath*_kEnergyLoss;
@@ -977,11 +990,11 @@ public:
 		char ch;
 		//cout<<" in saveParticle4VectorsAfterEnergyLoss beagin"<<endl;
 		//cin>>ch;
-	//	cout<<"saveParticle4VectorsAfterEnergyLoss1 = "<<particleA->p();
+		if(_verbose)cout<<"saveParticle4VectorsAfterEnergyLoss1 = "<<particleA->p();
 
 		particleA->rotateHardping();
 
-	//	cout<<"saveParticle4VectorsAfterEnergyLoss2 = "<<particleA->p();
+		if(_verbose)cout<<"saveParticle4VectorsAfterEnergyLoss2 = "<<particleA->p();
 	//	cout.precision(12);
 	//	cout<<"1particleA->theta() "<<particleA->theta()<<" 1particleA->phi() "<<particleA->phi()<<endl;
 		particleA->setAngles();
@@ -1411,12 +1424,18 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 
 
 	////////// calculating impact parameter of incident particles//////////////////////////////////////////
+
+
+
 	double xImpact = 0, yImpact = 0, zCoordinate = 0;
 	if(particleA->isLepton()){
 
-		xImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
-		yImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
-		zCoordinate = gsl_ran_gaussian (gslRandomGenerator, 1);
+//		xImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
+//		yImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
+//		zCoordinate = gsl_ran_gaussian (gslRandomGenerator, 1);
+		xImpact 	= getPointOfInteraction();
+		yImpact		= getPointOfInteraction();
+		zCoordinate = getPointOfInteraction();
 	}else{
 
 		getNucleusImpactParameter(xImpact,yImpact);
@@ -1446,6 +1465,21 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 
 	//cin>>ch;
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+double getNuclearDensity(double coordinate){
+
+	return exp(-coordinate*coordinate/_r0/_r0)*_A/_r0/_r0/_r0/M_PIl/sqrt(M_PIl);
+
+}
+double getPointOfInteraction(void){
+
+	double coordinate = 0;
+	do{
+		coordinate = -_r0 + 2*getRandom()*_r0;
+	}while(getRandom() > getNuclearDensity(coordinate));
+
+	return coordinate;
 }
 void softToHard(hardpingParticle* particleA,hardpingParticle* particleB){
 	char ch;
