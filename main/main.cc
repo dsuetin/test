@@ -1,6 +1,6 @@
 #include "../include/Pythia8/Pythia.h"
 #include "../include/Pythia8/nucleus.h"
-
+#include <sstream>
 #include <fstream>
 //#include "../Pythia8/timer.h"
 #define HardQCD 1
@@ -31,30 +31,43 @@ double getFromBeFile();
  ofstream impactParameterFileBefore;
  ofstream deltaPtOutput;
  ofstream incidentParticlePt;
- const gsl_rng_type *gslRandomGeneratorType;
- gsl_rng *gslRandomGenerator;
+ //const gsl_rng_type *gslRandomGeneratorType;
+// gsl_rng *gslRandomGenerator;
 
 int main() {
 char ch;
 unsigned int numEvent = 100000000;
 Timer time2;
 time2.start();
+std::ostringstream numberToStringConverter;
 ofstream fileDrellYan;
 std::string outputFilename,softCollisionsNumberFilename, randomGeneratorStateFilename,impactParameterAfterFilename,impactParameterBeforeFilename, pathInNucleusFilename, coordinateSoftFilename, coordinateHardFilename, targetElementName,projectileElementName, probabilityOutputFilename, deltaPtOutputFilename;
 std::string incidentParticlePtFilename;
+std::string initialProjectileLabMomentumString;
 int Aproj = 0, Zproj = 0, Atarg = 0, Ztarg = 0, incidentParticleId = 0;
 double initialProjectileLabMomentum = 27.6;
 
 incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 
-numEvent = 100000000;
+numEvent = 1000;
 
 Aproj = 1;
 Zproj = 1;
+//Kr(36,84)
+//N(7,14)
+
+Atarg = 84;
+Ztarg = 36;
 
 
-Atarg = 184;
-Ztarg = 74;
+
+numberToStringConverter << initialProjectileLabMomentum;
+initialProjectileLabMomentumString = numberToStringConverter.str();
+
+
+
+
+
 /*
 TMacro m("/home/guest/programs/build/macros_/getEvent.C");
 m.Exec();
@@ -62,9 +75,9 @@ cin>>ch;
 */
 //const gsl_rng_type *gslRandomGeneratorType;
 //gsl_rng *gslRandomGenerator;
-gslRandomGeneratorType = gsl_rng_default;
-gsl_rng_env_setup ();
-gslRandomGenerator= gsl_rng_alloc (gslRandomGeneratorType);
+//gslRandomGeneratorType = gsl_rng_default;
+//gsl_rng_env_setup ();
+//gslRandomGenerator= gsl_rng_alloc (gslRandomGeneratorType);
 _randomFile.open("/home/dsuetin/workspace/Pythia8180/Debug/randomNumbersFile.txt");
 //W_File.open("/home/dsuetin/workspace/Hardping_201401/Debug/02.06.14/WnCol_fort.txt");
 W_File.open("/home/dsuetin/workspace/Hardping_newold/Debug/08.10.14/W1nCol_fort.txt");
@@ -94,6 +107,8 @@ if(incidentParticleId){
 	pythia8->event.append(newPythiaParticle);
 	incidentParticle = new hardpingParticle(pythia8->event.back());
 	incidentParticle->e(sqrt(incidentParticle->getRestMass()*incidentParticle->getRestMass() + incidentParticle->pAbs2()));
+	incidentParticle->m(incidentParticle->getRestMass());
+	cout<<"incidentParticle "<<incidentParticle->id()<<" p = "<<incidentParticle->p();
 	pythia8->event.clear();
 }else{
 	incidentParticle = new hardpingParticle();
@@ -106,8 +121,8 @@ projectileElementName = (incidentParticle->id()==0 )? projectile.getNucleusName(
 //cin>>ch;
 targetElementName = target.getNucleusName();
 
-
-outputFilename = projectileElementName + "_" + targetElementName + "_"+ "800GeV_DY_" + convertNumberOfEventsToString(numEvent) + ".txt";
+//todo написать конвертацию энергии в строку + процесс
+outputFilename = projectileElementName + "_" + targetElementName + "_"+ initialProjectileLabMomentumString+"GeV_" + convertNumberOfEventsToString(numEvent) + ".txt";
 cout<< "outputFilename is "<<outputFilename<<endl;
 //cin>>ch;
 
@@ -211,10 +226,11 @@ if(coordinateHardOutput.is_open()){
 
 		//hardping = new Hardping(projectile,target);
 		hardping = (incidentParticle->id()/*incidentParticleId*/ == 0 )? new Hardping(projectile,target) : new Hardping(*incidentParticle,target);
-		if(iop==218){
+		if(iop==21){
 			cout<<"hui";
 		}
-
+		//cout << incidentParticle->getPythiaParticle()->p();
+		//cin>>ch;
 		hardping->hardping();
 
 		if(iop%100 == 0||1)cout<<"event number "<<iop<<endl;
@@ -222,9 +238,12 @@ if(coordinateHardOutput.is_open()){
 
 		for(unsigned int ih = 0; ih < hardping->_finalState->size(); ih++){
 
-
-			fileDrellYan<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).p();
-			cout<<"in main n = "<<iop<<" "<<"id = "<<hardping->_finalState->at(ih).id()<<" "<<" isHardron "<<hardping->_finalState->at(ih).isHadron()<<hardping->_finalState->at(ih).p();
+			cout.precision(3);
+			if(1)cout<<"begin "<<endl;
+			if(hardping->_finalState->at(ih).isHadron())fileDrellYan<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<<hardping->_finalState->at(ih).p();
+			if(hardping->_finalState->at(ih).isHadron())cout<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<<hardping->_finalState->at(ih).p();
+			//cout<<"in main n = "<<iop<<" "<<"id = "<<hardping->_finalState->at(ih).id()<<" "<<" isHardron "<<hardping->_finalState->at(ih).isHadron()<<hardping->_finalState->at(ih).p();
+			if(1)cout<<"end "<<endl;
 
 		}
 
