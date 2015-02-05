@@ -114,10 +114,10 @@ Hardping::Hardping(nucleus projectileNucleus,
 	  _softToHard(false),
 	  //_initialProjectileLabMomentum(projectileNucleus.getInitialMomentum()),
 	  _energyLab(projectileNucleus.getInitialMomentum()),
-	  _hardInteractionCount(0),
-	  _softInteractionCount(0),
+	  _hardInteractionSummaryCount(0),
+	  _softInteractionSummaryCount(0),
 	  _fortranHardping(false),
-	  _verbose(1),
+	  _verbose(0),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")//,
 	 // _gslRandomGeneratorType(gsl_rng_default)
@@ -237,10 +237,10 @@ Hardping::Hardping(hardpingParticle incidentParticle,
 	  _hardInteraction(false),
 	  _softToHard(false),
 	  _energyLab(incidentParticle.getInitialProjectileLabMomentum()),
-	  _hardInteractionCount(0),
-	  _softInteractionCount(0),
+	  _hardInteractionSummaryCount(0),
+	  _softInteractionSummaryCount(0),
 	  _fortranHardping(false),
-	  _verbose(1),
+	  _verbose(0),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")
 	 // _randomFile("/home/dsuetin/workspace/Pythia8180/Debug/randomNumbersFile.txt"),
@@ -355,7 +355,7 @@ Hardping::~Hardping()
 }
 void
 Hardping::setVaribles(){
-	_softInteractionCount = 0;
+	_softInteractionSummaryCount = 0;
 	_vertexOfInteraction->resize(0);
 	_vertexOfBadHardInteraction->resize(0);
 	_indexSoftToHardBadInit->resize(0);
@@ -371,7 +371,7 @@ Hardping::setVaribles(){
 	_softInteractionFlag = false;
 	_hardInteractionFlag = false;
 	_hardInteraction = false;
-	_hardInteractionCount = 0;
+	_hardInteractionSummaryCount = 0;
 //	_softInteractionCount = 0;
 	//_softCollisionIterator. = NULL;
 	_softToHard = false;
@@ -794,7 +794,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
         	/////////////////////////////////////////////////////////////////////////////////////////////////////
         }while(/*!_isScattering && _firstCall*/0); //this condition correspond to case that collision of first incident particle happened always
 
-        if(/*_isScattering DIFSC && INOFCOLL < _targetNucleus.A() */  _isScattering && _softInteractionCount < _targetNucleus.A()){
+        if(/*_isScattering DIFSC && INOFCOLL < _targetNucleus.A() */  _isScattering && _softInteractionSummaryCount < _targetNucleus.A()){
         	//numOfCollisions++;
         	INOFCOLL++;
         	do{
@@ -1527,7 +1527,7 @@ char ch;
 						particleA->setXBjorkenProjectile(1.);//todo неправильно. переделать.
 					}
 					if(particleA->isHadron()){
-						pythiaNextFlag = pythia->next();//todo change for leptons
+						pythiaNextFlag = pythia->next();
 						particleA->setXBjorkenProjectile( pythia->info.x1());
 						particleA->setXBjorkenTarget(     pythia->info.x2());
 					}
@@ -1553,7 +1553,8 @@ char ch;
 
 
 				if(particleA->isHard()){
-					_hardInteractionCount++;
+					_hardInteractionSummaryCount++;
+					particleA->increaseHardCollisionNumber();
 					//cout<<"particleA history size = "<<particleA->getHistory()->size()<<endl;
 					if(_verbose)cout<<" particleA = "<<particleA->getHistory()->back()<<" have a hard collision "<<endl;
 
@@ -1572,7 +1573,8 @@ char ch;
 
 				}
 				if(particleA->isSoft()){
-					_softInteractionCount++;
+					particleA->increaseSoftCollisionNumber();
+					_softInteractionSummaryCount++;
 					//cout<<"particleA history size = "<<particleA->getHistory()->size()<<endl;
 					if(_verbose)cout<<" particleA = "<<particleA->getHistory()->back()<<" have a soft collision "<<endl;
 				}
@@ -1679,7 +1681,7 @@ char ch;
 	for(int i =0 ; i < _outOfNucleus->size(); i++){
 		_finalState->push_back(_outOfNucleus->at(i));
 	}
-	softCollisionsNumberOutput<<_softInteractionCount<<endl;
+	softCollisionsNumberOutput<<_softInteractionSummaryCount<<endl;
 
 
 	if(_verbose)cout<< "out of huge cycle"<<endl;
@@ -2051,6 +2053,9 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				tempHardpingParticle->setPhiHardping(particleA->getPhiHardping());
 				tempHardpingParticle->setThetaHardping(particleA->getThetaHardping());
 
+				tempHardpingParticle->setSoftCollisionNumber(particleA->getSoftCollisionNumber());
+				tempHardpingParticle->setHardCollisionNumber(particleA->getHardCollisionNumber());
+
 				if(_verbose)cout<<"before "<<tempHardpingParticle->p();
 				tempHardpingParticle->vProd(vecCoordinate);
 				tempHardpingParticle->rotateHardping();
@@ -2077,8 +2082,11 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 					if(particleA->isLepton()){
 
 						tempHardpingParticle->setVirtualPhotonEnergy(particleA->getVirtualPhotonEnergy());
-						z = tempHardpingParticle->e()/particleA->getVirtualPhotonEnergy();
-						tempHardpingParticle->setHadronEnergyFraction(z);
+						if(particleA->getVirtualPhotonEnergy() != 0){
+							z = tempHardpingParticle->e()/particleA->getVirtualPhotonEnergy();
+							tempHardpingParticle->setHadronEnergyFraction(z);
+						}
+
 						if(_verbose)cout<<" HadronEnergyFraction = "<<tempHardpingParticle->getHadronEnergyFraction()<<endl;
 						bl = particleA->getVirtualPhotonEnergy()/_kEnergyLoss;//todo узнать физический смысл bl
 						if(_verbose)cout<<" bl = "<<bl<<endl;
@@ -2140,7 +2148,18 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 
 					}
 
-				}
+				}else{ //end of if(particleA->isHard() && tempHardpingParticle->isHadron())
+
+					if(particleA->getVirtualPhotonEnergy() != 0 && tempHardpingParticle->isHadron()){
+						tempHardpingParticle->setVirtualPhotonEnergy(particleA->getVirtualPhotonEnergy());
+						z = tempHardpingParticle->e()/tempHardpingParticle->getVirtualPhotonEnergy();
+						tempHardpingParticle->setHadronEnergyFraction(z);
+						if(_verbose)cout<<" HadronEnergyFraction = "<<tempHardpingParticle->getHadronEnergyFraction()<<endl;
+					}
+				}//end of if(particleA->isHard() && tempHardpingParticle->isHadron())
+
+
+
 				if(/*pythia->event.size() != 4*/1){
 					//cout<<"here i am "<<endl;
 
@@ -2574,7 +2593,7 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 		}// end of  Drell- Yan part
 
-		if(_hardInteractionCount){
+		if(_hardInteractionSummaryCount){
 		//	softCollisionsNumberOutput<<_softInteractionCount<<endl;
 
 		//	return true;
