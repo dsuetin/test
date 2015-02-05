@@ -77,7 +77,10 @@ public:
 		_indexInGeneration(0),
 		_thetaHardping(0),
 		_phiHardping(0),
-		_lastHard(false)
+		_lastHard(false),
+		_numberOfSoftCollisions(0),
+		_numberOfHardCollisions(0)
+
 
 	{
 		_pythiaParticle = new Particle(0);
@@ -105,7 +108,9 @@ public:
 		_indexInGeneration(0),
 		_thetaHardping(0),
 		_phiHardping(0),
-		_lastHard(false)
+		_lastHard(false),
+		_numberOfSoftCollisions(0),
+		_numberOfHardCollisions(0)
 
 	{
 		_pythiaParticle = new Particle(0);
@@ -158,7 +163,10 @@ public:
 
 	}
 
-
+	~hardpingParticle(){
+	//	delete _pythiaParticle;
+	//	delete _history;
+	}
 
 
 	//todo написать деструктор
@@ -465,6 +473,30 @@ public:
 	void setPreviosCollisionHard(bool lastHard = true){
 		_lastHard = lastHard;
 	}
+	void increaseSoftCollisionNumber(void){
+		_numberOfSoftCollisions++;
+	}
+	void increaseHardCollisionNumber(void){
+		_numberOfHardCollisions++;
+	}
+	void decreaseSoftCollisionNumber(void){
+		_numberOfSoftCollisions--;
+	}
+	void decreaseHardCollisionNumber(void){
+		_numberOfHardCollisions--;
+	}
+	unsigned int getSoftCollisionNumber(void){
+		return _numberOfSoftCollisions;
+	}
+	unsigned int getHardCollisionNumber(void){
+		return _numberOfHardCollisions;
+	}
+	void setSoftCollisionNumber(unsigned int number){
+		_numberOfSoftCollisions = number;
+	}
+	void setHardCollisionNumber(unsigned int number){
+		_numberOfHardCollisions = number;
+	}
 	//todo написать функцию, которая по индексу частицы в истории возвращала бы указатель на эту частицу.
 private:
 	vector <unsigned int> * _history;
@@ -488,6 +520,8 @@ private:
 	double _preHadronFormationLength;
 	bool   _lastHard;
 	double _quarkNucleonCrossSection;
+	unsigned int _numberOfSoftCollisions;
+	unsigned int _numberOfHardCollisions;
 	Particle* _pythiaParticle;
 	//Rndm * _random;
 
@@ -523,10 +557,14 @@ public:
 					ElementName = "W";
 				  break;
 				case 1:
-					ElementName = "p";
+					if(_A == 1)	ElementName = "p";
+					if(_A == 2)ElementName = "D";
 				  break;
-				case 2:
-					ElementName = "D";
+				case 7:
+					ElementName = "N";
+					break;
+				case 36:
+				  ElementName = "Kr";
 				  break;
 				default:
 				  cout<<"Error no found such element. "<<endl;
@@ -873,7 +911,7 @@ public:
 	}
 	double getEnergy(void){return _energyLab;}
 	void deleteParticleFromSoftCollision(void){
-		if(_hardInteractionCount && _softToHard){
+		if(_hardInteractionSummaryCount && _softToHard){
 
 
 			//change 22.07.14
@@ -1286,7 +1324,7 @@ bool ifNoHardCollisionHappened(unsigned int numberOfGeneration/*, hardpingPartic
 
 //	cout<<"mat size _generations->at(numberOfGeneration-1).getMatrix()->size() = "<<_generations->at(numberOfGeneration-1).getMatrix()->size()<<" _hardInteractionCount = "<<_hardInteractionCount<<endl;
 //	cin>>ch;
-	if(_generations->at(numberOfGeneration-1).getMatrix()->size() == 0 && _hardInteractionCount == 0){
+	if(_generations->at(numberOfGeneration-1).getMatrix()->size() == 0 && _hardInteractionSummaryCount == 0){
 
 
 		if(_verbose)cout<<"_vertexOfInteraction->size() = "<<_vertexOfInteraction->size()<<" _vertexOfBadHardInteraction->size() = "<<_vertexOfBadHardInteraction->size()<<endl;
@@ -1461,7 +1499,7 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 //	cout<<" initial index particle "<<particleA->getHistory()->back()<<endl;
 	//cin>>ch;
 	_indexParticle++;
-	cout<<"gsl_ran_gaussian "<<particleA->vProd();
+	if(_verbose)cout<<"gsl_ran_gaussian "<<particleA->vProd();
 
 	//cin>>ch;
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1469,14 +1507,24 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 
 double getNuclearDensity(double coordinate){
 
-	return exp(-coordinate*coordinate/_r0/_r0)*_A/_r0/_r0/_r0/M_PIl/sqrt(M_PIl);
+
+	if(_verbose)cout.precision(12);
+	double nuclearDensity = 0;
+	double r2 = _targetNucleus.getNuclearRadius()*_targetNucleus.getNuclearRadius();
+	if(_verbose)cout<<"r2 = "<<r2<<endl;
+	double r3 = _targetNucleus.getNuclearRadius()*r2;
+	if(_verbose)cout<<"r3 = "<<r3<<endl;
+	nuclearDensity =  exp(-coordinate*coordinate/r2)*_targetNucleus.A()/r3/M_PIl/sqrt(M_PIl);
+
+	if(_verbose)cout<<"nuclearDensity = "<<nuclearDensity<<endl;
+	return nuclearDensity;
 
 }
 double getPointOfInteraction(void){
 
 	double coordinate = 0;
 	do{
-		coordinate = -_r0 + 2*getRandom()*_r0;
+		coordinate = -_targetNucleus.getNuclearRadius() + 2*getRandom()*_targetNucleus.getNuclearRadius();
 	}while(getRandom() > getNuclearDensity(coordinate));
 
 	return coordinate;
@@ -1523,6 +1571,17 @@ bool checkEnergyCut(hardpingParticle* particleA){
 			particleA->setOut();
 			//dispose momentum of particle along initial beam direction
 			particleA->rotateHardping();
+
+
+			if(particleA->getVirtualPhotonEnergy() != 0 && particleA->isHadron()){
+
+				particleA->setHadronEnergyFraction(particleA->e()/particleA->getVirtualPhotonEnergy());
+
+				if(_verbose)cout<<" HadronEnergyFraction = "<<particleA->getHadronEnergyFraction()<<endl;
+			}
+
+
+
 			// put particle in massive
 			_outOfNucleus->push_back(*particleA);
 			// massive with index of particles which not initialize next wave
@@ -1585,8 +1644,8 @@ void finalOutput(void){
 	if(_verbose)for(unsigned int iv = 0; iv < _vertexOfInteraction->size(); iv ++){
 			cout<<_vertexOfInteraction->at(iv)<<" ";
 	}
-	if(_verbose)cout<< "number of hard scattering = "<<_hardInteractionCount<<endl;
-	if(_verbose)cout<< "number of soft scattering = "<<_softInteractionCount<<endl;
+	if(_verbose)cout<< "number of hard scattering = "<<_hardInteractionSummaryCount<<endl;
+	if(_verbose)cout<< "number of soft scattering = "<<_softInteractionSummaryCount<<endl;
 }
 	void notPythiaNext(hardpingParticle* particleA){
 		if(_verbose)cout<<"in !pythiaNextFlag = "<<particleA->id()<<"  "<<particleA->p();
@@ -1665,12 +1724,12 @@ void finalOutput(void){
 	*/
 
 	int getNumberOfSoftInteraction(void){
-		return _softInteractionCount;
+		return _softInteractionSummaryCount;
 	}
 
 
 	bool   _firstCall;
-	unsigned int _softInteractionCount;
+	unsigned int _softInteractionSummaryCount;
 private:
 
 	double woodSaxonSkinDepth() const { return 0.53;  }  ///< returns surface (0.53 fm for Au)
@@ -1722,7 +1781,7 @@ private:
 	bool _softInteractionFlag;
 	bool _hardInteractionFlag;
 	bool _hardInteraction; // correspond to situation when hard collision do not occurred in regular regime of running
-	unsigned int _hardInteractionCount;
+	unsigned int _hardInteractionSummaryCount;
 	//unsigned int _softInteractionCount;
 	unsigned int _indexOfHardCollosion;
 	int _verbose;
