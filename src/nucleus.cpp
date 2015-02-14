@@ -117,7 +117,7 @@ Hardping::Hardping(nucleus projectileNucleus,
 	  _hardInteractionSummaryCount(0),
 	  _softInteractionSummaryCount(0),
 	  _fortranHardping(false),
-	  _verbose(0),
+	  _verbose(1),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")//,
 	 // _gslRandomGeneratorType(gsl_rng_default)
@@ -240,7 +240,7 @@ Hardping::Hardping(hardpingParticle incidentParticle,
 	  _hardInteractionSummaryCount(0),
 	  _softInteractionSummaryCount(0),
 	  _fortranHardping(false),
-	  _verbose(0),
+	  _verbose(1),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")
 	 // _randomFile("/home/dsuetin/workspace/Pythia8180/Debug/randomNumbersFile.txt"),
@@ -690,16 +690,16 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
         	if(_verbose)cout<<" r "<<r<<" xMaxP0 = "<<xMaxP0<<" impactParameter = "<<impactParameter<<endl;
             if (  true || zCoord < 0 ){ //todo хз какое сечение брать. скорее всего нужно брать полное
             	if(_verbose)cout<<"путь до конца ядра = "<<integrationCoordinateBound - zCoord<<endl;
-            	if(numOfCollisions == 0 && particleA->getPreHadronFormationLength() < integrationCoordinateBound - zCoord){//todo DY hcs,
+            	if(numOfCollisions == 0 && particleA->getHadronFormationLength() < integrationCoordinateBound - zCoord){//todo DY hcs,
             	//	cout<<"impactParameter "<<impactParameter<< " zCoord = "<<zCoord<<" HIPR135 = "<<HIPR135<<endl;
             	//	cout<<"huinya = "<<_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,HIPR135)<<endl;
             		
                 //    DP0=DEXP(-0.1D0*DSIGMAPH* TA_(DIPA(IN),DZCORD(IN),DZCORD(IN)+DFORMHOST)-0.1D0*DSIGMAH*TA_(DIPA(IN),DZCORD(IN)+DFORMHOST,HIPR1(35)))
-            		if(_verbose)cout<<"zCoord "<<zCoord<<" PreHadronFormationLength = "<<particleA->getPreHadronFormationLength()<<" delta "<<particleA->getPreHadronFormationLength()-zCoord<<endl;
-            		 if(_verbose)cout<<"P0 predhadron "<<exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getPreHadronFormationLength()))<<endl;
-            		 if(_verbose)cout<<"zCoord + PreHadronFormationLength "<<zCoord<<" integrationCoordinateBound = "<<particleA->getPreHadronFormationLength()<<" delta "<< integrationCoordinateBound -particleA->getPreHadronFormationLength()-zCoord<<endl;
-            		 if(_verbose)cout<<"P0 hadron "<<exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord+particleA->getPreHadronFormationLength(),integrationCoordinateBound))<<endl;
-            		 P0 = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getPreHadronFormationLength())-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord+particleA->getPreHadronFormationLength(),integrationCoordinateBound));//probability of zero scattering
+            		if(_verbose)cout<<"zCoord "<<zCoord<<" HadronFormationLength = "<<particleA->getHadronFormationLength()<<" delta "<<particleA->getHadronFormationLength()-zCoord<<endl;
+            		 if(_verbose)cout<<"P0 predhadron "<<exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getHadronFormationLength()))<<endl;
+            		 if(_verbose)cout<<"zCoord + PreHadronFormationLength "<<zCoord<<" integrationCoordinateBound = "<<particleA->getHadronFormationLength()<<" delta "<< integrationCoordinateBound -particleA->getHadronFormationLength()-zCoord<<endl;
+            		 if(_verbose)cout<<"P0 hadron "<<exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord+particleA->getHadronFormationLength(),integrationCoordinateBound))<<endl;
+            		 P0 = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getHadronFormationLength())-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord+particleA->getHadronFormationLength(),integrationCoordinateBound));//probability of zero scattering
             		 //probabilityOutput<<P0<<endl;
             		 cout.precision(16);
             		 if(_verbose)cout<< "P0 combined  = "<<P0<<endl;
@@ -813,17 +813,17 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             	z = X;
             	ICOUNT++;
             	//count++;
-            	if(/*numCollisions*/INCOLL == 0 && particleA->getPreHadronFormationLength() < z - zCoord){
+            	if(/*numCollisions*/INCOLL == 0 && particleA->getHadronFormationLength() < z - zCoord){
             //		cout<<"im in numCollisions = 0"<<endl;
-            		/*double preHardronProbabilityPart = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getPreHadronFormationLength()));
+            		/*double preHardronProbabilityPart = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getHadronFormationLength()));
             		cout<<" preHardronProbabilityPart "<<preHardronProbabilityPart<<endl;
 
-            		double hardronProbabilityPart = exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord + particleA->getPreHadronFormationLength() ,z));
+            		double hardronProbabilityPart = exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord + particleA->getHadronFormationLength() ,z));
             		cout<<" hardronProbabilityPart "<<hardronProbabilityPart<<endl;
             		double totalProbability =  hardronProbabilityPart*preHardronProbabilityPart;
             		cout<<" totalProbability "<<totalProbability<<endl;
             		cout<<" P0 "<<P0<<endl;*/
-            		path = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getPreHadronFormationLength())-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord + particleA->getPreHadronFormationLength() ,z)) - P0;
+            		path = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,particleA->getHadronFormationLength())-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord + particleA->getHadronFormationLength() ,z)) - P0;
             		//DPATH=DEXP(-0.1D0*DSIGMAPH* TA_(DIPA(IN),DZCORD(IN),(DZCORD(IN)+DFORMHOST))-0.1D0*DSIGMAH*TA_(DIPA(IN),DZCORD(IN)+DFORMHOST,DZ))-DP0
             		 probabilityOutput<<path<<endl;
          //   		 cout<<"path1 = "<<path<<endl;
@@ -1161,7 +1161,7 @@ char ch;
 	int countCut = 0;
 
 	if(_verbose)cout<<"lepton "<<_incidentParticle.isLepton()<<" id "<<_incidentParticle.id()<<" p "<<_incidentParticle.p();
-//todo нет массы покоя при инициализации.
+
 	pythia->event.clear();
 	//std::vector <int> *vectorNProducedParticles;
 
@@ -1271,7 +1271,11 @@ char ch;
 				}else{
 					particleA->setNumberOfCurrentGeneration(numberOfGeneration);
 					particleA->setInexNumber(i_init);
-					getParticleFromPreviousGeneration(particleA);
+					getParticleFromPreviousGeneration(particleA);//todo может сделать, чтобы лептоны сразу вылетали
+					if(numberOfGeneration == 2){
+						cout<<"111"<<endl;
+					}
+					if(_verbose)cout<<"getParticleFromPreviousGeneration prehadron FormationLength "<<particleA->getPreHadronFormationLength()<<endl;
 					particleA->setHard(false);
 					particleA->setSoft(false);
 					if(_verbose)cout<<"size "<<_indexBadInitializations->size()<<" generation "<<particleA->getNumberOfCurrentGeneration()-1<<" incident number "<< iMax<<endl;
@@ -1331,9 +1335,10 @@ char ch;
 
 				//	cout<<"impactMax = "<<_impactParameterMax<<" impactMin"<<_impactParameterMin<<endl;
 					vecCoordinate = particleA->vProd();
-					if(_verbose)cout<<"prehadron FormationLength "<<particleA->getPreHadronFormationLength()<<endl;
-					if(_verbose)cout<<"FormationLength "<<particleA->getFormationLength()<<endl;
-					vecCoordinate.pz(vecCoordinate.pz() + particleA->getFormationLength());//todo проверить правильно ли работает
+					if(_verbose)cout<<"NumberOfCurrentGeneration " <<particleA->getNumberOfCurrentGeneration()<<endl;
+					if(_verbose)cout<<"prehadron FormationLength "<<particleA->getPreHadronFormationLength()<<" vfe "<<particleA->getVirtualPhotonEnergy()<<endl;
+					if(_verbose)cout<<"FormationLength "<<particleA->getPreHadronFormationLength()<<endl;
+					vecCoordinate.pz(vecCoordinate.pz() + particleA->getPreHadronFormationLength());//todo проверить правильно ли работает
 					if(_verbose)cout<<"z coord before "<<particleA->vProd().pz()<<endl;
 					particleA->vProd(vecCoordinate);
 					if(_verbose)cout<<"z coord after "<<particleA->vProd().pz()<<endl;
@@ -1826,8 +1831,13 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 				cout<<"Q2 "<<particleA->getAbsQ2()<<endl;
 				cout<<"q "<<particleA->getTransferred4Momentum()<<endl;
 				cout<<"nu "<<particleA->getVirtualPhotonEnergy()<<endl;
+
 				cout<<"q "<<particleA->getTransferred4Momentum().m2Calc()<<endl;
 			//	cin>>ch;
+			}
+			if(particleA->isHadron() && particleA->getVirtualPhotonEnergy() == 0){
+				cout<<"q "<<particleA->getTransferred4Momentum()<<endl;
+				cout<<"nu "<<particleA->getVirtualPhotonEnergy()<<endl;
 			}
 			//double virtualPhotonEnergyOverEnergyLoss = particleA->getVirtualPhotonEnergy()/_kEnergyLoss;
 			_pythia6File->close();
@@ -2084,6 +2094,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 						tempHardpingParticle->setVirtualPhotonEnergy(particleA->getVirtualPhotonEnergy());
 						if(particleA->getVirtualPhotonEnergy() != 0){
 							z = tempHardpingParticle->e()/particleA->getVirtualPhotonEnergy();
+							if(z >= 1)z = 0.99; //фикс для случая когда доля импульса адрона больше единицы (происходит из-за того что энергии в сцм может быть больше из-за ненулевой массы покоя нуклона)
 							tempHardpingParticle->setHadronEnergyFraction(z);
 						}
 
@@ -2094,7 +2105,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 
 						formationLength = bl*z;
 
-						tempHardpingParticle->setFormationLength(formationLength);
+						tempHardpingParticle->setHadronFormationLength(formationLength);
 
 						if(_verbose)cout<<"form lenght "<<formationLength<<endl;
 
@@ -2103,10 +2114,21 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 
 						//z2 = tempHardpingParticle->getHadronEnergyFraction()*tempHardpingParticle->getHadronEnergyFraction();
 						z2 = z*z;
+						if (z2 == 0 || z2 > 1){
+							cout<<"z2 =  "<<z2<<endl;
+						//	cin>>ch;
+						}
 						preHadronFormationLength = (log(1/z2) - 1 + z2 )*z*bl/(1-z2);
 						if(_verbose)cout<<"form pre hardron lenght "<<preHadronFormationLength<<endl;
 
-						//tempHardpingParticle->setFormationLength(formationLength);
+
+						if (preHadronFormationLength <= 0 || preHadronFormationLength > 100){
+							cout<<"preHadronFormationLength = 0 "<<endl;
+							cout<<"z2 = 0 "<<z2<<endl;
+							cout<<"bl = 0 "<<bl<<endl;
+						//	cin>>ch;
+						}
+						//tempHardpingParticle->setHadronFormationLength(formationLength);
 						tempHardpingParticle->setPreHadronFormationLength(preHadronFormationLength);
 						//cin>>ch;
 					}
@@ -2116,7 +2138,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 
 						//pythia->info.eCM();
 						//todo непонятно в какой системе считать. в фортране используется сцм
-
+/*
 						// z = pt/pmax
 						double energyOfPartonSystemCM = 0;
 						//pythia->event.at(0).m() - ECM of system
@@ -2145,7 +2167,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 						tempHardpingParticle->setPreHadronFormationLength(preHadronFormationLength);
 
 						if(_verbose)cout<<"form lenght "<<preHadronFormationLength<<endl;
-
+*/
 					}
 
 				}else{ //end of if(particleA->isHard() && tempHardpingParticle->isHadron())
