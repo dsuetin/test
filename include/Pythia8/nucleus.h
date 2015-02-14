@@ -71,7 +71,7 @@ public:
 		_x2(0),
 		_hadronEnergyFraction(0),
 		_motherParticleHistoryIndex(0),
-		_formationLength(0),
+		_hadronFormationLength(0),
 		_history(0),
 		_hardInteraction(false),
 		_softInteraction(false),
@@ -103,7 +103,7 @@ public:
 		_x2(0),
 		_hadronEnergyFraction(0),
 		_motherParticleHistoryIndex(0),
-		_formationLength(0),
+		_hadronFormationLength(0),
 		_history(0),
 		_hardInteraction(false),
 		_softInteraction(false),
@@ -466,11 +466,11 @@ public:
 	void setHadronEnergyFraction(double fraction){
 		_hadronEnergyFraction = fraction;
 	}
-	double getFormationLength(void){
-		return _formationLength;
+	double getHadronFormationLength(void){
+		return _hadronFormationLength;
 	}
-	void setFormationLength(double formationLength){
-		_formationLength = formationLength;
+	void setHadronFormationLength(double formationLength){
+		_hadronFormationLength = formationLength;
 	}
 	double getPreHadronFormationLength(void){
 		return _preHadronFormationLength;
@@ -527,7 +527,7 @@ private:
 	double _preHadronNucleonCrossSection;
 	double _hadronEnergyFraction;
 	unsigned int _motherParticleHistoryIndex;
-	double _formationLength;
+	double _hadronFormationLength;
 	double _preHadronFormationLength;
 	bool   _lastHard;
 	double _quarkNucleonCrossSection;
