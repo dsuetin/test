@@ -37,6 +37,10 @@
 #define neutronMass  0.939565378212
 #define muonMass     0.105658371535
 #define electronMass 0.000510998928
+#define chargedPionMass 0.1395701835
+#define unchargedPionMass 0.13497666
+#define chargedKaonMass   0.49367716
+#define unchargedKaonMass 0.49761424
 //#include <cmath>
 #include "Pythia.h"
 #include "timer.h"
@@ -79,7 +83,8 @@ public:
 		_phiHardping(0),
 		_lastHard(false),
 		_numberOfSoftCollisions(0),
-		_numberOfHardCollisions(0)
+		_numberOfHardCollisions(0),
+		_preHadronFormationLength(0)
 
 
 	{
@@ -110,7 +115,8 @@ public:
 		_phiHardping(0),
 		_lastHard(false),
 		_numberOfSoftCollisions(0),
-		_numberOfHardCollisions(0)
+		_numberOfHardCollisions(0),
+		_preHadronFormationLength(0)
 
 	{
 		_pythiaParticle = new Particle(0);
@@ -206,33 +212,38 @@ public:
 	double getRestMass(void){
 
 
-		switch (this->id()) {
+		switch (abs(this->id())) {
 		case 2212:
 
 		  return protonMass;
-
 		  break;
 		case 2112:
 			return neutronMass;
 			//this->e(neutronMass);
 		  break;
-		case -13:
-			return muonMass;
-
-		  break;
-
 		case 13:
 			return muonMass;
-
 		  break;
-
-		case -11:
-			return electronMass;
-
-		  break;
-
 		case 11:
 			return electronMass;
+
+		  break;
+		case 211:
+			return chargedPionMass;
+
+		  break;
+
+		case 111:
+			return unchargedPionMass;
+
+		  break;
+
+		case 321:
+			return chargedKaonMass;
+
+		  break;
+		case 311:
+			return unchargedKaonMass;
 
 		  break;
 
@@ -962,14 +973,18 @@ public:
 		return;
 	}
 	int energyLoss(hardpingParticle* particleA, double zCoordinateOfCollisions){
+		char ch;
 		// procedure return 0 if particle is adsorbed and 1 if not
 //		zCoordinateOfCollisions - this is a coordinate of particle up to which particle loses energy
 		bool isNucleon = false;
 		if(particleA->idAbs() == 2212 || particleA->idAbs() == 2112)isNucleon = true;
 		unsigned int i_init = particleA->getIndexNumber();
+		if(_verbose)cout<<" particleA p "<<particleA->p()<<endl;
 		if(_verbose)cout<<" zCoordinateOfCollisions "<<zCoordinateOfCollisions<<endl;
 		if(_verbose)cout<<" current zcoord "<<particleA->vProd().pz()<<endl;
 		double	deltaPath = zCoordinateOfCollisions - particleA->vProd().pz();
+		Vec4 momentum4;
+		momentum4.p(particleA->p());
 		if(particleA->vProd().pz() == -_maxZCoordinate) return 1;
 //if interaction occurred beyond boundary of nucleus hardron does not lose energy
 		if(_verbose)cout<<deltaPath<<endl;
@@ -978,7 +993,7 @@ public:
 		double	deltaE = deltaPath*_kEnergyLoss;
 			if(_verbose)cout<<"zCoordinateOfCollisions = "<<zCoordinateOfCollisions<<" zCoordinateOfCollisionsTemp = "<<zCoordinateOfCollisions<<" vecCoordinate.pz() = "<<particleA->vProd().pz()<<" deltaPath  = "<<deltaPath<<endl;
 		//
-			if( particleA->e() < deltaE || (particleA->e() - deltaE)*(particleA->e() - deltaE) < particleA->m2() ){ // second condition for correct calculation particle momentum
+			if(particleA->pz()*particleA->pz() + deltaE*deltaE - 2*deltaE*particleA->e() < 0 || particleA->e() < deltaE ){ // second condition for correct calculation particle momentum
 				_indexBadInitializations->push_back(i_init);
 				if(_verbose)cout << "particle "<<particleA->getHistory()->back()<<" is adsorbed "<<endl;
 				//todo history is not initializing
@@ -987,11 +1002,27 @@ public:
 				return 0;
 				//todo think may be do not escape from cycle
 			}
-	    double	deltaP = sqrt(particleA->e()*particleA->e() - particleA->m2()) - sqrt((particleA->e() - deltaE)*(particleA->e() - deltaE)- particleA->m2());
-			if(_verbose)cout<<"deltaE = "<<deltaE<<" deltaP = "<<deltaP<<endl;
+	//
+			//   double	deltaP = sqrt(particleA->e()*particleA->e() - particleA->m2()) - sqrt((particleA->e() - deltaE)*(particleA->e() - deltaE)- particleA->m2());
+	    double	deltaP = 0;
+
+	    deltaP = particleA->pz() - sqrt(particleA->pz()*particleA->pz() + deltaE*deltaE - 2*deltaE*particleA->e() );
+	    if(_verbose)cout<<particleA->p();
+	  	if(_verbose)cout<<"deltaE = "<<deltaE<<" deltaP = "<<deltaP<<endl;
+		//	cin>>ch;
+			momentum4.e(particleA->e() - deltaE);
+			momentum4.pz(particleA->pz() - deltaP);
+			//momentum4.
+			//particleA->p(momentum4);
 			particleA->e(particleA->e() - deltaE);
 			particleA->pz(particleA->pz() - deltaP);
+			double restMass = 0;
 
+			particleA->m(restMass);
+			restMass = particleA->getRestMass();
+			particleA->m(restMass);
+			if(_verbose)cout<<"particleA->getRestMass() "<<particleA->getRestMass()<<endl;
+			if(_verbose)cout<<"particleA p = "<<particleA->p();
 		}else{
 
 			if(_verbose)	cout<<"energy lose do not occurred, deltapath = "<<deltaPath<<" id particle = "<<particleA->id()<<endl;
