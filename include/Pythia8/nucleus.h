@@ -53,6 +53,7 @@ extern ofstream deltaPtOutput;
 extern  double getRandomFromFile();
 extern  const gsl_rng_type *gslRandomGeneratorType;
 extern  gsl_rng *gslRandomGenerator;
+extern ifstream coordinateFile;
  //class Pythia8::Pythia;
 //This class holds the information for a target nucleus
 namespace Pythia8{
@@ -84,7 +85,11 @@ public:
 		_lastHard(false),
 		_numberOfSoftCollisions(0),
 		_numberOfHardCollisions(0),
-		_preHadronFormationLength(0)
+		_preHadronFormationLength(0),
+		_leftHadronFormationLength(0),
+		_leftPreHadronFormationLength(0),
+		_residualHadronFormationLength(0),
+		_totalPathInNucleus(0)
 
 
 	{
@@ -116,7 +121,11 @@ public:
 		_lastHard(false),
 		_numberOfSoftCollisions(0),
 		_numberOfHardCollisions(0),
-		_preHadronFormationLength(0)
+		_preHadronFormationLength(0),
+		_leftHadronFormationLength(0),
+		_leftPreHadronFormationLength(0),
+		_residualHadronFormationLength(0),
+		_totalPathInNucleus(0)
 
 	{
 		_pythiaParticle = new Particle(0);
@@ -137,6 +146,19 @@ public:
 					//this->e(neutronMass);
 				break;
 
+				case -2212:
+
+					_hadronNucleonCrossSection = 25;
+					_preHadronNucleonCrossSection = 10;
+
+				break;
+
+				case -2112:
+					_hadronNucleonCrossSection = 25;
+					_preHadronNucleonCrossSection = 10;
+					//this->e(neutronMass);
+				break;
+
 				case 211:
 					_hadronNucleonCrossSection = 15;
 					_preHadronNucleonCrossSection = 7;
@@ -147,7 +169,12 @@ public:
 					_hadronNucleonCrossSection = 15;
 					_preHadronNucleonCrossSection = 7;
 				break;
-
+/*
+				case 111:
+					_hadronNucleonCrossSection = 15;
+					_preHadronNucleonCrossSection = 7;
+				break;
+*/
 				case 321:
 					_hadronNucleonCrossSection = 10;
 					_preHadronNucleonCrossSection = 5;
@@ -158,10 +185,22 @@ public:
 					_preHadronNucleonCrossSection = 5;
 
 				break;
+/*				case 130:
 
+					_hadronNucleonCrossSection = 10;
+					_preHadronNucleonCrossSection = 5;
+
+				break;
+				case 3110:
+
+					_hadronNucleonCrossSection = 10;
+					_preHadronNucleonCrossSection = 5;
+
+				break;
+*/
 				default:
-					_hadronNucleonCrossSection =  0;
-					_preHadronNucleonCrossSection = 0;
+					_hadronNucleonCrossSection =  15; //_hadronNucleonCrossSection =  0;
+					_preHadronNucleonCrossSection = 10;//;/_preHadronNucleonCrossSection = 0;
 				break;
 		}
 
@@ -508,6 +547,36 @@ public:
 	void setHardCollisionNumber(unsigned int number){
 		_numberOfHardCollisions = number;
 	}
+	void setTotalPathInNucleus(double path){
+		_totalPathInNucleus = path;
+	}
+	double getTotalPathInNucleus(void){
+		return _totalPathInNucleus;
+	}
+	double getLeftHadronFormationLength(void){
+		return _leftHadronFormationLength;
+	}
+	void setLeftHadronFormationLength(double formationLength){
+		_leftHadronFormationLength = formationLength;
+	}
+	double getLeftPreHadronFormationLength(void){
+		return _leftPreHadronFormationLength;
+	}
+	void setLeftPreHadronFormationLength(double formationLength){
+		_leftPreHadronFormationLength = formationLength;
+	}
+	double getResidualHadronFormationLength(void){
+		return _residualHadronFormationLength;
+	}
+	void setResidualHadronFormationLength(double formationLength){
+		_residualHadronFormationLength = formationLength;
+	}
+	double getEnergyLoss(void){
+		return _energyLoss;
+	}
+	void setEnergyLoss(double formationLength){
+		_energyLoss = formationLength;
+	}
 	//todo написать функцию, которая по индексу частицы в истории возвращала бы указатель на эту частицу.
 private:
 	vector <unsigned int> * _history;
@@ -528,12 +597,17 @@ private:
 	double _hadronEnergyFraction;
 	unsigned int _motherParticleHistoryIndex;
 	double _hadronFormationLength;
+	double _leftHadronFormationLength;
 	double _preHadronFormationLength;
+	double _leftPreHadronFormationLength;
+	double _residualHadronFormationLength;
 	bool   _lastHard;
 	double _quarkNucleonCrossSection;
 	unsigned int _numberOfSoftCollisions;
 	unsigned int _numberOfHardCollisions;
 	Particle* _pythiaParticle;
+	double _totalPathInNucleus;
+	double _energyLoss;
 	//Rndm * _random;
 
 };
@@ -982,18 +1056,55 @@ public:
 		if(_verbose)cout<<" particleA p "<<particleA->p()<<endl;
 		if(_verbose)cout<<" zCoordinateOfCollisions "<<zCoordinateOfCollisions<<endl;
 		if(_verbose)cout<<" current zcoord "<<particleA->vProd().pz()<<endl;
-		double	deltaPath = zCoordinateOfCollisions - particleA->vProd().pz();
+
+		double passedHadronFormathionLenght = 0;
+
+		cout<<particleA->getLeftHadronFormationLength()<<endl;
+		if(particleA->getLeftHadronFormationLength() > 0 && particleA->getSoftCollisionNumber() == 0){
+			//cout<<"resid 1 "<<particleA->getResidualHadronFormationLength()<<endl;
+			// если адрон прошел путь меньший чем его длина формирования, потери энергии не происходят, так как они уже учтены в pythia
+			return 1;
+
+		}else{
+
+			cout<<"resid 2 "<<particleA->getResidualHadronFormationLength()<<endl;
+			cout<<"left 2 "<<particleA->getLeftHadronFormationLength()<<endl;
+			passedHadronFormathionLenght = particleA->getResidualHadronFormationLength();
+			passedHadronFormathionLenght =0 ;
+	    	//cin>>ch;
+		}
+
+		double	deltaPath = zCoordinateOfCollisions - particleA->vProd().pz() -passedHadronFormathionLenght;
 		Vec4 momentum4;
 		momentum4.p(particleA->p());
-		if(particleA->vProd().pz() == -_maxZCoordinate) return 1;
+		if(particleA->vProd().pz() == -_maxZCoordinate) return 1;  //todo возможно второе условие дублирует это.
+		if(particleA->getSoftCollisionNumber() == 0) return 1;
+
 //if interaction occurred beyond boundary of nucleus hardron does not lose energy
 		if(_verbose)cout<<deltaPath<<endl;
+
 		if(deltaPath > 0 && (particleA->isHadron() || isNucleon)){
-		//pathInNucleiOutput<<deltaPath<<endl;
+
+	if(zCoordinateOfCollisions == sqrt(_targetNucleus.getNuclearRadius()*_targetNucleus.getNuclearRadius() - particleA->vProd().pT2())){
+		cout<<"before "<<particleA->getTotalPathInNucleus()<<endl;
+	//	particleA->setTotalPathInNucleus(particleA->getTotalPathInNucleus()+deltaPath);// учитывается путь от последней точки мягкого соударения до вылета из ядра
+		//todo осмыслить: если раскоментировать строчку результат в 2а раза больше, если потери энергии происходят
+		cout<<"after "<<particleA->getTotalPathInNucleus()<<endl;
+	//	cin>>ch;
+	}
+	    cout<<"totalPath "<<particleA->getTotalPathInNucleus()<<endl;
+	//    cin>>ch;
+			//pathInNucleiOutput<<deltaPath<<endl;
 		double	deltaE = deltaPath*_kEnergyLoss;
-			if(_verbose)cout<<"zCoordinateOfCollisions = "<<zCoordinateOfCollisions<<" zCoordinateOfCollisionsTemp = "<<zCoordinateOfCollisions<<" vecCoordinate.pz() = "<<particleA->vProd().pz()<<" deltaPath  = "<<deltaPath<<endl;
+		//suetin debug
+
+	//	cin>>ch;
 		//
-			if(particleA->pz()*particleA->pz() + deltaE*deltaE - 2*deltaE*particleA->e() < 0 || particleA->e() < deltaE ){ // second condition for correct calculation particle momentum
+			if(_verbose)cout<<"zCoordinateOfCollisions = "<<zCoordinateOfCollisions<<" zCoordinateOfCollisionsTemp = "<<zCoordinateOfCollisions<<" vecCoordinate.pz() = "<<particleA->vProd().pz()<<" deltaPath  = "<<deltaPath<<endl;
+		//suetin debug
+			cout<<"particleA->e() - deltaE < particleA->m()"<<particleA->e() - deltaE <<" m "<<particleA->mCalc()<< endl;
+
+			if(/*particleA->pz()*particleA->pz() + deltaE*deltaE - 2*deltaE*particleA->e() < 0 ||*/ particleA->e() - deltaE < particleA->mCalc() ){ // second condition for correct calculation particle momentum
 				_indexBadInitializations->push_back(i_init);
 				if(_verbose)cout << "particle "<<particleA->getHistory()->back()<<" is adsorbed "<<endl;
 				//todo history is not initializing
@@ -1002,14 +1113,38 @@ public:
 				return 0;
 				//todo think may be do not escape from cycle
 			}
+			particleA->setEnergyLoss(deltaE + particleA->getEnergyLoss());
+			cout<<" eL "<<particleA->getEnergyLoss()<<endl;
 	//
 			//   double	deltaP = sqrt(particleA->e()*particleA->e() - particleA->m2()) - sqrt((particleA->e() - deltaE)*(particleA->e() - deltaE)- particleA->m2());
-	    double	deltaP = 0;
+			double	deltaP = 0, newAbsoluteMomentum = 0, newEnergy = 0, newPx = 0, newPy = 0, newPz = 0;
+         //   abspi=sqrt(PATT(i,1)**2+PATT(i,2)**2+PATT(i,3)**2)
+         //   PabsNew=sqrt(P4newmy**2-dmassi**2)
+         //   PATT(I,1)=PATT(I,1)*PabsNew/abspi
+         //   PATT(I,2)=PATT(I,2)*PabsNew/abspi
+         //   PATT(I,3)=PATT(I,3)*PabsNew/abspi
+         //   PATT(I,4)=P4newmy
+			newEnergy =  particleA->e() - deltaE;
+			newAbsoluteMomentum = sqrt(newEnergy*newEnergy - particleA->m2Calc());
+			newPx = particleA->px()*newAbsoluteMomentum/particleA->pAbs();
+			newPy = particleA->py()*newAbsoluteMomentum/particleA->pAbs();
+			newPz = particleA->pz()*newAbsoluteMomentum/particleA->pAbs();
 
-	    deltaP = particleA->pz() - sqrt(particleA->pz()*particleA->pz() + deltaE*deltaE - 2*deltaE*particleA->e() );
-	    if(_verbose)cout<<particleA->p();
-	  	if(_verbose)cout<<"deltaE = "<<deltaE<<" deltaP = "<<deltaP<<endl;
+			cout<<"m1 "<<particleA->mCalc()<<" p1 = "<<particleA->p()<<endl;
+
+			particleA->e(newEnergy);
+			particleA->px(newPx);
+			particleA->py(newPy);
+			particleA->pz(newPz);
+
+			cout<<"m "<<particleA->m2()<<" p = "<<particleA->p()<<endl;
 		//	cin>>ch;
+			//suetin debug
+			/*
+			deltaP = particleA->pz() - sqrt(particleA->pz()*particleA->pz() + deltaE*deltaE - 2*deltaE*particleA->e() );
+	    	if(_verbose)cout<<particleA->p();
+	    	if(_verbose)cout<<"deltaE = "<<deltaE<<" deltaP = "<<deltaP<<endl;
+	    	//	cin>>ch;
 			momentum4.e(particleA->e() - deltaE);
 			momentum4.pz(particleA->pz() - deltaP);
 			//momentum4.
@@ -1023,6 +1158,8 @@ public:
 			particleA->m(restMass);
 			if(_verbose)cout<<"particleA->getRestMass() "<<particleA->getRestMass()<<endl;
 			if(_verbose)cout<<"particleA p = "<<particleA->p();
+			*/
+
 		}else{
 
 			if(_verbose)	cout<<"energy lose do not occurred, deltapath = "<<deltaPath<<" id particle = "<<particleA->id()<<endl;
@@ -1060,8 +1197,8 @@ public:
 		//cout<<" in saveParticle4VectorsAfterEnergyLoss beagin"<<endl;
 		//cin>>ch;
 		if(_verbose)cout<<"saveParticle4VectorsAfterEnergyLoss1 = "<<particleA->p();
-
-		particleA->rotateHardping();
+//todo suetin debug
+	//	particleA->rotateHardping();
 
 		if(_verbose)cout<<"saveParticle4VectorsAfterEnergyLoss2 = "<<particleA->p();
 	//	cout.precision(12);
@@ -1258,7 +1395,7 @@ double getQ2LeptonHadron(pythia6Event* py6Ev){
 		deltaLeptonP = py6Ev->pythia6Particle->at(0).p() - py6Ev->pythia6Particle->at(py6Ev->leptonPosition->at(0)).p();
 
 		double nu = 0; //energy of virtual photon
-		nu = (deltaLeptonP * py6Ev->pythia6Particle->at(1).p())/py6Ev->pythia6Particle->at(1).m();
+		nu = (deltaLeptonP * py6Ev->pythia6Particle->at(1).p())/py6Ev->pythia6Particle->at(1).mCalc();
 
 		Q2 = deltaLeptonP*deltaLeptonP;
 
@@ -1496,15 +1633,29 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 
 
 
-	double xImpact = 0, yImpact = 0, zCoordinate = 0;
+	double xImpact = 0, yImpact = 0, zCoordinate = 0, impact = 0, phi = 0;
+	double maxHalfPathInNucleus = 0;
+	double R = 0;
 	if(particleA->isLepton()){
 
+
+		R = _targetNucleus.getNuclearRadius();
 //		xImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
 //		yImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
 //		zCoordinate = gsl_ran_gaussian (gslRandomGenerator, 1);
-		xImpact 	= getPointOfInteraction();
-		yImpact		= getPointOfInteraction();
-		zCoordinate = getPointOfInteraction();
+		phi = 2* M_PIl * getRandom();
+		//impact 	= getNewImpact();
+		impact = getImpactParameter();
+		xImpact  =  impact*sin(phi);//getPointOfInteraction();//impact*sin(phi);
+		yImpact	 =  impact*cos(phi);//getPointOfInteraction();//impact*cos(phi);
+	//	DHALFMAXPATH=SQRT((R**(2.0D0))-((DIPA(ili))**(2.0D0)))
+		maxHalfPathInNucleus = sqrt(R*R - impact*impact);
+
+		zCoordinate = -maxHalfPathInNucleus + 2*maxHalfPathInNucleus*getRandom();//getPointOfInteraction();
+
+	//	xImpact = getPointOfInteraction();
+	//	yImpact	= getPointOfInteraction();
+	//	zCoordinate	= getPointOfInteraction();
 	}else{
 
 		getNucleusImpactParameter(xImpact,yImpact);
@@ -1515,10 +1666,16 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 	//////////end of calculating impact parameter of incident particles//////////////////////////////////////////
 
 	/////// set coordinate of incident particle////////////////////////////////////
-
+//	coordinateFile>>xImpact>>yImpact>>zCoordinate;
+// 	cout<<"coord23 "<<xImpact<<" "<<yImpact<<" "<<zCoordinate<<endl;
+// 	cin>>ch;
 	vecCoordinate.px(xImpact);
 	vecCoordinate.py(yImpact);
-	vecCoordinate.pz(zCoordinate);
+	vecCoordinate.pz(zCoordinate); //todo suetin debug
+/*  		vecCoordinate.px(0.);
+		vecCoordinate.py(0);
+		vecCoordinate.pz(0.5);
+*/
 	particleA->vProd(vecCoordinate);
 
 	//////// end of set coordinate of incident particle ////////////////////
@@ -1551,14 +1708,89 @@ double getNuclearDensity(double coordinate){
 	return nuclearDensity;
 
 }
+double myGausLeft(double x){
+	double sigma =  1.49316;
+	double mean = -1.89812;
+	double constant = 0.0862204;
+
+	return 1.57*constant/sigma*exp(-(x - mean)*(x - mean)/2./sigma/sigma);
+
+
+}
+double myGausRight(double x){
+	double sigma =  1.95555;
+	double mean = 0.948823;
+	double constant = 0.0434087;
+	return 1.95*constant/sigma*exp(-(x - mean)*(x - mean)/2./sigma/sigma);
+
+
+}
 double getPointOfInteraction(void){
 
 	double coordinate = 0;
+	double myGaus = 0;
+		//			suetin debug
 	do{
 		coordinate = -_targetNucleus.getNuclearRadius() + 2*getRandom()*_targetNucleus.getNuclearRadius();
-	}while(getRandom() > getNuclearDensity(coordinate));
+	}while(getRandom() > getNuclearDensity(coordinate));// todo отнормировать все по y
+
+
+/*
+	do{
+		coordinate = -_targetNucleus.getNuclearRadius() + 2*getRandom()*_targetNucleus.getNuclearRadius();
+		(coordinate < 0)? myGaus = myGausLeft(coordinate) : myGaus = myGausRight(coordinate);  //fortran harping impactParameter for Kr
+	}while(0.09*getRandom() > myGaus);
+*/
 
 	return coordinate;
+}
+
+double getNewImpact(void){
+
+	double coordinate = 0;
+	double probability = 0;
+
+	double p0 = 0;
+	double p1 = 0;
+	double p2 = 0;
+	double p3 = 0;
+	double p4 = 0;
+	double p5 = 0;
+	double p6 = 0;
+	double p7 = 0;
+	double p8 = 0;
+	double p9 = 0;
+//	double random = 0;
+	p0 = 0.00130852;
+	p1 = 0.0114604;
+	p2 = 0.0277417;
+	p3 = -0.0140817;
+	p4 = 0.0019539;
+	p5 = 0.000102176;
+	p6 = -5.81069*pow(10,-5);
+	p7 = 6.73422*pow(10,-6);
+	p8 = -3.47855*pow(10,-7);
+	p9 = 6.98531*pow(10,-9);
+	do{
+		coordinate = 11.*getRandom();
+		probability = p9*pow(coordinate,9) + p8*pow(coordinate,8) + p7*pow(coordinate,7) + p6*pow(coordinate,6) + p5*pow(coordinate,5) + p4*pow(coordinate,4) + p3*pow(coordinate,3) +p2*pow(coordinate,2) + p1*coordinate + p0;
+		//coordinate = -_targetNucleus.getNuclearRadius() + 2*getRandom()*_targetNucleus.getNuclearRadius();
+		//(coordinate < 0)? myGaus = myGausLeft(coordinate) : myGaus = myGausRight(coordinate);  //fortran harping impactParameter for Kr
+	}while(0.06*getRandom() > probability);
+
+/*	do{
+		coordinate = -_targetNucleus.getNuclearRadius() + 2*getRandom()*_targetNucleus.getNuclearRadius();
+		(coordinate < 0)? myGaus = myGausLeft(coordinate) : myGaus = myGausRight(coordinate);  //fortran harping impactParameter for Kr
+	}while(0.09*getRandom() > myGaus);
+*/
+
+	return coordinate;
+}
+double getImpactParameter(void){
+	double R = _targetNucleus.getNuclearRadius();
+	double impact = 0;
+	impact = -R + 2*R*getRandom();
+	return impact;
 }
 void softToHard(hardpingParticle* particleA,hardpingParticle* particleB){
 	char ch;
@@ -1588,20 +1820,23 @@ bool checkEnergyCut(hardpingParticle* particleA){
 	// if particle set out of nucleus put her into energy cut massive,
 	// if not decrease her energy correspond to residual path in nucleus.
 	// if energy became bellow zero or equal assume that particle is adsorbed if not add her into energy cut massive.
-
+	double tempLenght = 0;//todo change a name
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//part for particles which can't initialize new event. for this particles - if z coordinate position more that nuclear radius assumed that particle set out of nucleus
 	//	else we propose particle propagates in nuclear matter along the z direction and keeps losing energy until it reaches the boundary of nucleus (i.e. nuclear radius).
 	bool isNotAdsorbed = true;
 	if(particleA->e() < _energyCut){
-
-		isNotAdsorbed = energyLoss(particleA,_targetNucleus.getNuclearRadius());
+		tempLenght = sqrt(_targetNucleus.getNuclearRadius()*_targetNucleus.getNuclearRadius() - particleA->vProd().pT2());
+		//suetin debug
+		isNotAdsorbed = energyLoss(particleA,tempLenght);
+		//isNotAdsorbed = 1;
 		// isNotAdsorbed = 0 - particle is adsorbed
 		// isNotAdsorbed = 1 - all right
 		if(isNotAdsorbed){
 			particleA->setOut();
 			//dispose momentum of particle along initial beam direction
-			particleA->rotateHardping();
+			//suetin debug
+			//particleA->rotateHardping();
 
 
 			if(particleA->getVirtualPhotonEnergy() != 0 && particleA->isHadron()){
@@ -1703,14 +1938,17 @@ void finalOutput(void){
 			if(_verbose)cout<<"1after particleA->isHadron() = "<<particleA->p();
 
 		//	cin>>lll;
-
-			isNotAdsorbed = energyLoss(particleA,_targetNucleus.getNuclearRadius());
+			//suetin debug
+			double tempLenght = sqrt(_targetNucleus.getNuclearRadius()*_targetNucleus.getNuclearRadius() - particleA->vProd().pT2());
+			//isNotAdsorbed = energyLoss(particleA, tempLenght);
+			isNotAdsorbed = 1;
 			// isNotAdsorbed = 0 - particle is adsorbed
 			// isNotAdsorbed = 1 - all right
 			if(isNotAdsorbed){
 				particleA->setOut();
 				//dispose momentum of particle along initial beam direction
-				particleA->rotateHardping();
+				//suetin debug
+				//particleA->rotateHardping();
 			}else{return;}
 		}// end of if(numberOfGeneration && particleA->isHadron())
 		// put particle in massive
@@ -1761,6 +1999,9 @@ void finalOutput(void){
 
 	bool   _firstCall;
 	unsigned int _softInteractionSummaryCount;
+	double getMaxZCoordinate(){
+		return _maxZCoordinate;
+	}
 private:
 
 	double woodSaxonSkinDepth() const { return 0.53;  }  ///< returns surface (0.53 fm for Au)
