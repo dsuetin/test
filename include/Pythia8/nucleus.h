@@ -82,6 +82,8 @@ public:
 		_indexInGeneration(0),
 		_thetaHardping(0),
 		_phiHardping(0),
+		_thetaHardping2(0),
+		_phiHardping2(0),
 		_lastHard(false),
 		_numberOfSoftCollisions(0),
 		_numberOfHardCollisions(0),
@@ -89,7 +91,11 @@ public:
 		_leftHadronFormationLength(0),
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
-		_totalPathInNucleus(0)
+		_totalPathInNucleus(0),
+		  _sinY1(0),
+		  _cosY1(0),
+		  _sinX2(0),
+		  _cosX2(0)
 
 
 	{
@@ -118,6 +124,8 @@ public:
 		_indexInGeneration(0),
 		_thetaHardping(0),
 		_phiHardping(0),
+		_thetaHardping2(0),
+		_phiHardping2(0),
 		_lastHard(false),
 		_numberOfSoftCollisions(0),
 		_numberOfHardCollisions(0),
@@ -125,7 +133,11 @@ public:
 		_leftHadronFormationLength(0),
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
-		_totalPathInNucleus(0)
+		_totalPathInNucleus(0),
+		  _sinY1(0),
+		  _cosY1(0),
+		  _sinX2(0),
+		  _cosX2(0)
 
 	{
 		_pythiaParticle = new Particle(0);
@@ -242,6 +254,12 @@ public:
 	void setPhiHardping(double phi){_phiHardping = phi;}
 	double getThetaHardping(){return _thetaHardping;}
 	double getPhiHardping(){return _phiHardping;}
+
+	void setThetaHardping2(double theta){_thetaHardping2 = theta;}
+	void setPhiHardping2(double phi){_phiHardping2 = phi;}
+	double getThetaHardping2(){return _thetaHardping2;}
+	double getPhiHardping2(){return _phiHardping2;}
+
 	void setInitialProjectileLabMomentum(double initialProjectileLabMomentum){
 		this->pz(initialProjectileLabMomentum);
 	}
@@ -326,11 +344,14 @@ public:
 	}
 
 	void setAngles(void){
-		_thetaHardping = this->theta();
-		_phiHardping = this->phi();
+
+
+	//	_thetaHardping = this->theta();
+	//	_phiHardping = this->phi();
+
 		char ch;
-/*
-		_thetaHardping = acos(this->pz()/this->pAbs());
+
+/*		_thetaHardping = acos(this->pz()/this->pAbs());
 		if(this->pT() == 0){
 			_phiHardping = 0;
 		}else{
@@ -339,7 +360,7 @@ public:
 		//	cout<<"asin phi"<<asin(this->px()/this->pT())+M_PIl<<endl;
 		}
 */
-	/*	cout.precision(18);
+		/*	cout.precision(18);
 		cout<<"this->theta() = "<<this->theta()<<" this->phi() = "<<this->phi()<<endl;
 		cout<<"thetaHardping = "<<_thetaHardping<<" phi = "<<_phiHardping<<endl;
 		cout<<"sin1 "<<sin(this->phi())<<" sin2 "<<sin(_phiHardping+M_PIl/2.)<<endl;
@@ -348,21 +369,206 @@ public:
 		cout<<"tsin1 "<<sin(this->theta())<<" tsin2 "<<sin(_thetaHardping)<<endl;
 		cout<<"tcos1 "<<cos(this->theta())<<" tcos2 "<<cos(_thetaHardping)<<endl;
 	*/	//cin>>ch;
+		//double sinY1, cosY1, sinX2, cosX2;
+		//double px,py,pz, px1,py1,pz1,px2,py2,pz2;
+		double x,y,z, x1,y1,z1,x2,y2,z2;
+
+		double px,py,pz, px1,py1,pz1,px2,py2,pz2;
+		double sinY1, cosY1, sinX2, cosX2;
+		px = this->px();
+		py = this->py();
+		pz = this->pz();
+		sinY1 = px/sqrt(px*px+pz*pz);
+		cosY1 = pz/sqrt(px*px+pz*pz);
+
+		_phiHardping = asin(sinY1);
+		double P,R;
+		P = sqrt(pz*pz+py*py+px*px);
+		cout.precision(12);
+		sinX2 = -py/P;
+		cosX2 = sqrt(px*px+pz*pz)/P;
+		_thetaHardping = asin(sinX2);
+		setTrigonometricFunctions(sinY1,cosY1,sinX2,cosX2);
+		 cout<<"_phiHardping "<<_phiHardping<<" _thetaHardping "<<_thetaHardping<<endl;
+		 cout<<"_phi "<<this->phi()<<" _theta "<<this->theta()<<endl;
+
+
+		 cout<<"sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
+		 		cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
+		 		cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
+		 		px1 = px*cosY1 - pz*sinY1;
+		 		py1 = py;
+		 		pz1 = px*sinY1 + pz*cosY1;
+
+		 		x1  =  x*cosY1  - z*sinY1;
+		 		y1  =  y;
+		 		z1  =  x*sinY1  + z*cosY1;
+
+		 		cout<<"px1 = "<<px1<<" py1 = "<<py1<<" pz1 = "<<pz1<<endl;
+		 		cout<<"x1 = "<<x1<<" y1 = "<<y1<<" z1 = "<<z1<<endl;
+
+		 		px2 = px1;
+		 		py2 = py1*cosX2  + pz1*sinX2;
+		 		pz2 = -py1*sinX2 + pz1*cosX2;
+
+		 		x2  = x1;
+		 		y2  = y1*cosX2  + z1*sinX2;
+		 		z2  = -y1*sinX2 + z1*cosX2;
+		  //       DX03=DX02
+		  //       DY03=DY02*DCOSX2+DZ02*DSINX2
+		  //       DZ03=-DY02*DSINX2+DZ02*DCOSX2
+		 		cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
+		 		cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
 
 	}
+	void setAngles(double sinPhi,double cosPhi,double sinTheta,double cosTheta){
+		_sinPhi   = sinPhi;
+		_cosPhi   = cosPhi;
+		_sinTheta = sinTheta;
+		_cosTheta = cosTheta;
+	}
+	void getAngles(double &sinPhi,double &cosPhi,double &sinTheta,double &cosTheta){
+		sinPhi   = _sinPhi;
+		cosPhi   = _cosPhi;
+		sinTheta = _sinTheta;
+		cosTheta = _cosTheta;
+	}
+	void setTrigonometricFunctions(double sinY1,double cosY1,double sinX2,double cosX2){
+		_sinY1 = sinY1;
+		_cosY1 = cosY1;
+		_sinX2 = sinX2;
+		_cosX2 = cosX2;
+	}
+
+	void getTrigonometricFunctions(double &sinY1,double &cosY1,double &sinX2,double &cosX2){
+		sinY1   = _sinY1;
+		cosY1   = _cosY1;
+		sinX2   = _sinX2;
+		cosX2   = _cosX2;
+	}
+	void setAngles2(void){
+
+
+		//	_thetaHardping = this->theta();
+		//	_phiHardping = this->phi();
+			char ch;
+
+			double px,py,pz, px1,py1,pz1,px2,py2,pz2;
+
+			double cosPhi = 0;
+			double sinPhi = 0;
+			double sinTheta = 0;
+			double cosTheta = 0;
+			px = this->px();
+			py = this->py();
+			pz = this->pz();
+
+			double absoluteNucleonMomentum = 0;
+			absoluteNucleonMomentum = this->pAbs();
+
+			if(px == 0 && py == 0){
+				cosPhi = 1;
+				sinPhi = 0;
+			}else{
+				 cosPhi = py/sqrt(px*px+py*py);
+				 sinPhi = px/sqrt(px*px+py*py);
+			}
+
+			 sinTheta = sqrt(px*px+py*py)/absoluteNucleonMomentum;
+			 cosTheta = pz/absoluteNucleonMomentum;
+
+			 setAngles(sinPhi,cosPhi,sinTheta,cosTheta);
+
+			 _phiHardping2 = asin(sinPhi);
+			 _thetaHardping2 = asin(sinTheta);
+			 cout<<"_phiHardping2 "<<_phiHardping2<<" _thetaHardping2 "<<_thetaHardping2<<endl;
+			 cout<<"_phi2 "<<this->phi()<<" _theta2 "<<this->theta()<<endl;
+
+		}
+
 	void rotateHardping(void){
 		//if(_verbose)cout<<"thetaHardping = "<<_thetaHardping<<" phi = "<<_phiHardping<<endl;
 		//dispose momentum of particle along initial beam direction
+		char ch;
+	/*
 		this->rot(_thetaHardping,0);
 		this->rot(0,_phiHardping);
+
+	*/
+		double sinY1, cosY1, sinX2, cosX2;
+		double px,py,pz, px1,py1,pz1,px2,py2,pz2;
+		double x,y,z, x1,y1,z1,x2,y2,z2;
+ 		px = this->px();
+		py = this->py();
+		pz = this->pz();
+
+ 		x = this->vProd().px();
+ 		y = this->vProd().py();
+ 		z = this->vProd().pz();
+
+		sinY1 = px/sqrt(px*px+pz*pz);
+		cosY1 = pz/sqrt(px*px+pz*pz);
+		double P,R;
+		P = sqrt(pz*pz+py*py+px*px);
+		cout.precision(12);
+		sinX2 = -py/P;
+		cosX2 = sqrt(px*px+pz*pz)/P;
+
+
+/*
+		sinY1 = sin(_phiHardping);
+		cosY1 = cos(_phiHardping);
+		sinX2 = sin(_thetaHardping);
+		cosX2 = cos(_thetaHardping);*/
+		getTrigonometricFunctions(sinY1,cosY1, sinX2,cosX2);
+		cout<<"111sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
+		cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
+		cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
+		//cin>>ch;
+		px1 = px;
+		py1 = py*cosX2 - pz*sinX2;
+		pz1 = py*sinX2 + pz*cosX2;
+
+		x1  = x;
+		y1  = y*cosX2  - z*sinX2;
+		z1  = y*sinX2  + z*cosX2;
+
+		cout<<"px1 = "<<px1<<" py1 = "<<py1<<" pz1 = "<<pz1<<endl;
+		cout<<"x1 = "<<x<<" y1 = "<<y1<<" z1 = "<<z1<<endl;
+
+		px2 = px1*cosY1 + pz1*sinY1;
+		py2 = py1;
+		pz2 = -px1*sinY1 + pz1*cosY1;
+
+		x2  = x1*cosY1 + z1*sinY1;
+		y2  = y1;
+		z2  = -x1*sinY1 + z1*cosY1;
+		cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
+		cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
+		this->px(px2);
+		this->py(py2);
+		this->pz(pz2);
+ //		this->vProd().px(x2);
+// 		this->vProd().py(y2);
+// 		this->vProd().pz(z2);
+
+		Vec4 vector4(x2,y2,z2,0);
+		this->vProd(vector4);
+
+ 		cout<<"x3 = "<<this->vProd().px()<<" y3 = "<<this->vProd().py()<<" z3 = "<<this->vProd().pz()<<endl;
+//		cin>>ch;
 	//	cout<<"_thetaHardping = "<<_thetaHardping<<endl;
 	//	cout<<"_phiHardping = "<<_phiHardping<<endl;
 		//this->p().rotHardpingTest(_thetaHardping,0);
 		//this->p().rotHardpingTest(0,_phiHardping);
 	//	cout<<"0 rotation "<<this->p();
-		//rotateAroundX(_thetaHardping);
+
+
+	//	rotateAroundX(_thetaHardping);
 	//	cout<<"1 rotation "<<this->p();
-		//rotateAroundZ(_phiHardping);
+	//	rotateAroundZ(_phiHardping);
+
+
 	//	cout<<"2 rotation "<<this->p();
 	//	this->rot(0,_thetaHardping);
 	//	this->rot(_phiHardping,0);
@@ -370,16 +576,85 @@ public:
 	void rotateBackHardping(void){
 		//if(_verbose)cout<<"theta = "<<_thetaHardping<<" phi = "<<_phiHardping<<endl;
 		//set particle momentum along z' direction (moving along z' direction, px = py = 0)
-		this->rot(0,-_phiHardping);
-		this->rot(-_thetaHardping,0);
+		char ch;
+	//	this->rot(0,-_phiHardping);
+
+	//	this->rot(-_thetaHardping,0);
+
+
+		//cout<<"0 rotation "<<this->p();
+	//	rotateAroundX(_thetaHardping);
+
+		//cout<<"1 rotation "<<this->p();
 	//	rotateAroundZ(-_phiHardping);
-	//	rotateAroundX(-_thetaHardping);
+		//this->setAngles();
+		//cout<<"2 rotation "<<this->p();
+		double sinY1, cosY1, sinX2, cosX2;
+		double px,py,pz, px1,py1,pz1,px2,py2,pz2;
+		double x,y,z, x1,y1,z1,x2,y2,z2;
 
-		//this->p().rotHardpingTest(0,-_phiHardping);
-		//this->p().rotHardpingTest(-_thetaHardping,0);
+ 		px = this->px();
+		py = this->py();
+		pz = this->pz();
 
-//		this->rot(-_phiHardping,0);
-//		this->rot(0,-_thetaHardping);
+ 		x = this->vProd().px();
+ 		y = this->vProd().py();
+ 		z = this->vProd().pz();
+		sinY1 = px/sqrt(px*px+pz*pz);
+		cosY1 = pz/sqrt(px*px+pz*pz);
+		double P,R;
+		P = sqrt(pz*pz+py*py+px*px);
+		cout.precision(12);
+		sinX2 = -py/P;
+		cosX2 = sqrt(px*px+pz*pz)/P;
+
+/*
+		sinY1 = sin(_phiHardping);
+		cosY1 = cos(_phiHardping);
+		sinX2 = sin(_thetaHardping);
+		cosX2 = cos(_thetaHardping);
+*/
+		getTrigonometricFunctions(sinY1,cosY1, sinX2,cosX2);
+
+		cout<<"sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
+	//	cin>>ch;
+		 cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
+		cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
+		px1 = px*cosY1 - pz*sinY1;
+		py1 = py;
+		pz1 = px*sinY1 + pz*cosY1;
+
+		x1  =  x*cosY1  - z*sinY1;
+		y1  =  y;
+		z1  =  x*sinY1  + z*cosY1;
+
+		cout<<"px1 = "<<px1<<" py1 = "<<py1<<" pz1 = "<<pz1<<endl;
+		cout<<"x1 = "<<x1<<" y1 = "<<y1<<" z1 = "<<z1<<endl;
+
+		px2 = px1;
+		py2 = py1*cosX2  + pz1*sinX2;
+		pz2 = -py1*sinX2 + pz1*cosX2;
+
+		x2  = x1;
+		y2  = y1*cosX2  + z1*sinX2;
+		z2  = -y1*sinX2 + z1*cosX2;
+ //       DX03=DX02
+ //       DY03=DY02*DCOSX2+DZ02*DSINX2
+ //       DZ03=-DY02*DSINX2+DZ02*DCOSX2
+		cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
+		cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
+		this->px(px2);
+		this->py(py2);
+		this->pz(pz2);
+		Vec4 vector4(x2,y2,z2,0);
+		this->vProd(vector4);
+ 		//this->vProd().px(x2);
+ 		//this->vProd().py(y2);
+ 		//this->vProd().pz(z2);
+ 		cout<<"x3 = "<<this->vProd().px()<<" y3 = "<<this->vProd().py()<<" z3 = "<<this->vProd().pz()<<endl;
+	//	cin>>ch;
+
+
 
 	}
 
@@ -586,6 +861,8 @@ private:
 	int _scatteringOnparticle;
 	double _thetaHardping;
 	double _phiHardping;
+	double _thetaHardping2;
+	double _phiHardping2;
 	unsigned int _indexInGeneration;// i_init - index number of particle in current generation
 	unsigned int _numberOfCurrentGeneration;
 	Vec4 _transferred4Momentum;
@@ -608,6 +885,12 @@ private:
 	Particle* _pythiaParticle;
 	double _totalPathInNucleus;
 	double _energyLoss;
+	double _cosTheta;
+	double _sinTheta;
+	double _cosPhi;
+	double _sinPhi;
+
+	double _sinY1, _cosY1, _sinX2, _cosX2;
 	//Rndm * _random;
 
 };
@@ -1198,12 +1481,12 @@ public:
 		//cin>>ch;
 		if(_verbose)cout<<"saveParticle4VectorsAfterEnergyLoss1 = "<<particleA->p();
 //todo suetin debug
-	//	particleA->rotateHardping();
+	 	particleA->rotateHardping();
 
 		if(_verbose)cout<<"saveParticle4VectorsAfterEnergyLoss2 = "<<particleA->p();
 	//	cout.precision(12);
 	//	cout<<"1particleA->theta() "<<particleA->theta()<<" 1particleA->phi() "<<particleA->phi()<<endl;
-		particleA->setAngles();
+	//	particleA->setAngles();
 
 		int numberOfGeneration = 0;
 		numberOfGeneration = particleA->getNumberOfCurrentGeneration();
@@ -1240,7 +1523,7 @@ public:
 
 
 
-	//	particleA->rotateBackHardping();
+	  	particleA->rotateBackHardping();// необходимо развернуть пучок вдоль z, чтобы корректно работала prepareNewGeneration
 //		cout<<"saveParticle4VectorsAfterEnergyLoss3 = "<<particleA->p();
 		//cout<<" in saveParticle4VectorsAfterEnergyLoss end"<<endl;
 	//	cin>>ch;
@@ -1636,6 +1919,8 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 	double xImpact = 0, yImpact = 0, zCoordinate = 0, impact = 0, phi = 0;
 	double maxHalfPathInNucleus = 0;
 	double R = 0;
+	double temp1 = 0;
+
 	if(particleA->isLepton()){
 
 
@@ -1643,16 +1928,25 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 //		xImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
 //		yImpact = gsl_ran_gaussian (gslRandomGenerator, 1);
 //		zCoordinate = gsl_ran_gaussian (gslRandomGenerator, 1);
-		phi = 2* M_PIl * getRandom();
+
 		//impact 	= getNewImpact();
 		impact = getImpactParameter();
-		xImpact  =  impact*sin(phi);//getPointOfInteraction();//impact*sin(phi);
+		phi = 2* M_PIl * getRandom();
+//		temp1 = getRandomFromFile();
+//		cout<<"temp 1 = "<<temp1<<endl;
+//		phi = 2* M_PIl * temp1;
+		 xImpact  =  impact*sin(phi);//getPointOfInteraction();//impact*sin(phi);
 		yImpact	 =  impact*cos(phi);//getPointOfInteraction();//impact*cos(phi);
 	//	DHALFMAXPATH=SQRT((R**(2.0D0))-((DIPA(ili))**(2.0D0)))
 		maxHalfPathInNucleus = sqrt(R*R - impact*impact);
 
 		zCoordinate = -maxHalfPathInNucleus + 2*maxHalfPathInNucleus*getRandom();//getPointOfInteraction();
-
+		//temp1 = getRandomFromFile();
+		//cout<<"temp 2 = "<<temp1<<endl;
+		//zCoordinate = -maxHalfPathInNucleus + 2*maxHalfPathInNucleus*temp1;//getPointOfInteraction();
+		cout.precision(12);
+		cout<<"impact "<<impact<<" phi "<<phi<<" z "<<zCoordinate<<endl;
+	//	cin>>ch;
 	//	xImpact = getPointOfInteraction();
 	//	yImpact	= getPointOfInteraction();
 	//	zCoordinate	= getPointOfInteraction();
@@ -1672,9 +1966,9 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 	vecCoordinate.px(xImpact);
 	vecCoordinate.py(yImpact);
 	vecCoordinate.pz(zCoordinate); //todo suetin debug
-/*  		vecCoordinate.px(0.);
-		vecCoordinate.py(0);
-		vecCoordinate.pz(0.5);
+/*		vecCoordinate.px(1);
+	vecCoordinate.py(0);
+		vecCoordinate.pz(0);
 */
 	particleA->vProd(vecCoordinate);
 
@@ -1789,7 +2083,12 @@ double getNewImpact(void){
 double getImpactParameter(void){
 	double R = _targetNucleus.getNuclearRadius();
 	double impact = 0;
-	impact = -R + 2*R*getRandom();
+	impact = R*getRandom();
+	//impact = -R + 2*R*getRandomFromFile();
+	//double temp = 0;
+	//temp = getRandomFromFile();
+	//cout<<"temp "<<temp<<endl;
+	//impact = R*temp;
 	return impact;
 }
 void softToHard(hardpingParticle* particleA,hardpingParticle* particleB){
@@ -1836,7 +2135,7 @@ bool checkEnergyCut(hardpingParticle* particleA){
 			particleA->setOut();
 			//dispose momentum of particle along initial beam direction
 			//suetin debug
-			//particleA->rotateHardping();
+			 particleA->rotateHardping();
 
 
 			if(particleA->getVirtualPhotonEnergy() != 0 && particleA->isHadron()){
@@ -1940,15 +2239,15 @@ void finalOutput(void){
 		//	cin>>lll;
 			//suetin debug
 			double tempLenght = sqrt(_targetNucleus.getNuclearRadius()*_targetNucleus.getNuclearRadius() - particleA->vProd().pT2());
-			//isNotAdsorbed = energyLoss(particleA, tempLenght);
-			isNotAdsorbed = 1;
+			 isNotAdsorbed = energyLoss(particleA, tempLenght);
+			//isNotAdsorbed = 1;
 			// isNotAdsorbed = 0 - particle is adsorbed
 			// isNotAdsorbed = 1 - all right
 			if(isNotAdsorbed){
 				particleA->setOut();
 				//dispose momentum of particle along initial beam direction
 				//suetin debug
-				//particleA->rotateHardping();
+				 particleA->rotateHardping();
 			}else{return;}
 		}// end of if(numberOfGeneration && particleA->isHadron())
 		// put particle in massive

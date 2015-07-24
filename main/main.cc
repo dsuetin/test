@@ -59,6 +59,7 @@ double initialProjectileLabMomentum = 27.6;
 
 incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 
+numEvent =  10;//00000;
 numEvent =  1000000;
 
 Aproj = 1;
@@ -78,7 +79,7 @@ if(pythia6File.is_open()){
 }else{
 	cout<<"hui"<<endl;
 }
-int dummy,idPythia6;
+int dummy = 0,idPythia6;
 double pxPythia6,pyPythia6,pzPythia6,EPythia6;
 double hadronFormLenght = 0, preHadronFormLenght = 0, virtualPhotonEnergy = 0, virtualPhotonEnergyOld = 0;
 //pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>hadronFormLenght>>preHadronFormLenght>>virtualPhotonEnergy;
@@ -116,7 +117,7 @@ cin>>ch;
 
 //suetin debug
 
-//_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
+_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
 //
 
@@ -285,7 +286,7 @@ double maxPathInNucleus = 0;
 
 	//	_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
-		if(iop == 34){
+		if(iop == 2){
 			cout<<"iop = "<<iop<<endl;
 			cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "<<endl;
 
@@ -349,6 +350,7 @@ double maxPathInNucleus = 0;
 				cout<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<endl;
 			}
 			if(hardping->_finalState->at(ih).isHadron())fileDrellYan<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<<hardping->_finalState->at(ih).p();
+			if(hardping->_finalState->at(ih).isHadron())coordinateSoftOutput<<hardping->_finalState->at(ih).vProd().px()<<" "<<hardping->_finalState->at(ih).vProd().py()<<" "<<hardping->_finalState->at(ih).vProd().pz()<<" "<< dummy<<" "<<'('<<dummy<<')'<<endl;
 
 			if(hardping->_finalState->at(ih).isHadron())numberOfSoftCollisions<<iop<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<endl;
 
@@ -359,13 +361,13 @@ double maxPathInNucleus = 0;
 				//cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "<<endl;
 			}
 		//	cout<<"iop "<<iop<<" nsc "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<endl;
- //		cin>>ch;
+ 	//	cin>>ch;
 			if(hardping->_finalState->at(ih).getSoftCollisionNumber()){
 
 			}
 			if(hardping->_finalState->at(ih).isHadron()){
 
-				cout<<sqrt(target.getNuclearRadius()*target.getNuclearRadius() - hardping->_finalState->at(ih).vProd().pT2()) - hardping->_finalState->at(ih).vProd().pz() - hardping->_finalState->at(ih).getTotalPathInNucleus()<<endl;
+				cout<<"kopjj "<<sqrt(target.getNuclearRadius()*target.getNuclearRadius() - hardping->_finalState->at(ih).vProd().pT2()) - hardping->_finalState->at(ih).vProd().pz() - hardping->_finalState->at(ih).getTotalPathInNucleus()<<endl;
 				maxPathInNucleus = (target.getNuclearRadius()*target.getNuclearRadius() > hardping->_finalState->at(ih).vProd().pT2() )? sqrt(target.getNuclearRadius()*target.getNuclearRadius() - hardping->_finalState->at(ih).vProd().pT2()) : 0;
 
 
