@@ -378,6 +378,9 @@ public:
 		px = this->px();
 		py = this->py();
 		pz = this->pz();
+		x = this->vProd().px();
+		y = this->vProd().py();
+		z = this->vProd().pz();
 		sinY1 = px/sqrt(px*px+pz*pz);
 		cosY1 = pz/sqrt(px*px+pz*pz);
 
@@ -393,7 +396,7 @@ public:
 		 cout<<"_phi "<<this->phi()<<" _theta "<<this->theta()<<endl;
 
 
-		 cout<<"sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
+		 cout<<"setangles sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
 		 		cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
 		 		cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
 		 		px1 = px*cosY1 - pz*sinY1;
@@ -616,10 +619,11 @@ public:
 */
 		getTrigonometricFunctions(sinY1,cosY1, sinX2,cosX2);
 
-		cout<<"sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
+		cout<<"sfinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
 	//	cin>>ch;
 		 cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
 		cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
+	//	cin>>ch;
 		px1 = px*cosY1 - pz*sinY1;
 		py1 = py;
 		pz1 = px*sinY1 + pz*cosY1;
@@ -1966,9 +1970,9 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 	vecCoordinate.px(xImpact);
 	vecCoordinate.py(yImpact);
 	vecCoordinate.pz(zCoordinate); //todo suetin debug
-/*		vecCoordinate.px(1);
+/*		vecCoordinate.px(0.5);
 	vecCoordinate.py(0);
-		vecCoordinate.pz(0);
+		vecCoordinate.pz(-4);
 */
 	particleA->vProd(vecCoordinate);
 
