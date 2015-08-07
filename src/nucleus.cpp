@@ -1652,7 +1652,7 @@ char ch;
 	                        	cout<<"vc1 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
 	                        	particleA->rotateHardping();
 	                        	cout<<"vc2 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
-	                        	getNewPtInitialState(particleA,2);
+	                      //  	getNewPtInitialState(particleA,2);
 	                        	cout<<"vc3 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
 		                        particleA->setAngles();
 		                        particleA->rotateBackHardping();
@@ -1740,7 +1740,7 @@ char ch;
 
 						// energy loss will occur up to zCoordinateOfCollisionsTemp
 						//todo suetin debug
-					  // 	if(maxHalfPathInNucleus)if(!energyLoss(particleA,zCoordinateOfCollisionsTemp))continue;
+					   	if(maxHalfPathInNucleus)if(!energyLoss(particleA,zCoordinateOfCollisionsTemp))continue;
 						//
 						cout<<"El "<<particleA->getEnergyLoss()<<endl;
 					//	cin>>ch;
@@ -1770,8 +1770,8 @@ char ch;
 
 						//todo suetin debug
 						//tempLenght =
-					  //	isNotAdsorbed = energyLoss(particleA,maxHalfPathInNucleus);
-					   	 isNotAdsorbed =1;
+					  	isNotAdsorbed = energyLoss(particleA,maxHalfPathInNucleus);
+					  // 	 isNotAdsorbed =1;
 						// isNotAdsorbed = 0 - particle is adsorbed
 						// isNotAdsorbed = 1 - all right
 						if(isNotAdsorbed){
@@ -1865,9 +1865,9 @@ char ch;
 						//todo	suetin debug
 							//particleA->rotateBackHardping();
 							if(_verbose)cout<<"momentum after 0 rotate "<<particleA->p();
-					 		getNewPtInitialState(particleA,1);
+					 	//	getNewPtInitialState(particleA,1);
 							if(_verbose)cout<<"momentum after 1 rotate "<<particleA->p();
-					 		getNewPtInitialState(particleA,2);
+					 	//	getNewPtInitialState(particleA,2);
 							if(_verbose)cout<<"momentum after 2 rotate "<<particleA->p();
 							//particleA->rotateHardping();
 
@@ -2263,7 +2263,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			do{
 
 // поставить *_
-				 pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>virtualPhotonEnergy;
+				 *_pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>virtualPhotonEnergy;
 				cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<endl;
 			//	cin>>ch;
 				 if(_pythia6File->eof())continue;
@@ -2288,7 +2288,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 	 		//	particleA->setPreHadronFormationLength(preHadronFormLenght);
 			//	particleA->setHadronFormationLength(hadronFormLenght);
 				particleA->setVirtualPhotonEnergy(virtualPhotonEnergy);
-		}while( idPythia6 != 0 /* !_pythia6File->eof() */ );
+		}while( /*idPythia6 != 0 */ !_pythia6File->eof() );
 	 	   	if(_verbose)pythia->event.list();
 			//cout<<"vfe "<<particleA->getVirtualPhotonEnergy()<<endl;
  //  	cin>>ch;
