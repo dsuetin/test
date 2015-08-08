@@ -1970,10 +1970,11 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 	vecCoordinate.px(xImpact);
 	vecCoordinate.py(yImpact);
 	vecCoordinate.pz(zCoordinate); //todo suetin debug
-		vecCoordinate.px(0.5);
+/*
+	vecCoordinate.px(0.5);
 	vecCoordinate.py(0);
 		vecCoordinate.pz(1);
-
+*/
 	particleA->vProd(vecCoordinate);
 
 	//////// end of set coordinate of incident particle ////////////////////

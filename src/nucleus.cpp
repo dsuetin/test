@@ -2263,7 +2263,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			do{
 
 // поставить *_
-				 *_pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>virtualPhotonEnergy;
+				 pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>virtualPhotonEnergy;
 				cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<endl;
 			//	cin>>ch;
 				 if(_pythia6File->eof())continue;
@@ -2288,7 +2288,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 	 		//	particleA->setPreHadronFormationLength(preHadronFormLenght);
 			//	particleA->setHadronFormationLength(hadronFormLenght);
 				particleA->setVirtualPhotonEnergy(virtualPhotonEnergy);
-		}while( /*idPythia6 != 0 */ !_pythia6File->eof() );
+		}while( idPythia6 != 0 /* !_pythia6File->eof()*/ );
 	 	   	if(_verbose)pythia->event.list();
 			//cout<<"vfe "<<particleA->getVirtualPhotonEnergy()<<endl;
  //  	cin>>ch;
