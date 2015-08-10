@@ -64,8 +64,8 @@ double initialProjectileLabMomentum = 27.6;
 
 incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 
-numEvent =  30;//00000;
-numEvent =  1000000;
+numEvent =  100;//00000;
+ //numEvent =  1000000;
 
 Aproj = 1;
 Zproj = 1;
@@ -129,7 +129,7 @@ cin>>ch;
 
 //suetin debug
 
-_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
+//_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
 //
 
@@ -302,7 +302,7 @@ double maxPathInNucleus = 0;
 	for(unsigned int iop = 1; iop <= numEvent ; iop++){
 
 
-		_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
+	 	_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
 		if(iop == 2){
 			cout<<"iop = "<<iop<<endl;
@@ -311,13 +311,13 @@ double maxPathInNucleus = 0;
 	//		cin>>ch;
 		}
 
-	/*	cout<<"iop "<<iop<<endl;
+	 	cout<<"iop "<<iop<<endl;
 		for(int iran = 0; iran < iop ; iran ++){
 			if(iran == 0)continue;
-			//getRandomFromFile();
-			cout<<"temp1 "<<getRandomFromFile()<<endl;
+			// getRandomFromFile();
+			 cout<<"temp1 "<<getRandomFromFile()<<endl;
 		}
-*/
+
 //		cin>>ch;
 
 		cout<<"iop = "<<iop<<endl;
@@ -437,7 +437,7 @@ double maxPathInNucleus = 0;
 			//if(1)cout<<"end "<<endl;
 
 		}
-		_randomFile.close();
+	 	_randomFile.close();
 		delete hardping;
 		//todo delete all dynamic memory
 

@@ -797,15 +797,15 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
          //   	cout<< "in cycle "<<endl;
                 temp1 = getRandom();
                 temp2 = getRandom();
-      //       	temp1 = getRandomFromFile();
-       //       	temp2 = getRandomFromFile();
+             	temp1 = getRandomFromFile();
+             	temp2 = getRandomFromFile();
 
                 X= xMaxP0*temp1;//getRandomFromFile();		// x is NOT coordinate
                 Y= yMaxP0*temp2;//getRandomFromFile();
                 if(_verbose)cout<<"temp1 = "<<temp1<<" temp2 = "<<temp2<<endl;
                 if(_verbose)cout<<" X = "<<X<<" yMaxP0 = "<<yMaxP0<<" Y = "<<Y<<endl;
 
-  //              cin>>ch;
+               //  cin>>ch;
                 if ( X > xMaxP0/2.){
                 	YF = 1. - P0;
                 	_isScattering = true;
@@ -875,8 +875,8 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
         	do{
             	temp1 = getRandom();
             	temp2 = getRandom();
-  //          	temp1 = getRandomFromFile();
-  //           	temp2 = getRandomFromFile();
+            	temp1 = getRandomFromFile();
+             	temp2 = getRandomFromFile();
             	if(_verbose)cout<<" temp1 = "<<temp1<<"  temp2 = "<<temp2<<endl;
 
             	X = xMinP + (xMaxP -xMinP)*temp1;//getRandomFromFile();//*getRandom();
@@ -1652,7 +1652,7 @@ char ch;
 	                        	cout<<"vc1 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
 	                        	particleA->rotateHardping();
 	                        	cout<<"vc2 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
-	                        	getNewPtInitialState(particleA,2);
+	                       // 	getNewPtInitialState(particleA,2);
 	                        	cout<<"vc3 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
 		                        particleA->setAngles();
 		                        particleA->rotateBackHardping();
@@ -1865,9 +1865,9 @@ char ch;
 						//todo	suetin debug
 							//particleA->rotateBackHardping();
 							if(_verbose)cout<<"momentum after 0 rotate "<<particleA->p();
-					 		getNewPtInitialState(particleA,1);
+					 //		getNewPtInitialState(particleA,1);
 							if(_verbose)cout<<"momentum after 1 rotate "<<particleA->p();
-					 		getNewPtInitialState(particleA,2);
+					// 		getNewPtInitialState(particleA,2);
 							if(_verbose)cout<<"momentum after 2 rotate "<<particleA->p();
 							//particleA->rotateHardping();
 
@@ -2263,7 +2263,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			do{
 
 // поставить *_
-				 pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>virtualPhotonEnergy;
+				 *_pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>virtualPhotonEnergy;
 				cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<endl;
 			//	cin>>ch;
 				 if(_pythia6File->eof())continue;
@@ -2288,7 +2288,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 	 		//	particleA->setPreHadronFormationLength(preHadronFormLenght);
 			//	particleA->setHadronFormationLength(hadronFormLenght);
 				particleA->setVirtualPhotonEnergy(virtualPhotonEnergy);
-		}while( idPythia6 != 0 /* !_pythia6File->eof()*/ );
+		}while( /*idPythia6 != 0 */ !_pythia6File->eof() );
 	 	   	if(_verbose)pythia->event.list();
 			//cout<<"vfe "<<particleA->getVirtualPhotonEnergy()<<endl;
  //  	cin>>ch;
