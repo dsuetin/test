@@ -1652,7 +1652,7 @@ char ch;
 	                        	cout<<"vc1 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
 	                        	particleA->rotateHardping();
 	                        	cout<<"vc2 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
-	                      //  	getNewPtInitialState(particleA,2);
+	                        	getNewPtInitialState(particleA,2);
 	                        	cout<<"vc3 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
 		                        particleA->setAngles();
 		                        particleA->rotateBackHardping();
@@ -1865,9 +1865,9 @@ char ch;
 						//todo	suetin debug
 							//particleA->rotateBackHardping();
 							if(_verbose)cout<<"momentum after 0 rotate "<<particleA->p();
-					 	//	getNewPtInitialState(particleA,1);
+					 		getNewPtInitialState(particleA,1);
 							if(_verbose)cout<<"momentum after 1 rotate "<<particleA->p();
-					 	//	getNewPtInitialState(particleA,2);
+					 		getNewPtInitialState(particleA,2);
 							if(_verbose)cout<<"momentum after 2 rotate "<<particleA->p();
 							//particleA->rotateHardping();
 
