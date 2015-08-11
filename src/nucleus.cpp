@@ -1665,7 +1665,7 @@ char ch;
 	                   //     cin>>ch;
                     }
 					isScattering = pathInNucleus2(particleA,zCoordinateOfCollisions);//todo осмыслить, может, если столкновение не происходит возвращать не ноль, а точку выхода из ядра
-
+					cout<<" energy loss "<<particleA->getEnergyLoss()<<endl;
 					cout<<"tp2 "<<particleA->getTotalPathInNucleus()<<endl;
 					cout<<particleA->vProd().px()<<endl;
 					cout<<particleA->vProd().py()<<endl;
@@ -1783,8 +1783,10 @@ char ch;
 							//todo suetin debug
 					 		particleA->rotateHardping();
 
-
-
+					 	//	cout<<"El "<<particleA->getEnergyLoss()<<endl;
+					 		particleA->setHadronEnergyFraction(particleA->e()/particleA->getVirtualPhotonEnergy());
+					 	//	cout<<"e "<<particleA->e()<<" vfe "<<particleA->getVirtualPhotonEnergy()<<endl;
+					 //		cout<<" hef "<<particleA->getHadronEnergyFraction()<<endl;
 							_outOfNucleus->push_back(*particleA);
 							// massive with index of particles which not initialize next wave
 							_indexBadInitializations->push_back(particleA->getIndexNumber());
@@ -2597,7 +2599,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 							if(z >= 1)z = 0.99; //фикс для случая когда доля импульса адрона больше единицы (происходит из-за того что энергии в сцм может быть больше из-за ненулевой массы покоя нуклона)
 							tempHardpingParticle->setHadronEnergyFraction(z);
 						}
-
+						cout <<" tempHardpingParticle->e() "<<tempHardpingParticle->e()<<" particleA->getVirtualPhotonEnergy() "<<particleA->getVirtualPhotonEnergy()<<endl;
 						if(_verbose)cout<<" HadronEnergyFraction = "<<tempHardpingParticle->getHadronEnergyFraction()<<endl;
 						bl = particleA->getVirtualPhotonEnergy()/_kEnergyLoss;//todo узнать физический смысл bl
 						if(_verbose)cout<<" bl = "<<bl<<endl;
@@ -2692,7 +2694,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 						tempHardpingParticle->setVirtualPhotonEnergy(particleA->getVirtualPhotonEnergy());
 						z = tempHardpingParticle->e()/tempHardpingParticle->getVirtualPhotonEnergy();
 						tempHardpingParticle->setHadronEnergyFraction(z);
-
+						cout <<" tempHardpingParticle->e() "<<tempHardpingParticle->e()<<" particleA->getVirtualPhotonEnergy() "<<particleA->getVirtualPhotonEnergy()<<endl;
 						//tempHardpingParticle->setHadronFormationLength(particleA->getHadronFormationLength());
 						//////
 						if(_verbose)cout<<" HadronEnergyFraction = "<<tempHardpingParticle->getHadronEnergyFraction()<<endl;
