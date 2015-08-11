@@ -1129,10 +1129,10 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 
 	do{
 		//randomNumber =getRandomFromFile();//getRandom();
-		// tempRandom1 = getRandomFromFile();//getRandom();
-		// tempRandom2 = getRandomFromFile();//getRandom();
-		tempRandom1 = getRandom();
-		tempRandom2 = getRandom();
+		tempRandom1 = getRandomFromFile();//getRandom();
+		tempRandom2 = getRandomFromFile();//getRandom();
+		//tempRandom1 = getRandom();
+		//tempRandom2 = getRandom();
 		newTransverseMomentum = transverseMomentumMax*tempRandom1;
 		probabilytyBound        = probabilytyMax*tempRandom2;
 		probabilyty = B*B*newTransverseMomentum*exp(-B*newTransverseMomentum);
@@ -1168,8 +1168,8 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 	//particleA->rotateHardping();
 	//if(_verbose)cout<<" 000000000000000000000000000    = "<<particleA->p()<<endl;
 	//particleA->rotateBackHardping();
-	// tempRandom1 = getRandomFromFile();
-	tempRandom1 = getRandom();
+	 tempRandom1 = getRandomFromFile();
+//	tempRandom1 = getRandom();
 	anglePhi = 2.*M_PIl*tempRandom1;//getRandom();//getRandom();
 	cout<<"temp1 = "<<tempRandom1<<endl;
 	if(_verbose)cout<<" phi = "<<anglePhi<<" new momentum = "<<newTransverseMomentum<<endl;
@@ -1652,7 +1652,7 @@ char ch;
 	                        	cout<<"vc1 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
 	                        	particleA->rotateHardping();
 	                        	cout<<"vc2 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
-	                       // 	getNewPtInitialState(particleA,2);
+	                         	getNewPtInitialState(particleA,2);
 	                        	cout<<"vc3 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;
 		                        particleA->setAngles();
 		                        particleA->rotateBackHardping();
@@ -1867,9 +1867,9 @@ char ch;
 						//todo	suetin debug
 							//particleA->rotateBackHardping();
 							if(_verbose)cout<<"momentum after 0 rotate "<<particleA->p();
-					 //		getNewPtInitialState(particleA,1);
+					  		getNewPtInitialState(particleA,1);
 							if(_verbose)cout<<"momentum after 1 rotate "<<particleA->p();
-					// 		getNewPtInitialState(particleA,2);
+					  		getNewPtInitialState(particleA,2);
 							if(_verbose)cout<<"momentum after 2 rotate "<<particleA->p();
 							//particleA->rotateHardping();
 

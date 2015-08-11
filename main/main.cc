@@ -65,7 +65,7 @@ double initialProjectileLabMomentum = 27.6;
 incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 
 numEvent =  100;//00000;
- //numEvent =  1000000;
+//  numEvent =  1000000;
 
 Aproj = 1;
 Zproj = 1;
@@ -437,6 +437,7 @@ double maxPathInNucleus = 0;
 			//if(1)cout<<"end "<<endl;
 
 		}
+		//suetin debug
 	 	_randomFile.close();
 		delete hardping;
 		//todo delete all dynamic memory
