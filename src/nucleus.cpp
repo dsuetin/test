@@ -797,8 +797,8 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
          //   	cout<< "in cycle "<<endl;
                 temp1 = getRandom();
                 temp2 = getRandom();
-             	temp1 = getRandomFromFile();
-             	temp2 = getRandomFromFile();
+              	temp1 = getRandomFromFile();
+              	temp2 = getRandomFromFile();
 
                 X= xMaxP0*temp1;//getRandomFromFile();		// x is NOT coordinate
                 Y= yMaxP0*temp2;//getRandomFromFile();
@@ -875,8 +875,8 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
         	do{
             	temp1 = getRandom();
             	temp2 = getRandom();
-            	temp1 = getRandomFromFile();
-             	temp2 = getRandomFromFile();
+             	temp1 = getRandomFromFile();
+              	temp2 = getRandomFromFile();
             	if(_verbose)cout<<" temp1 = "<<temp1<<"  temp2 = "<<temp2<<endl;
 
             	X = xMinP + (xMaxP -xMinP)*temp1;//getRandomFromFile();//*getRandom();
@@ -1129,10 +1129,10 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 
 	do{
 		//randomNumber =getRandomFromFile();//getRandom();
-		tempRandom1 = getRandomFromFile();//getRandom();
-		tempRandom2 = getRandomFromFile();//getRandom();
-		//tempRandom1 = getRandom();
-		//tempRandom2 = getRandom();
+	 	tempRandom1 = getRandomFromFile();//getRandom();
+	 	tempRandom2 = getRandomFromFile();//getRandom();
+	//	tempRandom1 = getRandom();
+	// 	tempRandom2 = getRandom();
 		newTransverseMomentum = transverseMomentumMax*tempRandom1;
 		probabilytyBound        = probabilytyMax*tempRandom2;
 		probabilyty = B*B*newTransverseMomentum*exp(-B*newTransverseMomentum);
@@ -1168,7 +1168,7 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 	//particleA->rotateHardping();
 	//if(_verbose)cout<<" 000000000000000000000000000    = "<<particleA->p()<<endl;
 	//particleA->rotateBackHardping();
-	 tempRandom1 = getRandomFromFile();
+ 	 tempRandom1 = getRandomFromFile();
 //	tempRandom1 = getRandom();
 	anglePhi = 2.*M_PIl*tempRandom1;//getRandom();//getRandom();
 	cout<<"temp1 = "<<tempRandom1<<endl;
@@ -1771,7 +1771,7 @@ char ch;
 						//todo suetin debug
 						//tempLenght =
 					  	isNotAdsorbed = energyLoss(particleA,maxHalfPathInNucleus);
-					  // 	 isNotAdsorbed =1;
+					   // 	 isNotAdsorbed =1;
 						// isNotAdsorbed = 0 - particle is adsorbed
 						// isNotAdsorbed = 1 - all right
 						if(isNotAdsorbed){
@@ -1867,9 +1867,9 @@ char ch;
 						//todo	suetin debug
 							//particleA->rotateBackHardping();
 							if(_verbose)cout<<"momentum after 0 rotate "<<particleA->p();
-					  		getNewPtInitialState(particleA,1);
+					   		getNewPtInitialState(particleA,1);
 							if(_verbose)cout<<"momentum after 1 rotate "<<particleA->p();
-					  		getNewPtInitialState(particleA,2);
+					   		getNewPtInitialState(particleA,2);
 							if(_verbose)cout<<"momentum after 2 rotate "<<particleA->p();
 							//particleA->rotateHardping();
 
