@@ -1964,7 +1964,7 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 	//////////end of calculating impact parameter of incident particles//////////////////////////////////////////
 
 	/////// set coordinate of incident particle////////////////////////////////////
-	coordinateFile>>xImpact>>yImpact>>zCoordinate;
+	//coordinateFile>>xImpact>>yImpact>>zCoordinate;
  	cout<<"coord23 "<<xImpact<<" "<<yImpact<<" "<<zCoordinate<<endl;
 //  	cin>>ch;
 	vecCoordinate.px(xImpact);

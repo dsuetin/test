@@ -797,8 +797,8 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
          //   	cout<< "in cycle "<<endl;
                 temp1 = getRandom();
                 temp2 = getRandom();
-              	temp1 = getRandomFromFile();
-              	temp2 = getRandomFromFile();
+  //            	temp1 = getRandomFromFile();
+  //            	temp2 = getRandomFromFile();
 
                 X= xMaxP0*temp1;//getRandomFromFile();		// x is NOT coordinate
                 Y= yMaxP0*temp2;//getRandomFromFile();
@@ -875,8 +875,8 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
         	do{
             	temp1 = getRandom();
             	temp2 = getRandom();
-             	temp1 = getRandomFromFile();
-              	temp2 = getRandomFromFile();
+  //           	temp1 = getRandomFromFile();
+  //            	temp2 = getRandomFromFile();
             	if(_verbose)cout<<" temp1 = "<<temp1<<"  temp2 = "<<temp2<<endl;
 
             	X = xMinP + (xMaxP -xMinP)*temp1;//getRandomFromFile();//*getRandom();
@@ -1129,10 +1129,10 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 
 	do{
 		//randomNumber =getRandomFromFile();//getRandom();
-	 	tempRandom1 = getRandomFromFile();//getRandom();
-	 	tempRandom2 = getRandomFromFile();//getRandom();
-	//	tempRandom1 = getRandom();
-	// 	tempRandom2 = getRandom();
+//	 	tempRandom1 = getRandomFromFile();//getRandom();
+//	 	tempRandom2 = getRandomFromFile();//getRandom();
+	 	tempRandom1 = getRandom();
+	  	tempRandom2 = getRandom();
 		newTransverseMomentum = transverseMomentumMax*tempRandom1;
 		probabilytyBound        = probabilytyMax*tempRandom2;
 		probabilyty = B*B*newTransverseMomentum*exp(-B*newTransverseMomentum);
@@ -1168,8 +1168,8 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 	//particleA->rotateHardping();
 	//if(_verbose)cout<<" 000000000000000000000000000    = "<<particleA->p()<<endl;
 	//particleA->rotateBackHardping();
- 	 tempRandom1 = getRandomFromFile();
-//	tempRandom1 = getRandom();
+// 	 tempRandom1 = getRandomFromFile();
+ 	tempRandom1 = getRandom();
 	anglePhi = 2.*M_PIl*tempRandom1;//getRandom();//getRandom();
 	cout<<"temp1 = "<<tempRandom1<<endl;
 	if(_verbose)cout<<" phi = "<<anglePhi<<" new momentum = "<<newTransverseMomentum<<endl;
@@ -2265,7 +2265,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			do{
 
 // поставить *_
-				 *_pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>virtualPhotonEnergy;
+				 pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>virtualPhotonEnergy;
 				cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<endl;
 			//	cin>>ch;
 				 if(_pythia6File->eof())continue;
@@ -2290,7 +2290,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 	 		//	particleA->setPreHadronFormationLength(preHadronFormLenght);
 			//	particleA->setHadronFormationLength(hadronFormLenght);
 				particleA->setVirtualPhotonEnergy(virtualPhotonEnergy);
-		}while( /*idPythia6 != 0 */ !_pythia6File->eof() );
+		}while( idPythia6 != 0  /*_pythia6File->eof()*/ );
 	 	   	if(_verbose)pythia->event.list();
 			//cout<<"vfe "<<particleA->getVirtualPhotonEnergy()<<endl;
  //  	cin>>ch;
