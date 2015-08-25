@@ -64,8 +64,8 @@ double initialProjectileLabMomentum = 27.6;
 
 incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 
-numEvent =  476;//00000;
-   numEvent =  1000000;
+numEvent =  4400;//00000;
+//   numEvent =  1000000;
 
 Aproj = 1;
 Zproj = 1;
@@ -129,7 +129,7 @@ cin>>ch;
 
 //suetin debug
 
-_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
+//_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
 //
 
@@ -299,25 +299,26 @@ double maxPathInNucleus = 0;
 	particleA->id(2212);
 	//particleA->setHadronFormationLength(1.0);
 	//cin>>ch;
+
 	for(unsigned int iop = 1; iop <= numEvent ; iop++){
 
 
-	 // 	_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
+	  	_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
-		if(iop == 2){
+		if(iop == 35){
 			cout<<"iop = "<<iop<<endl;
 			cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "<<endl;
 
 	//		cin>>ch;
 		}
-/*
+
   	 	cout<<"iop "<<iop<<endl;
 		for(int iran = 0; iran < iop ; iran ++){
 			if(iran == 0)continue;
-			// getRandomFromFile();
-			 cout<<"temp1 "<<getRandomFromFile()<<endl;
+			 getRandomFromFile();
+			// cout<<"temp1 "<<getRandomFromFile()<<endl;
 		}
-*/
+
 //		cin>>ch;
 
 		cout<<"iop = "<<iop<<endl;
@@ -342,6 +343,8 @@ double maxPathInNucleus = 0;
 		cout<<" TotalPathInNucleus "<<particleA->getTotalPathInNucleus()<<endl;
 		//cout << incidentParticle->getPythiaParticle()->p();
 		//cin>>ch;*/
+		hardping->setVerbose(0);
+		if(iop == 4338)hardping->setVerbose(1);
 		softCollisionsNumberInput>>intDummy>>nSoft;
 		cout<<"i = "<<intDummy<<" nSoft "<<nSoft<<endl;
 	//	cin>>ch;
@@ -371,7 +374,8 @@ double maxPathInNucleus = 0;
 			if(hardping->_finalState->at(ih).getPreHadronFormationLength() == 0 && hardping->_finalState->at(ih).isHadron()){
 				cout<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<endl;
 			}
-			if(hardping->_finalState->at(ih).isHadron())fileDrellYan<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<<hardping->_finalState->at(ih).p();
+			if(hardping->_finalState->at(ih).isHadron())fileDrellYan<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<<hardping->_finalState->at(ih).p();
+			if(hardping->_finalState->at(ih).isHadron())cout<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<<hardping->_finalState->at(ih).p();
 		//	if(hardping->_finalState->at(ih).isHadron())fileDrellYan<<hardping->_finalState->at(ih).vProd().px()<<" "<<hardping->_finalState->at(ih).vProd().py()<<" "<<hardping->_finalState->at(ih).vProd().pz()<<" "<< dummy<<" "<<'('<<dummy<<')'<<endl;
 			if(hardping->_finalState->at(ih).isHadron())coordinateSoftOutput<<hardping->_finalState->at(ih).vProd().px()<<" "<<hardping->_finalState->at(ih).vProd().py()<<" "<<hardping->_finalState->at(ih).vProd().pz()<<" "<< dummy<<" "<<'('<<dummy<<')'<<endl;
 			cout.precision(17);
@@ -442,7 +446,7 @@ double maxPathInNucleus = 0;
 
 		}
 		//suetin debug
-	//  	_randomFile.close();
+	  	_randomFile.close();
 		delete hardping;
 		//todo delete all dynamic memory
 

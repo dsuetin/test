@@ -92,6 +92,7 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
+		_verbose(0),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -134,6 +135,7 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
+		_verbose(0),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -336,7 +338,7 @@ public:
 			  break;
 
 			default:
-			  cout<<"Error no found such element. "<<endl;
+				if(_verbose)cout<<"Error no found such element. "<<endl;
 			  ElementName = "";
 			  break;
 			}
@@ -392,13 +394,13 @@ public:
 		cosX2 = sqrt(px*px+pz*pz)/P;
 		_thetaHardping = asin(sinX2);
 		setTrigonometricFunctions(sinY1,cosY1,sinX2,cosX2);
-		 cout<<"_phiHardping "<<_phiHardping<<" _thetaHardping "<<_thetaHardping<<endl;
-		 cout<<"_phi "<<this->phi()<<" _theta "<<this->theta()<<endl;
+		if(_verbose)cout<<"_phiHardping "<<_phiHardping<<" _thetaHardping "<<_thetaHardping<<endl;
+		if(_verbose)cout<<"_phi "<<this->phi()<<" _theta "<<this->theta()<<endl;
 
 
-		 cout<<"setangles sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
-		 		cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
-		 		cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
+		if(_verbose) cout<<"setangles sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
+		if(_verbose) 		cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
+		if(_verbose) 		cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
 		 		px1 = px*cosY1 - pz*sinY1;
 		 		py1 = py;
 		 		pz1 = px*sinY1 + pz*cosY1;
@@ -407,8 +409,8 @@ public:
 		 		y1  =  y;
 		 		z1  =  x*sinY1  + z*cosY1;
 
-		 		cout<<"px1 = "<<px1<<" py1 = "<<py1<<" pz1 = "<<pz1<<endl;
-		 		cout<<"x1 = "<<x1<<" y1 = "<<y1<<" z1 = "<<z1<<endl;
+		if(_verbose)		cout<<"px1 = "<<px1<<" py1 = "<<py1<<" pz1 = "<<pz1<<endl;
+ 		if(_verbose)		cout<<"x1 = "<<x1<<" y1 = "<<y1<<" z1 = "<<z1<<endl;
 
 		 		px2 = px1;
 		 		py2 = py1*cosX2  + pz1*sinX2;
@@ -420,8 +422,8 @@ public:
 		  //       DX03=DX02
 		  //       DY03=DY02*DCOSX2+DZ02*DSINX2
 		  //       DZ03=-DY02*DSINX2+DZ02*DCOSX2
-		 		cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
-		 		cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
+		 if(_verbose)cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
+		 if(_verbose)cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
 
 	}
 	void setAngles(double sinPhi,double cosPhi,double sinTheta,double cosTheta){
@@ -484,8 +486,8 @@ public:
 
 			 _phiHardping2 = asin(sinPhi);
 			 _thetaHardping2 = asin(sinTheta);
-			 cout<<"_phiHardping2 "<<_phiHardping2<<" _thetaHardping2 "<<_thetaHardping2<<endl;
-			 cout<<"_phi2 "<<this->phi()<<" _theta2 "<<this->theta()<<endl;
+	 if(_verbose)cout<<"_phiHardping2 "<<_phiHardping2<<" _thetaHardping2 "<<_thetaHardping2<<endl;
+	 if(_verbose)cout<<"_phi2 "<<this->phi()<<" _theta2 "<<this->theta()<<endl;
 
 		}
 
@@ -524,9 +526,9 @@ public:
 		sinX2 = sin(_thetaHardping);
 		cosX2 = cos(_thetaHardping);*/
 		getTrigonometricFunctions(sinY1,cosY1, sinX2,cosX2);
-		cout<<"111sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
-		cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
-		cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
+		if(_verbose)cout<<"111sinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
+		if(_verbose)cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
+		if(_verbose)cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
 		//cin>>ch;
 		px1 = px;
 		py1 = py*cosX2 - pz*sinX2;
@@ -536,8 +538,8 @@ public:
 		y1  = y*cosX2  - z*sinX2;
 		z1  = y*sinX2  + z*cosX2;
 
-		cout<<"px1 = "<<px1<<" py1 = "<<py1<<" pz1 = "<<pz1<<endl;
-		cout<<"x1 = "<<x<<" y1 = "<<y1<<" z1 = "<<z1<<endl;
+		if(_verbose)cout<<"px1 = "<<px1<<" py1 = "<<py1<<" pz1 = "<<pz1<<endl;
+		if(_verbose)cout<<"x1 = "<<x<<" y1 = "<<y1<<" z1 = "<<z1<<endl;
 
 		px2 = px1*cosY1 + pz1*sinY1;
 		py2 = py1;
@@ -546,8 +548,8 @@ public:
 		x2  = x1*cosY1 + z1*sinY1;
 		y2  = y1;
 		z2  = -x1*sinY1 + z1*cosY1;
-		cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
-		cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
+		if(_verbose)cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
+		if(_verbose)cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
 		this->px(px2);
 		this->py(py2);
 		this->pz(pz2);
@@ -558,7 +560,7 @@ public:
 		Vec4 vector4(x2,y2,z2,0);
 		this->vProd(vector4);
 
- 		cout<<"x3 = "<<this->vProd().px()<<" y3 = "<<this->vProd().py()<<" z3 = "<<this->vProd().pz()<<endl;
+		if(_verbose)cout<<"x3 = "<<this->vProd().px()<<" y3 = "<<this->vProd().py()<<" z3 = "<<this->vProd().pz()<<endl;
 //		cin>>ch;
 	//	cout<<"_thetaHardping = "<<_thetaHardping<<endl;
 	//	cout<<"_phiHardping = "<<_phiHardping<<endl;
@@ -619,10 +621,10 @@ public:
 */
 		getTrigonometricFunctions(sinY1,cosY1, sinX2,cosX2);
 
-		cout<<"sfinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
+		if(_verbose)cout<<"sfinY1 "<<sinY1<<" cosY1 "<<cosY1<<" sinX2 "<<sinX2<<" cosX2 "<<cosX2<<endl;
 	//	cin>>ch;
-		 cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
-		cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
+		if(_verbose)cout<<"px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
+		if(_verbose)cout<<"x = "<<x<<" y = "<<y<<" z = "<<z<<endl;
 	//	cin>>ch;
 		px1 = px*cosY1 - pz*sinY1;
 		py1 = py;
@@ -632,8 +634,8 @@ public:
 		y1  =  y;
 		z1  =  x*sinY1  + z*cosY1;
 
-		cout<<"px1 = "<<px1<<" py1 = "<<py1<<" pz1 = "<<pz1<<endl;
-		cout<<"x1 = "<<x1<<" y1 = "<<y1<<" z1 = "<<z1<<endl;
+		if(_verbose)cout<<"px1 = "<<px1<<" py1 = "<<py1<<" pz1 = "<<pz1<<endl;
+		if(_verbose)cout<<"x1 = "<<x1<<" y1 = "<<y1<<" z1 = "<<z1<<endl;
 
 		px2 = px1;
 		py2 = py1*cosX2  + pz1*sinX2;
@@ -645,8 +647,8 @@ public:
  //       DX03=DX02
  //       DY03=DY02*DCOSX2+DZ02*DSINX2
  //       DZ03=-DY02*DSINX2+DZ02*DCOSX2
-		cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
-		cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
+		if(_verbose)cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
+		if(_verbose)cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
 		this->px(px2);
 		this->py(py2);
 		this->pz(pz2);
@@ -655,7 +657,7 @@ public:
  		//this->vProd().px(x2);
  		//this->vProd().py(y2);
  		//this->vProd().pz(z2);
- 		cout<<"x3 = "<<this->vProd().px()<<" y3 = "<<this->vProd().py()<<" z3 = "<<this->vProd().pz()<<endl;
+		if(_verbose)cout<<"x3 = "<<this->vProd().px()<<" y3 = "<<this->vProd().py()<<" z3 = "<<this->vProd().pz()<<endl;
 	//	cin>>ch;
 
 
@@ -893,7 +895,7 @@ private:
 	double _sinTheta;
 	double _cosPhi;
 	double _sinPhi;
-
+	int _verbose;
 	double _sinY1, _cosY1, _sinX2, _cosX2;
 	//Rndm * _random;
 
@@ -1346,7 +1348,7 @@ public:
 
 		double passedHadronFormathionLenght = 0;
 
-		cout<<particleA->getLeftHadronFormationLength()<<endl;
+		if(_verbose)cout<<particleA->getLeftHadronFormationLength()<<endl;
 		if(particleA->getLeftHadronFormationLength() > 0 && particleA->getSoftCollisionNumber() == 0){
 			//cout<<"resid 1 "<<particleA->getResidualHadronFormationLength()<<endl;
 			// если адрон прошел путь меньший чем его длина формирования, потери энергии не происходят, так как они уже учтены в pythia
@@ -1354,8 +1356,8 @@ public:
 
 		}else{
 
-			cout<<"resid 2 "<<particleA->getResidualHadronFormationLength()<<endl;
-			cout<<"left 2 "<<particleA->getLeftHadronFormationLength()<<endl;
+			if(_verbose)cout<<"resid 2 "<<particleA->getResidualHadronFormationLength()<<endl;
+			if(_verbose)cout<<"left 2 "<<particleA->getLeftHadronFormationLength()<<endl;
 			passedHadronFormathionLenght = particleA->getResidualHadronFormationLength();
 			passedHadronFormathionLenght =0 ;
 	    	//cin>>ch;
@@ -1366,6 +1368,7 @@ public:
 		momentum4.p(particleA->p());
 		if(particleA->vProd().pz() == -_maxZCoordinate) return 1;  //todo возможно второе условие дублирует это.
 		if(particleA->getSoftCollisionNumber() == 0) return 1;
+		if(_targetNucleus.getNuclearRadius()*_targetNucleus.getNuclearRadius() < particleA->vProd().pT2())return 1;
 
 //if interaction occurred beyond boundary of nucleus hardron does not lose energy
 		if(_verbose)cout<<deltaPath<<endl;
@@ -1373,13 +1376,13 @@ public:
 		if(deltaPath > 0 && (particleA->isHadron() || isNucleon)){
 
 	if(zCoordinateOfCollisions == sqrt(_targetNucleus.getNuclearRadius()*_targetNucleus.getNuclearRadius() - particleA->vProd().pT2())){
-		cout<<"before "<<particleA->getTotalPathInNucleus()<<endl;
+		if(_verbose)cout<<"before "<<particleA->getTotalPathInNucleus()<<endl;
 	//	particleA->setTotalPathInNucleus(particleA->getTotalPathInNucleus()+deltaPath);// учитывается путь от последней точки мягкого соударения до вылета из ядра
 		//todo осмыслить: если раскоментировать строчку результат в 2а раза больше, если потери энергии происходят
-		cout<<"after "<<particleA->getTotalPathInNucleus()<<endl;
+		if(_verbose)cout<<"after "<<particleA->getTotalPathInNucleus()<<endl;
 	//	cin>>ch;
 	}
-	    cout<<"totalPath "<<particleA->getTotalPathInNucleus()<<endl;
+	if(_verbose)cout<<"totalPath "<<particleA->getTotalPathInNucleus()<<endl;
 	//    cin>>ch;
 			//pathInNucleiOutput<<deltaPath<<endl;
 		double	deltaE = deltaPath*_kEnergyLoss;
@@ -1389,7 +1392,7 @@ public:
 		//
 			if(_verbose)cout<<"zCoordinateOfCollisions = "<<zCoordinateOfCollisions<<" zCoordinateOfCollisionsTemp = "<<zCoordinateOfCollisions<<" vecCoordinate.pz() = "<<particleA->vProd().pz()<<" deltaPath  = "<<deltaPath<<endl;
 		//suetin debug
-			cout<<"particleA->e() - deltaE < particleA->m()"<<particleA->e() - deltaE <<" m "<<particleA->mCalc()<< endl;
+			if(_verbose)cout<<"particleA->e() - deltaE < particleA->m()"<<particleA->e() - deltaE <<" m "<<particleA->mCalc()<< endl;
 
 			if(/*particleA->pz()*particleA->pz() + deltaE*deltaE - 2*deltaE*particleA->e() < 0 ||*/ particleA->e() - deltaE < particleA->mCalc() ){ // second condition for correct calculation particle momentum
 				_indexBadInitializations->push_back(i_init);
@@ -1401,7 +1404,7 @@ public:
 				//todo think may be do not escape from cycle
 			}
 			particleA->setEnergyLoss(deltaE + particleA->getEnergyLoss());
-			cout<<" eL "<<particleA->getEnergyLoss()<<endl;
+			if(_verbose)cout<<" eL "<<particleA->getEnergyLoss()<<endl;
 	//
 			//   double	deltaP = sqrt(particleA->e()*particleA->e() - particleA->m2()) - sqrt((particleA->e() - deltaE)*(particleA->e() - deltaE)- particleA->m2());
 			double	deltaP = 0, newAbsoluteMomentum = 0, newEnergy = 0, newPx = 0, newPy = 0, newPz = 0;
@@ -1417,14 +1420,14 @@ public:
 			newPy = particleA->py()*newAbsoluteMomentum/particleA->pAbs();
 			newPz = particleA->pz()*newAbsoluteMomentum/particleA->pAbs();
 
-			cout<<"m1 "<<particleA->mCalc()<<" p1 = "<<particleA->p()<<endl;
+			if(_verbose)cout<<"m1 "<<particleA->mCalc()<<" p1 = "<<particleA->p()<<endl;
 
 			particleA->e(newEnergy);
 			particleA->px(newPx);
 			particleA->py(newPy);
 			particleA->pz(newPz);
 
-			cout<<"m "<<particleA->m2()<<" p = "<<particleA->p()<<endl;
+			if(_verbose)cout<<"m "<<particleA->m2()<<" p = "<<particleA->p()<<endl;
 		//	cin>>ch;
 			//suetin debug
 			/*
@@ -1964,7 +1967,7 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 	//////////end of calculating impact parameter of incident particles//////////////////////////////////////////
 
 	/////// set coordinate of incident particle////////////////////////////////////
-	//coordinateFile>>xImpact>>yImpact>>zCoordinate;
+	coordinateFile>>xImpact>>yImpact>>zCoordinate;
  	cout<<"coord23 "<<xImpact<<" "<<yImpact<<" "<<zCoordinate<<endl;
 //  	cin>>ch;
 	vecCoordinate.px(xImpact);
@@ -2305,6 +2308,9 @@ void finalOutput(void){
 	unsigned int _softInteractionSummaryCount;
 	double getMaxZCoordinate(){
 		return _maxZCoordinate;
+	}
+	void setVerbose(int verbose){
+		_verbose = verbose;
 	}
 private:
 
