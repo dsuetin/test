@@ -64,8 +64,8 @@ double initialProjectileLabMomentum = 27.6;
 
 incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 
-numEvent =  4400;//00000;
-//   numEvent =  1000000;
+numEvent =  100;//00000;
+   numEvent =  1000000;
 
 Aproj = 1;
 Zproj = 1;
@@ -73,8 +73,8 @@ Zproj = 1;
 //N(7,14)
 
 
-Atarg = 84;
-Ztarg = 36;
+Atarg = 2;//84;
+Ztarg = 1;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/20.04.2015/pythia6event.txt";
@@ -129,7 +129,7 @@ cin>>ch;
 
 //suetin debug
 
-//_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
+_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
 //
 
@@ -303,7 +303,7 @@ double maxPathInNucleus = 0;
 	for(unsigned int iop = 1; iop <= numEvent ; iop++){
 
 
-	  	_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
+//	  	_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
 		if(iop == 35){
 			cout<<"iop = "<<iop<<endl;
@@ -311,14 +311,14 @@ double maxPathInNucleus = 0;
 
 	//		cin>>ch;
 		}
-
+/*
   	 	cout<<"iop "<<iop<<endl;
 		for(int iran = 0; iran < iop ; iran ++){
 			if(iran == 0)continue;
 			 getRandomFromFile();
 			// cout<<"temp1 "<<getRandomFromFile()<<endl;
 		}
-
+*/
 //		cin>>ch;
 
 		cout<<"iop = "<<iop<<endl;
@@ -343,7 +343,7 @@ double maxPathInNucleus = 0;
 		cout<<" TotalPathInNucleus "<<particleA->getTotalPathInNucleus()<<endl;
 		//cout << incidentParticle->getPythiaParticle()->p();
 		//cin>>ch;*/
-		hardping->setVerbose(0);
+		//hardping->setVerbose(0);
 		if(iop == 4338)hardping->setVerbose(1);
 		softCollisionsNumberInput>>intDummy>>nSoft;
 		cout<<"i = "<<intDummy<<" nSoft "<<nSoft<<endl;
@@ -446,7 +446,7 @@ double maxPathInNucleus = 0;
 
 		}
 		//suetin debug
-	  	_randomFile.close();
+//	  	_randomFile.close();
 		delete hardping;
 		//todo delete all dynamic memory
 

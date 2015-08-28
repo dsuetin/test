@@ -92,7 +92,7 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
-		_verbose(0),
+		_verbose(1),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -135,7 +135,7 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
-		_verbose(0),
+		_verbose(1),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -1967,7 +1967,7 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 	//////////end of calculating impact parameter of incident particles//////////////////////////////////////////
 
 	/////// set coordinate of incident particle////////////////////////////////////
-	coordinateFile>>xImpact>>yImpact>>zCoordinate;
+//	coordinateFile>>xImpact>>yImpact>>zCoordinate;
  	cout<<"coord23 "<<xImpact<<" "<<yImpact<<" "<<zCoordinate<<endl;
 //  	cin>>ch;
 	vecCoordinate.px(xImpact);
