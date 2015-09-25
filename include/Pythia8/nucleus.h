@@ -67,6 +67,7 @@ public:
 	hardpingParticle():
 		Particle(0),
 		_transferred4Momentum(0),
+		_transferredCM4Momentum(0),
 		_virtualPhotonEnergy(0),
 		_x1(0),
 		_x2(0),
@@ -92,7 +93,7 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
-		_verbose(1),
+		_verbose(0),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -110,6 +111,7 @@ public:
 	hardpingParticle(Particle &particle):
 		Particle(particle),
 		_transferred4Momentum(0),
+		_transferredCM4Momentum(0),
 		_virtualPhotonEnergy(0),
 		_x1(0),
 		_x2(0),
@@ -135,7 +137,7 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
-		_verbose(1),
+		_verbose(0),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -740,6 +742,12 @@ public:
 	void setTransferred4Momentum(Vec4 transferred4Momentum){
 		_transferred4Momentum = transferred4Momentum;
 	}
+	Vec4 getTransferredCM4Momentum(void){
+		return _transferredCM4Momentum;
+	}
+	void setTransferredCM4Momentum(Vec4 transferred4Momentum){
+		_transferredCM4Momentum = transferred4Momentum;
+	}
 	double getVirtualPhotonEnergy(void){
 		return _virtualPhotonEnergy;
 		//return _transferred4Momentum.e();
@@ -872,6 +880,7 @@ private:
 	unsigned int _indexInGeneration;// i_init - index number of particle in current generation
 	unsigned int _numberOfCurrentGeneration;
 	Vec4 _transferred4Momentum;
+	Vec4 _transferredCM4Momentum;
 	double _virtualPhotonEnergy;
 	double _x1;
 	double _x2;
@@ -1952,7 +1961,7 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 		//cout<<"temp 2 = "<<temp1<<endl;
 		//zCoordinate = -maxHalfPathInNucleus + 2*maxHalfPathInNucleus*temp1;//getPointOfInteraction();
 		cout.precision(12);
-		cout<<"impact "<<impact<<" phi "<<phi<<" z "<<zCoordinate<<endl;
+		if(_verbose)cout<<"impact "<<impact<<" phi "<<phi<<" z "<<zCoordinate<<endl;
 	//	cin>>ch;
 	//	xImpact = getPointOfInteraction();
 	//	yImpact	= getPointOfInteraction();
@@ -1968,7 +1977,7 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 
 	/////// set coordinate of incident particle////////////////////////////////////
 //	coordinateFile>>xImpact>>yImpact>>zCoordinate;
- 	cout<<"coord23 "<<xImpact<<" "<<yImpact<<" "<<zCoordinate<<endl;
+ 	//cout<<"coord23 "<<xImpact<<" "<<yImpact<<" "<<zCoordinate<<endl;
 //  	cin>>ch;
 	vecCoordinate.px(xImpact);
 	vecCoordinate.py(yImpact);

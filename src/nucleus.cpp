@@ -52,6 +52,7 @@ extern  double getRandomFromFile();
 extern ofstream probabilityOutput;
 extern ofstream formationLenghtOutput;
 extern ofstream impactParameterFileBefore;
+extern ofstream pythiaEventFile;
 //suetin debug;
 extern ifstream pythia6File;
 extern ifstream softCollisionsNumberInput;
@@ -106,7 +107,7 @@ Hardping::Hardping(nucleus projectileNucleus,
 	  _energyCut(0.1),
 	  _firstCall(true),
 	  _isScattering(false),
-	  _kEnergyLoss(1.0),
+	  _kEnergyLoss(1.7),
 	  _projectileNucleus(projectileNucleus),
 	  _targetNucleus(targetNucleus),
 	  _indexParticle(0),
@@ -121,7 +122,7 @@ Hardping::Hardping(nucleus projectileNucleus,
 	  _hardInteractionSummaryCount(0),
 	  _softInteractionSummaryCount(0),
 	  _fortranHardping(false),
-	  _verbose(1),
+	  _verbose(0),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")//,
 
@@ -244,7 +245,7 @@ Hardping::Hardping(hardpingParticle incidentParticle,
 	  _energyCut(0.1),
 	  _firstCall(true),
 	  _isScattering(false),
-	  _kEnergyLoss(1.0),
+	  _kEnergyLoss(1.7),
 	  _incidentParticle(incidentParticle),
 	  _projectileNucleus(0,0), //hz
 	  _targetNucleus(targetNucleus),
@@ -259,7 +260,7 @@ Hardping::Hardping(hardpingParticle incidentParticle,
 	  _hardInteractionSummaryCount(0),
 	  _softInteractionSummaryCount(0),
 	  _fortranHardping(false),
-	  _verbose(1),
+	  _verbose(0),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")
 	 // _randomFile("/home/dsuetin/workspace/Pythia8180/Debug/randomNumbersFile.txt"),
@@ -797,8 +798,8 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
          //   	cout<< "in cycle "<<endl;
                 temp1 = getRandom();
                 temp2 = getRandom();
-   //           	temp1 = getRandomFromFile();
-   //           	temp2 = getRandomFromFile();
+//             	temp1 = getRandomFromFile();
+//              	temp2 = getRandomFromFile();
 
                 X= xMaxP0*temp1;//getRandomFromFile();		// x is NOT coordinate
                 Y= yMaxP0*temp2;//getRandomFromFile();
@@ -869,15 +870,18 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
         	}
         	/////////////////////////////////////////////////////////////////////////////////////////////////////
         }while(/*!_isScattering && _firstCall*/0); //this condition correspond to case that collision of first incident particle happened always
-
-        if(/*_isScattering DIFSC && INOFCOLL < _targetNucleus.A() */  _isScattering && particleA->getSoftCollisionNumber() < _targetNucleus.A()){
+       // bool testB = false;
+      //  testB = _isScattering && particleA->getSoftCollisionNumber() < _targetNucleus.A();
+     //   cout<<"res "<<testB<<" isc "<<_isScattering<<endl;//" cond "<<particleA->getSoftCollisionNumber() < _targetNucleus.A()<<endl;
+    //    cin>>ch;
+        if(/*_isScattering DIFSC && INOFCOLL < _targetNucleus.A() */  _isScattering && particleA->getSoftCollisionNumber() < _targetNucleus.A()-1){
         	//numOfCollisions++;
         	INOFCOLL++;
         	do{
             	temp1 = getRandom();
             	temp2 = getRandom();
-   //          	temp1 = getRandomFromFile();
-   //         	temp2 = getRandomFromFile();
+//             	temp1 = getRandomFromFile();
+//            	temp2 = getRandomFromFile();
             	if(_verbose)cout<<" temp1 = "<<temp1<<"  temp2 = "<<temp2<<endl;
 
             	X = xMinP + (xMaxP -xMinP)*temp1;//getRandomFromFile();//*getRandom();
@@ -1775,7 +1779,7 @@ char ch;
 						//todo suetin debug
 						//tempLenght =
 					  	isNotAdsorbed = energyLoss(particleA,maxHalfPathInNucleus);
-					   // 	 isNotAdsorbed =1;
+					    //	 isNotAdsorbed =1;
 						// isNotAdsorbed = 0 - particle is adsorbed
 						// isNotAdsorbed = 1 - all right
 						if(isNotAdsorbed){
@@ -2158,10 +2162,10 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			filename = filename + "_"+_targetNucleus.getNucleusName()+".txt";
 			if(_verbose)cout<<"filename "<<filename<<endl;
 		//	cin>>ch;
-		//	_pythia6Event.Exec(str);
+			//_pythia6Event.Exec(str);
 			//todo suetin debug
-			filename = "/home/guest/workspace4/Hardping_newold/pythia6event.txt";
-			//filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event.txt";
+		//	filename = "/home/guest/workspace4/Hardping_newold/pythia6event.txt";
+			filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event.txt";
 			//todo suetin debug
 			_pythia6File = new ifstream(filename);
 			if(_pythia6File->is_open()){
@@ -2196,6 +2200,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			pythia->event.append(partB);
 			pythia->event.append(partB);
 			pythia->event.append(partB);
+			//todo suetin debug end
 			///
 
 			//suetin debug
@@ -2263,20 +2268,27 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 		//	cin>>ch;
 
 			double hadronFormLenght = 0, preHadronFormLenght = 0, virtualPhotonEnergy = 0, virtualPhotonEnergyOld = 0;
-
+			double Qxcm = 0, Qycm = 0,Qzcm = 0,Qecm = 0;
+			double Qx = 0, Qy = 0,Qz = 0,Qe = 0;
+			Vec4 Q = 0;
 			//todo suetin debug
 
 			do{
 
 // поставить *_
-				 pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>virtualPhotonEnergy;
-				 if(_verbose)cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<endl;
-			//	cin>>ch;
+				 pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>Qx>>Qy>>Qz>>virtualPhotonEnergy;
+				 if(_verbose||1)cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<" Qx = "<<Qx<<" Qy = "<<Qy<<" Qz = "<<Qz<<" Qe = "<<Qe<<endl;
+			//	cout<<" id "<<idPythia6<<endl;
+				 Q.px(Qx);
+				 Q.py(Qy);
+				 Q.pz(Qz);
+				 Q.e(virtualPhotonEnergy);
+			 	//cin>>ch;
 				 if(_pythia6File->eof())continue;
 			 	if(idPythia6 == 0)continue;
 				countParticles++;
 				//todo suetin debug
-				if(countParticles <= 3 &&0){
+				if(countParticles <= 3 &&0 ){ //suetin change
 					statusCode = 0; // not final state
 				}else{
 					statusCode = 1; // final state
@@ -2294,10 +2306,15 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 	 		//	particleA->setPreHadronFormationLength(preHadronFormLenght);
 			//	particleA->setHadronFormationLength(hadronFormLenght);
 				particleA->setVirtualPhotonEnergy(virtualPhotonEnergy);
+				//suetin change
+				particleA->setTransferred4Momentum(Q);
+				cout<<"Q "<<particleA->getTransferred4Momentum().px()<<" "<<particleA->getTransferred4Momentum().py()<<" "<<particleA->getTransferred4Momentum().pz()<<" "<<particleA->getTransferred4Momentum().e()<<endl;
+				//suetin change end
+			//	cin>>ch;
 		}while( idPythia6 != 0 /*!_pythia6File->eof()*/ );
 	 	   	if(_verbose)pythia->event.list();
 			//cout<<"vfe "<<particleA->getVirtualPhotonEnergy()<<endl;
-    //	cin>>ch;
+     //	cin>>ch;
 			int scatteringLeptonPosition = 0;
 
 			for(unsigned i = 3; i < pythia->event.size(); i++){
@@ -2316,6 +2333,14 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 
 			}
 
+		/*	for(int i = 4; i < pythia->event.size(); i++){
+				cout<<pythia->event[i].id()<<" "<<pythia->event[i].px()<<" "<<pythia->event[i].py()<<" "<<pythia->event[i].pz()<<" "<<pythia->event[i].e()<<" "<<particleA->getVirtualPhotonEnergy()<<endl;
+				pythiaEventFile<<pythia->event[i].id()<<" "<<pythia->event[i].px()<<" "<<pythia->event[i].py()<<" "<<pythia->event[i].pz()<<" "<<pythia->event[i].e()<<" "<<particleA->getVirtualPhotonEnergy()<<endl;
+			}
+			pythiaEventFile<<0<<" "<<0<<" "<<0<<" "<<0<<" "<<0<<" "<<0<<endl;
+			//cin>>ch;
+
+	 */
 
 			if(_verbose)cout<<"ecv "<<pythia->event.at(0).mCalc()<<endl;// ECM of system
 
@@ -2594,6 +2619,8 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 					if(particleA->isLepton()){
 
 						tempHardpingParticle->setVirtualPhotonEnergy(particleA->getVirtualPhotonEnergy());
+						tempHardpingParticle->setTransferredCM4Momentum(particleA->getTransferredCM4Momentum());
+						tempHardpingParticle->setTransferred4Momentum(particleA->getTransferred4Momentum());
 						if(particleA->getVirtualPhotonEnergy() != 0){
 							z = tempHardpingParticle->e()/particleA->getVirtualPhotonEnergy();
 							if(z == 0){
@@ -2696,6 +2723,8 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 
 					if(particleA->getVirtualPhotonEnergy() != 0 && tempHardpingParticle->isHadron()){
 						tempHardpingParticle->setVirtualPhotonEnergy(particleA->getVirtualPhotonEnergy());
+						tempHardpingParticle->setTransferredCM4Momentum(particleA->getTransferredCM4Momentum());
+						tempHardpingParticle->setTransferred4Momentum(particleA->getTransferred4Momentum());
 						z = tempHardpingParticle->e()/tempHardpingParticle->getVirtualPhotonEnergy();
 						tempHardpingParticle->setHadronEnergyFraction(z);
 						if(_verbose)cout <<" tempHardpingParticle->e() "<<tempHardpingParticle->e()<<" particleA->getVirtualPhotonEnergy() "<<particleA->getVirtualPhotonEnergy()<<endl;
