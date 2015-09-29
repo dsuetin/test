@@ -122,7 +122,7 @@ Hardping::Hardping(nucleus projectileNucleus,
 	  _hardInteractionSummaryCount(0),
 	  _softInteractionSummaryCount(0),
 	  _fortranHardping(false),
-	  _verbose(0),
+	  _verbose(1),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")//,
 
@@ -260,7 +260,7 @@ Hardping::Hardping(hardpingParticle incidentParticle,
 	  _hardInteractionSummaryCount(0),
 	  _softInteractionSummaryCount(0),
 	  _fortranHardping(false),
-	  _verbose(0),
+	  _verbose(1),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")
 	 // _randomFile("/home/dsuetin/workspace/Pythia8180/Debug/randomNumbersFile.txt"),
@@ -668,7 +668,8 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
 	hadronNucleonCrossSection  = particleA->getHadronNucleonCrossSection();
 
 	preHadronNucleonCrossSection = particleA->getPreHadronNucleonCrossSection();
-
+	hadronNucleonCrossSection = 25.0;
+	preHadronNucleonCrossSection = 10.0;
 	//hadronNucleonCrossSection = particleA->getHadronNucleonCrossSection();
 	//preHadronNucleonCrossSection = particleA->getPreHadronNucleonCrossSection();
 	if(_verbose)cout<<"id = "<<particleA->id()<<endl;
@@ -1654,7 +1655,7 @@ char ch;
 							_isScattering = 0;
 						}
 					}
-*/					if(particleA->isHadron()){
+*/					if(particleA->isHadron()){//todo не видит налетающую частицу адроном
 							cout<<"1  "<<particleA->p();
 	                        if(particleA->getSoftCollisionNumber() == 0){
 	                        	if(_verbose)cout<<"vc1 "<<particleA->vProd().px()<<" py = "<<particleA->vProd().py()<<" pz = "<<particleA->vProd().pz()<<endl;

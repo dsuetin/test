@@ -93,7 +93,7 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
-		_verbose(0),
+		_verbose(1),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -137,7 +137,7 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
-		_verbose(0),
+		_verbose(1),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -147,43 +147,46 @@ public:
 		_pythiaParticle = new Particle(0);
 		_history = new vector <unsigned int>;
 		_hadronNucleonCrossSection = 0;
+		double preHadronCrossSectionNucleon = 10;
+		double preHadronCrossSectionPiMeson = 7;
+		double preHadronCrossSectionKMeson = 5;
 
 		switch (this->id()) {
 				case 2212:
 
 					_hadronNucleonCrossSection = 25;
-					_preHadronNucleonCrossSection = 10;
+					_preHadronNucleonCrossSection = preHadronCrossSectionNucleon;
 
 				break;
 
 				case 2112:
 					_hadronNucleonCrossSection = 25;
-					_preHadronNucleonCrossSection = 10;
+					_preHadronNucleonCrossSection = preHadronCrossSectionNucleon;
 					//this->e(neutronMass);
 				break;
 
 				case -2212:
 
 					_hadronNucleonCrossSection = 25;
-					_preHadronNucleonCrossSection = 10;
+					_preHadronNucleonCrossSection = preHadronCrossSectionNucleon;
 
 				break;
 
 				case -2112:
 					_hadronNucleonCrossSection = 25;
-					_preHadronNucleonCrossSection = 10;
+					_preHadronNucleonCrossSection = preHadronCrossSectionNucleon;
 					//this->e(neutronMass);
 				break;
 
 				case 211:
 					_hadronNucleonCrossSection = 15;
-					_preHadronNucleonCrossSection = 7;
+					_preHadronNucleonCrossSection = preHadronCrossSectionPiMeson;
 
 				break;
 
 				case -211:
 					_hadronNucleonCrossSection = 15;
-					_preHadronNucleonCrossSection = 7;
+					_preHadronNucleonCrossSection = preHadronCrossSectionPiMeson;
 				break;
 /*
 				case 111:
@@ -193,12 +196,12 @@ public:
 */
 				case 321:
 					_hadronNucleonCrossSection = 10;
-					_preHadronNucleonCrossSection = 5;
+					_preHadronNucleonCrossSection = preHadronCrossSectionKMeson;
 				break;
 
 				case -321:
 					_hadronNucleonCrossSection = 10;
-					_preHadronNucleonCrossSection = 5;
+					_preHadronNucleonCrossSection = preHadronCrossSectionKMeson;
 
 				break;
 /*				case 130:
