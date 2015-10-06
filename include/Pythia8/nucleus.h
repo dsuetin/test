@@ -406,9 +406,9 @@ public:
 	void setAngles(void){
 
 
-	//	_thetaHardping = this->theta();
-	//	_phiHardping = this->phi();
-
+		_thetaHardping = this->theta();
+		_phiHardping = this->phi();
+		return;
 		char ch;
 
 /*		_thetaHardping = acos(this->pz()/this->pAbs());
@@ -553,11 +553,13 @@ public:
 		//if(_verbose)cout<<"thetaHardping = "<<_thetaHardping<<" phi = "<<_phiHardping<<endl;
 		//dispose momentum of particle along initial beam direction
 		char ch;
-	/*
+
 		this->rot(_thetaHardping,0);
 		this->rot(0,_phiHardping);
 
-	*/
+
+		return ;
+
 		double sinY1, cosY1, sinX2, cosX2;
 		double px,py,pz, px1,py1,pz1,px2,py2,pz2;
 		double x,y,z, x1,y1,z1,x2,y2,z2;
@@ -640,10 +642,10 @@ public:
 		//if(_verbose)cout<<"theta = "<<_thetaHardping<<" phi = "<<_phiHardping<<endl;
 		//set particle momentum along z' direction (moving along z' direction, px = py = 0)
 		char ch;
-	//	this->rot(0,-_phiHardping);
+		this->rot(0,-_phiHardping);
 
-	//	this->rot(-_thetaHardping,0);
-
+		this->rot(-_thetaHardping,0);
+		return ;
 
 		//cout<<"0 rotation "<<this->p();
 	//	rotateAroundX(_thetaHardping);

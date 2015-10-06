@@ -746,7 +746,11 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
     	countInfinityLoop++;
 
         do{
-
+        	if(particleA->getSoftCollisionNumber() == 0 && particleA->isHadron()){
+        		hadronNucleonCrossSection = 30;
+        	}else{
+        		hadronNucleonCrossSection = 10;
+        	}
         	if(_verbose)cout<<" r "<<r<<" xMaxP0 = "<<xMaxP0<<" impactParameter = "<<impactParameter<<endl;
             if (  true || zCoord < 0 ){ //todo хз какое сечение брать. скорее всего нужно брать полное
             	if(_verbose)cout<<"путь до конца ядра = "<<integrationCoordinateBound - zCoord<<endl;
