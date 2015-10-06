@@ -260,7 +260,7 @@ Hardping::Hardping(hardpingParticle incidentParticle,
 	  _hardInteractionSummaryCount(0),
 	  _softInteractionSummaryCount(0),
 	  _fortranHardping(false),
-	  _verbose(1),
+	  _verbose(0),
 	  _cutMass(true),
 	  _pythia6Event("/home/guest/programs/build/macros_/getEvent.C")
 	 // _randomFile("/home/dsuetin/workspace/Pythia8180/Debug/randomNumbersFile.txt"),
@@ -1419,7 +1419,8 @@ char ch;
 	int countCut = 0;
 
 	if(_verbose)cout<<"lepton "<<_incidentParticle.isLepton()<<" id "<<_incidentParticle.id()<<" p "<<_incidentParticle.p();
-
+	if(_verbose)cout<<"hadron "<<_incidentParticle.isHadron()<<" id "<<_incidentParticle.id()<<" p "<<_incidentParticle.p();
+//	cin>>ch;
 	pythia->event.clear();
 	//std::vector <int> *vectorNProducedParticles;
 
@@ -1431,7 +1432,7 @@ char ch;
 	particleA = new hardpingParticle();
 
 	if(_incidentParticle.id() == 0 ){// слуай, когда инициализируется ядром
-
+/*
 		particleA->id(2212);
 		projectileRestMass = particleA->getRestMass();
 		initialProjectile4Momentum.pz(_energyLab);
@@ -1441,13 +1442,33 @@ char ch;
 
 		particleA->p(initialProjectile4Momentum);
 		_initialParticle = *particleA;
+*/
+
+
+
+		Particle newPythiaParticle;
+		newPythiaParticle.pz(_energyLab);
+		newPythiaParticle.id(2212);
+		newPythiaParticle.status(0);
+		pythia8->event.append(newPythiaParticle);
+		particleA = new hardpingParticle(pythia8->event.back());
+		particleA->e(sqrt(particleA->getRestMass()*particleA->getRestMass() + particleA->pAbs2()));
+		particleA->m(particleA->getRestMass());
+		cout<<"incidentParticle "<<particleA->id()<<" p = "<<particleA->p();
+		pythia8->event.clear();
+
+
+
+
 
 	}else{
 		*particleA = _incidentParticle; // слуай, когда инициализируется частицей
 
 	}
 
-
+	if(_verbose)cout<<"lepton "<<particleA->isLepton()<<" id "<<particleA->id()<<" p "<<particleA->p();
+	if(_verbose)cout<<"hadron "<<particleA->isHadron()<<" id "<<particleA->id()<<" p "<<particleA->p();
+//	cin>>ch;
 	if(_verbose)cout<<"_maxZCoordinate = "<<_maxZCoordinate<<endl;
 
 
@@ -1793,7 +1814,7 @@ char ch;
 					 		particleA->rotateHardping();
 
 					 	//	cout<<"El "<<particleA->getEnergyLoss()<<endl;
-					 		particleA->setHadronEnergyFraction(particleA->e()/particleA->getVirtualPhotonEnergy());
+					 		if(particleA->getVirtualPhotonEnergy())particleA->setHadronEnergyFraction(particleA->e()/particleA->getVirtualPhotonEnergy());
 					 	//	cout<<"e "<<particleA->e()<<" vfe "<<particleA->getVirtualPhotonEnergy()<<endl;
 					 //		cout<<" hef "<<particleA->getHadronEnergyFraction()<<endl;
 							_outOfNucleus->push_back(*particleA);
@@ -1803,7 +1824,7 @@ char ch;
 						continue;
 					}
 
-					cout<<"El "<<particleA->getEnergyLoss()<<endl;
+					//cout<<"El "<<particleA->getEnergyLoss()<<endl;
 				//	cin>>ch;
 //					cout<<particleA->vProd();
 
@@ -1916,10 +1937,12 @@ char ch;
 						pythiaNextFlag = 1;
 					}else{
 						pythiaNextFlag = pythia->next();
-					//	pythia->info.list();
+						//pythia->info.list();
 						if(_verbose)cout<<"name of processes "<< pythia->info.name()<<endl;
 						if(_verbose)cout<<"code of processes "<< pythia->info.code()<<endl;
+						//pythia->
 						//pythia->event.list();
+						//cin>>ch;
 					}
 
 
@@ -1929,8 +1952,14 @@ char ch;
 						pythiaNextFlag = 1;
 						particleA->setXBjorkenProjectile(1.);//todo неправильно. переделать.
 					}
+					if(_verbose)cout<<"is h befor next"<<particleA->isHadron()<<endl;
+				//	cin>>ch;
 					if(particleA->isHadron()){
+
 						pythiaNextFlag = pythia->next();
+						pythia->event.list();
+						//pythia->process.
+						//cin>>ch;
 						particleA->setXBjorkenProjectile( pythia->info.x1());
 						particleA->setXBjorkenTarget(     pythia->info.x2());
 					}
@@ -1958,7 +1987,7 @@ char ch;
 				if(particleA->isHard()){
 					_hardInteractionSummaryCount++;
 					particleA->increaseHardCollisionNumber();
-					//cout<<"particleA history size = "<<particleA->getHistory()->size()<<endl;
+					cout<<"particleA history size = "<<particleA->getHistory()->size()<<endl;
 					if(_verbose)cout<<" particleA = "<<particleA->getHistory()->back()<<" have a hard collision "<<endl;
 
 
@@ -2028,7 +2057,7 @@ char ch;
 
 					}else{
 						/////////////////////////   Drell- Yan part    ////////////////////////////////////////////////////////
-							if(findDrellYanPairs( i_pyEv, particleA))continue;//return;
+							if(findDrellYanPairs( i_pyEv, particleA))return;//continue;//return;
 					}
 
 				/*	if(pythia->event.at(i_pyEv).id()==abs(13)){
@@ -2548,11 +2577,15 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 		if(_verbose) cout<<" in prepareNewGeneration beagin"<<endl;
 
 		if(_verbose)cout<<" p "<<particleA->p();
+		if(_verbose)cout<<" pi "<<pythia->event.at(i_pyEv+3).p();
+
+		if(_verbose)cout<<" isHadron begining prepareNewGeneration"<<particleA->isHadron();
 		// cin>>ch;
 		Vec4  vecCoordinate(particleA->vProd());
 
 		hardpingParticle* tempHardpingParticle;
-
+		cout<<"status "<<pythia->event.at(i_pyEv+3).isFinal()<<endl;
+		//cin>>ch;
 		if(pythia->event.at(i_pyEv+3).isFinal()){
 			unsigned int numberOfGeneration = particleA->getNumberOfCurrentGeneration();
 			unsigned int i_init =  particleA->getIndexNumber();
@@ -2585,6 +2618,8 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 			//	tempHardpingParticle->setThetaHardping(particleA->getThetaHardping());
 				double sinY1 = 0, cosY1 = 0, sinX2 = 0, cosX2 = 0;
 				particleA->getTrigonometricFunctions(sinY1,cosY1,sinX2,cosX2);
+				//cout<<"trig1 "<<sinY1<<" "<<cosY1<<" "<<sinX2<<" "<<cosX2<<endl;
+				//cin>>ch;
 				tempHardpingParticle->setTrigonometricFunctions(sinY1,cosY1,sinX2,cosX2);
 
 				tempHardpingParticle->setSoftCollisionNumber(particleA->getSoftCollisionNumber());
@@ -2616,6 +2651,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				double formationLength = 0;
 				double preHadronFormationLength = 0;
 				double bl = 0;
+				double sinTheta = 0, cosTheta =0, sinPhi = 0, cosPhi = 0, anglePhi = 0, angleTheta = 0;
 				if(particleA->isHard() && tempHardpingParticle->isHadron()){//в случае жесткого столкновения для вторичных адронов вычисляется длина формирования и сопутствующие величины
 					if(particleA->isLepton()){
 
@@ -2745,6 +2781,16 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				if(particleA->getLeftHadronFormationLength())tempHardpingParticle->setLeftHadronFormationLength(particleA->getLeftHadronFormationLength());
 				if(particleA->getLeftPreHadronFormationLength())tempHardpingParticle->setLeftPreHadronFormationLength(particleA->getLeftPreHadronFormationLength());
 //todo может быть на элсэ поставить приравнивание к нулю.
+				particleA->getAngles(sinPhi, cosPhi, sinTheta, cosTheta);
+				angleTheta = particleA->getThetaHardping();
+				anglePhi = particleA->getPhiHardping();
+				tempHardpingParticle->setPhiHardping(anglePhi);
+				tempHardpingParticle->setThetaHardping(angleTheta);
+				angleTheta = particleA->getThetaHardping2();
+				anglePhi = particleA->getPhiHardping2();
+				tempHardpingParticle->setPhiHardping2(anglePhi);
+				tempHardpingParticle->setThetaHardping2(angleTheta);
+				tempHardpingParticle->setAngles(sinPhi, cosPhi, sinTheta, cosTheta);
 				if(/*pythia->event.size() != 4*/1){
 					//cout<<"here i am "<<endl;
 
@@ -2803,6 +2849,8 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().rot(-theta,0);
 				cout<<"icoord 2=   "<<_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().p()<<endl;
 				cout<<" coord 2=   "<<_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().vProd()<<endl;*/
+				cout<<"is Hadron end prepare new gen "<<tempHardpingParticle->isHadron();// = *particle;
+				//cin>>ch;
 				delete tempHardpingParticle;
 				return true;
 			}// end else (pythia->event.at(i_pyEv+3).e() < _energyCut)
@@ -2821,6 +2869,10 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 		tempHardpingParticle = new hardpingParticle();
 		tempHardpingParticle->setPhiHardping(particleA->getPhiHardping());
 		tempHardpingParticle->setThetaHardping(particleA->getThetaHardping());
+		double sinPhi = 0 ;
+		double cosPhi = 0;
+		double sinTheta = 0;
+		double cosTheta = 0;
 		double pt_old = 0, pt_new = 0, px_old =0, py_old = 0,pz_old =0,pe_old =0, px_new = 0, py_new =0, deltaPt = 0;
 
 		Vec4 vecMomentumZ0(0);
@@ -2862,6 +2914,11 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 			particleA->p(vecMomentum);
 	//		cout<<"mom after "<<particleA->p();
 			particleA->setAngles();
+
+			double t1,t2,t3,t4;
+			particleA->getTrigonometricFunctions(t1,t2,t3,t4);
+			cout<<"t1234 3 "<<t1<<" "<<t2<<" "<<t3<<" "<<t4<<endl;
+		//	cin>>ch;
 	//		cout<<"phi = "<<particleA->getPhiHardping()<<" theta = "<<particleA->getThetaHardping()<<endl;
 /*
 			if(_targetNucleus.A()==184){
@@ -3020,6 +3077,7 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 				tempHardpingParticle->p(vecMomentumZ0);
 				tempHardpingParticle->setPhiHardping(particleA->getPhiHardping());
 				tempHardpingParticle->setThetaHardping(particleA->getThetaHardping());
+				tempHardpingParticle->setAngles();
 				tempHardpingParticle->id(23);
 
 			//	cout<<"phi = "<<tempHardpingParticle->getPhiHardping()<<" theta = "<<tempHardpingParticle->getThetaHardping()<<endl;

@@ -66,6 +66,9 @@ class hardpingParticle : public Particle{
 public:
 	hardpingParticle():
 		Particle(0),
+		//
+		//  Particle(particleId, 0, 0, 0, 0, 0, 0, 0, 0., 0., 0., 0., 0., 0., 9.),
+		//
 		_transferred4Momentum(0),
 		_transferredCM4Momentum(0),
 		_virtualPhotonEnergy(0),
@@ -93,6 +96,55 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
+		_energyLoss(0),
+		_verbose(1),
+		  _sinY1(0),
+		  _cosY1(0),
+		  _sinX2(0),
+		  _cosX2(0)
+
+
+	{
+		_pythiaParticle = new Particle(0);
+		_history = new vector <unsigned int>;
+		_hadronNucleonCrossSection = 0;
+		_preHadronNucleonCrossSection = 0;
+
+	}
+	hardpingParticle(int particleId):
+	//	Particle(0),
+		//
+		  Particle(particleId, 211, 211, 211, 211, 211, 211, 211, 121., 111., 321., 222., 1., 3., 9.),
+		  //Particle(particleId, 211, 211, 211, 211, 211, 211, 0, 0., 0., 0., 0., 0., 0., 9.),
+		//
+		_transferred4Momentum(0),
+		_transferredCM4Momentum(0),
+		_virtualPhotonEnergy(0),
+		_x1(0),
+		_x2(0),
+		_hadronEnergyFraction(0),
+		_motherParticleHistoryIndex(0),
+		_hadronFormationLength(0),
+		_history(0),
+		_hardInteraction(false),
+		_softInteraction(false),
+		_outOfNucleus(false),
+		_scatteringOnparticle(0),
+		_numberOfCurrentGeneration(0),
+		_indexInGeneration(0),
+		_thetaHardping(0),
+		_phiHardping(0),
+		_thetaHardping2(0),
+		_phiHardping2(0),
+		_lastHard(false),
+		_numberOfSoftCollisions(0),
+		_numberOfHardCollisions(0),
+		_preHadronFormationLength(0),
+		_leftHadronFormationLength(0),
+		_leftPreHadronFormationLength(0),
+		_residualHadronFormationLength(0),
+		_totalPathInNucleus(0),
+		_energyLoss(0),
 		_verbose(1),
 		  _sinY1(0),
 		  _cosY1(0),
@@ -137,6 +189,7 @@ public:
 		_leftPreHadronFormationLength(0),
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
+		_energyLoss(0),
 		_verbose(1),
 		  _sinY1(0),
 		  _cosY1(0),
@@ -1723,11 +1776,17 @@ double getQ2LeptonHadron(pythia6Event* py6Ev){
 double getQ2HadronHadron(pythia6Event* py6Ev){
 
 }
-bool findHardParticle(hardpingParticle* particleA){
+hardpingParticle* findHardParticle(/*hardpingParticle* particleA*/void){
 	bool itIsOk = false;
 	bool exit = false;
+	double sinTheta = 0, cosTheta =0, sinPhi = 0, cosPhi = 0, anglePhi = 0, angleTheta = 0;
 	char ch;
 	if(_verbose)cout<<"_generations->size() = "<<_generations->size()<<endl;
+	if(_verbose)cout<<"iam in = "<<endl;
+
+	hardpingParticle* particleA;// = new hardpingParticle();
+	//cout<<" p "<<particleA->p();
+	//cin>>ch;
 	for(unsigned int indexOfGeneration = 0; indexOfGeneration < _generations->size(); indexOfGeneration++ ){
 		if (indexOfGeneration == 3){
 			//cout<<"_generations->at(indexOfGeneration).getMatrix()->size() = "<<_generations->at(indexOfGeneration).getMatrix()->size()<<endl;
@@ -1749,16 +1808,61 @@ bool findHardParticle(hardpingParticle* particleA){
 				if(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->back() ==
 						_indexOfHardCollosion){
 				//	cin>>ch;
-
+			//todo строчка все косячит		//particleA = new hardpingParticle(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex));
 					if(_verbose)	cout<<" diff = "<<_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).p();
-					particleA->p(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).p());
-					particleA->vProd(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).vProd());
+					if(_verbose)pythia->event.list();
+					pythia->event.append(*_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getPythiaParticle());
+					if(_verbose)pythia->event.list();
+					particleA = new hardpingParticle(pythia->event.back());
+					particleA->e(sqrt(particleA->getRestMass()*particleA->getRestMass() + particleA->pAbs2()));
+					particleA->m(particleA->getRestMass());
+											//cout<<"incidentParticle "<<particleA->id()<<" p = "<<particleA->p();
+					pythia->event.remove(pythia->event.size()-1,pythia->event.size()-1);
+					if(_verbose)pythia->event.list();
+					for(int i = 0; i < _generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->size();i++){
+							cout<<_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->at(i)<<" ";
+					}
+					cout<<endl;
+					//cin>>ch;
+					//particleA->
+					//particleA->p(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).p());
+					//particleA->vProd(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).vProd());
 					particleA->scatteringOnParticle(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getIdscatteringParticle());
 					particleA->setPhiHardping(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).phi());
 					particleA->setThetaHardping(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).theta());
 					particleA->getHistory()->clear();
 					particleA->getHistory()->assign(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->begin(),_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->end());
-					particleA->id(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).id());
+
+					_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getAngles(sinPhi, cosPhi, sinTheta, cosTheta);
+					angleTheta = _generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getThetaHardping();
+					anglePhi = _generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getPhiHardping();
+					particleA->setPhiHardping(anglePhi);
+					particleA->setThetaHardping(angleTheta);
+					angleTheta = _generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getThetaHardping2();
+					anglePhi = _generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getPhiHardping2();
+					particleA->setPhiHardping2(anglePhi);
+					particleA->setThetaHardping2(angleTheta);
+					particleA->setAngles(sinPhi, cosPhi, sinTheta, cosTheta);
+
+
+					//double sinY1 = 0, cosY1 = 0, sinX2 = 0, cosX2 = 0;
+					//_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getTrigonometricFunctions(sinY1,cosY1,sinX2,cosX2);
+
+					_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getTrigonometricFunctions(sinPhi, cosPhi, sinTheta, cosTheta);
+					particleA->setTrigonometricFunctions(sinPhi, cosPhi, sinTheta, cosTheta);
+					cout<<"trig "<<sinPhi<<" "<<cosPhi<<" "<<sinTheta<<" "<<cosTheta<<endl;
+				//	cin>>ch;
+					cout<<"size "<<particleA->getHistory()->size()<<endl;
+					for(int i = 0; i < particleA->getHistory()->size(); i++ ){
+						cout<<particleA->getHistory()->at(i)<<" ";
+					}
+					cout<<endl;
+				//	cin>>ch;
+					if(_verbose)cout<<"particleA->isHadron() "<<particleA->isHadron()<<" id "<<particleA->id()<<endl;
+					if(_verbose)cout<<"particleA->vProd()    "<<particleA->vProd();
+					if(_verbose)cout<<"getIdscatteringParticle    "<<particleA->getIdscatteringParticle();
+			//		cin>>ch;
+					//particleA->id(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).id());
 /*
 					for(unsigned int i = 0 ; i < particleA->getHistory()->size(); i++){
 						cout<<particleA->getHistory()->at(i)<<" ";
@@ -1767,7 +1871,7 @@ bool findHardParticle(hardpingParticle* particleA){
 */
 					//todo may be add some new parameter
 					if(_verbose)cout<<" particleA = "<<particleA->p()<<" idb "<<particleA->getIdscatteringParticle()<<endl;
-					return itIsOk;
+					return particleA;
 					//exit = true;
 				//	cin>>ch;
 					break;
@@ -1779,16 +1883,52 @@ bool findHardParticle(hardpingParticle* particleA){
 	//	cout<<"3"<<endl;
 	}// end indexOfGeneration cycle
 //	cout<<"4"<<endl;
-	return itIsOk;
+	return particleA;
 }
 
 bool ifNoHardCollisionHappened(unsigned int numberOfGeneration/*, hardpingParticle * particleA*/){
 	char ch;
 	//cout<<" in ifNoHardCollisionHappened beagin"<<endl;
 	//cin>>ch;
-	hardpingParticle* particleA;
-	particleA = new hardpingParticle();
+	//Particle particleB
+	bool noHardCollisionHappened = false;
+	if(_generations->at(numberOfGeneration-1).getMatrix()->size() == 0 && _hardInteractionSummaryCount == 0)noHardCollisionHappened = true;
+	if(noHardCollisionHappened == false)return noHardCollisionHappened;
+	double sinTheta = 0, cosTheta =0, sinPhi = 0, cosPhi = 0, anglePhi = 0, angleTheta = 0;
+	hardpingParticle* particleA ;//= new hardpingParticle();
+	//particleA = new hardpingParticle();
+	/*Particle newPythiaParticle;
+	newPythiaParticle.pz(_energyLab);
+	newPythiaParticle.id(2212);
+	newPythiaParticle.status(0);
+	//pythia->event.list();
+	pythia->event.append(newPythiaParticle);
+	//pythia->event.list();
+	particleA = new hardpingParticle(pythia->event.back());
+	particleA->e(sqrt(particleA->getRestMass()*particleA->getRestMass() + particleA->pAbs2()));
+	particleA->m(particleA->getRestMass());
 
+	//cout<<"incidentParticle "<<particleA->id()<<" p = "<<particleA->p();
+	pythia->event.remove(pythia->event.size()-1,pythia->event.size()-1);
+	for(int i = 0; i < particleA->getHistory()->size(); i++ ){
+		cout<<particleA->getHistory()->at(i)<<" ";
+	}
+
+	cout<<"size beg "<<particleA->getHistory()->size()<<endl;
+	cout<<"p "<<particleA->p()<<endl;
+	cout<<"x "<<particleA->vProd().px()<<endl;
+	cout<<"y "<<particleA->vProd().py()<<endl;
+	cout<<"z "<<particleA->vProd().pz()<<endl;
+	cout<<"size "<<particleA->vProd().e()<<endl;
+
+	cin>>ch;
+*/
+	//pythia->event.clear();
+	//pythia->event.list();
+	//hardpingParticle* particleA;
+	//particleA = new hardpingParticle(newPythiaParticle);
+	//cout<<"particleA->isHadron() "<<particleA->isHadron()<<" id "<<particleA->id()<<endl;
+	//cin>>ch;
 	bool softToHard = false;
 	//unsigned int randomPossitionOfHardScattering = 0 ;
 
@@ -1812,19 +1952,66 @@ bool ifNoHardCollisionHappened(unsigned int numberOfGeneration/*, hardpingPartic
 
 				if(getIndexHardOfHardCollision()){
 					//when we get particle she is oriented along initial z direction
-					findHardParticle(particleA);
+					particleA = findHardParticle();
+					/*
+					cout<<"size "<<particleA->getHistory()->size()<<endl;
+					for(int i = 0; i < particleA->getHistory()->size(); i++ ){
+						cout<<particleA->getHistory()->at(i)<<" ";
+					}
+					cout<<"size "<<particleA->getHistory()->size()<<endl;
+					cout<<"p "<<particleA->p()<<endl;
+					cout<<"x "<<particleA->vProd().px()<<endl;
+					cout<<"y "<<particleA->vProd().py()<<endl;
+					cout<<"z "<<particleA->vProd().pz()<<endl;
+					cout<<"size "<<particleA->vProd().e()<<endl;
+					*/
+					//double t1,t2,t3,t4;
+					//particleA->getAngles(t1,t2,t3,t4);
 
+					//cout<<"t1234 "<<t1<<" "<<t2<<" "<<t3<<" "<<t4<<endl;
+					//particleA->getTrigonometricFunctions(t1,t2,t3,t4);
+					//cout<<"t1234 2 "<<t1<<" "<<t2<<" "<<t3<<" "<<t4<<endl;
+				//	cin>>ch;
 
 				}else{
-						particleA->p(_initialParticle.p());
-						particleA->vProd(_initialParticle.vProd());
-						particleA->id(_initialParticle.id());
+
+
+						//Particle newPythiaParticle(*_initialParticle.getPythiaParticle());
+
+					    if(_verbose)pythia->event.list();
+						pythia->event.append(*_initialParticle.getPythiaParticle());
+						if(_verbose)pythia->event.list();
+						particleA = new hardpingParticle(pythia->event.back());
+						particleA->e(sqrt(particleA->getRestMass()*particleA->getRestMass() + particleA->pAbs2()));
+						particleA->m(particleA->getRestMass());
+						//cout<<"incidentParticle "<<particleA->id()<<" p = "<<particleA->p();
+						pythia->event.remove(pythia->event.size()-1,pythia->event.size()-1);
+						if(_verbose)pythia->event.list();
+						//particleA = new hardpingParticle(_initialParticle);
+						if(_verbose)cout<<"particleA->isHadron() "<<particleA->isHadron()<<" id "<<particleA->id()<<endl;
+						if(_verbose)cout<<"particleA->vProd()    "<<particleA->vProd();
+						if(_verbose)cout<<"getIdscatteringParticle    "<<particleA->getIdscatteringParticle();
+
 						particleA->scatteringOnParticle(_initialParticle.getIdscatteringParticle());
 						particleA->getHistory()->clear();
 						for(unsigned int i_history = 0; i_history < _initialParticle.getHistory()->size(); i_history++){
 							particleA->getHistory()->push_back(_initialParticle.getHistory()->at(i_history));
 						}
+						_initialParticle.getAngles(sinPhi, cosPhi, sinTheta, cosTheta);
+						angleTheta = _initialParticle.getThetaHardping();
+						anglePhi = _initialParticle.getPhiHardping();
+						particleA->setPhiHardping(anglePhi);
+						particleA->setThetaHardping(angleTheta);
+						angleTheta = _initialParticle.getThetaHardping2();
+						anglePhi = _initialParticle.getPhiHardping2();
+						particleA->setPhiHardping2(anglePhi);
+						particleA->setThetaHardping2(angleTheta);
+						particleA->setAngles(sinPhi, cosPhi, sinTheta, cosTheta);
+						_initialParticle.getTrigonometricFunctions(sinPhi, cosPhi, sinTheta, cosTheta);
+						particleA->setTrigonometricFunctions(sinPhi, cosPhi, sinTheta, cosTheta);
 				}
+				//cout<<"is h soft to hard "<<particleA->isHadron()<<endl;
+			//	cin>>ch;
 				findParticlesWithIndexOfHardCollisions();
 
 				_generations->at(numberOfGeneration-1).getMatrix()->resize(1);
@@ -1853,6 +2040,7 @@ void findParticlesWithIndexOfHardCollisions(void){
 }
 void getParticleFromPreviousGeneration(hardpingParticle* particleA){
 	// get particle from previous generation
+	char ch;
 	unsigned int numberOfGeneration = 0;
 	unsigned int i_init = 0;
 	numberOfGeneration = particleA->getNumberOfCurrentGeneration();
@@ -1876,6 +2064,10 @@ cout<<"theta "<<_generations->at(numberOfGeneration-1).getMatrix()->at(_index->a
 cout<<"phi "<<_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(i_init).i).at(_index->at(i_init).j).phi()<<endl;
 */
 	*particleA = _generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(i_init).i).at(_index->at(i_init).j);
+	//cout<<"is h getParticleFromPreviousGeneration "<<particleA->isHadron()<<endl;
+	//cin>>ch;
+
+
 	// set index number of particle in current generation
 	particleA->setInexNumber(i_init);
 	//and number of current generation
