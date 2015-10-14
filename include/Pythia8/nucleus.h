@@ -45,15 +45,16 @@
 #include "Pythia.h"
 #include "timer.h"
 #include <vector>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
+//#include <gsl/gsl_rng.h>
+//#include <gsl/gsl_randist.h>
 extern ofstream pathInNucleiOutput;
 extern ofstream softCollisionsNumberOutput;
 extern ofstream deltaPtOutput;
 extern  double getRandomFromFile();
-extern  const gsl_rng_type *gslRandomGeneratorType;
-extern  gsl_rng *gslRandomGenerator;
+//extern  const gsl_rng_type *gslRandomGeneratorType;
+//extern  gsl_rng *gslRandomGenerator;
 extern ifstream coordinateFile;
+extern int verbose;
  //class Pythia8::Pythia;
 //This class holds the information for a target nucleus
 namespace Pythia8{
@@ -97,7 +98,7 @@ public:
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
 		_energyLoss(0),
-		_verbose(1),
+		_verbose(verbose),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -145,7 +146,7 @@ public:
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
 		_energyLoss(0),
-		_verbose(1),
+		_verbose(verbose),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -190,7 +191,7 @@ public:
 		_residualHadronFormationLength(0),
 		_totalPathInNucleus(0),
 		_energyLoss(0),
-		_verbose(1),
+		_verbose(verbose),
 		  _sinY1(0),
 		  _cosY1(0),
 		  _sinX2(0),
@@ -1845,7 +1846,8 @@ hardpingParticle* findHardParticle(/*hardpingParticle* particleA*/void){
 					particleA->setPhiHardping2(anglePhi);
 					particleA->setThetaHardping2(angleTheta);
 					particleA->setAngles(sinPhi, cosPhi, sinTheta, cosTheta);
-
+					particleA->setSoftCollisionNumber(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getSoftCollisionNumber()-1);//минус 1, потому что одно мягкое стало жестким
+					particleA->setEnergyLoss(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getEnergyLoss());
 
 					//double sinY1 = 0, cosY1 = 0, sinX2 = 0, cosX2 = 0;
 					//_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getTrigonometricFunctions(sinY1,cosY1,sinX2,cosX2);
@@ -2011,6 +2013,8 @@ bool ifNoHardCollisionHappened(unsigned int numberOfGeneration/*, hardpingPartic
 						particleA->setAngles(sinPhi, cosPhi, sinTheta, cosTheta);
 						_initialParticle.getTrigonometricFunctions(sinPhi, cosPhi, sinTheta, cosTheta);
 						particleA->setTrigonometricFunctions(sinPhi, cosPhi, sinTheta, cosTheta);
+						particleA->setSoftCollisionNumber(_initialParticle.getSoftCollisionNumber());
+						particleA->setEnergyLoss(_initialParticle.getEnergyLoss());
 				}
 				//cout<<"is h soft to hard "<<particleA->isHadron()<<endl;
 			//	cin>>ch;
@@ -2492,6 +2496,11 @@ void finalOutput(void){
 		//cout<<" phi1 = "<<phiImpact<<endl;
 		impactX = sin(phiImpact)*impactPar;
 		impactY = cos(phiImpact)*impactPar;
+
+		//suetindebug
+		//impactX = 0;
+		//impactY = 0;
+		return;
 
 	}
 
