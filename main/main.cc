@@ -70,7 +70,7 @@ double initialProjectileLabMomentum = 800;//27.6;
 
 numEvent =  10;//00000;
    numEvent =  1000000;
-   verbose = 1;
+   verbose = 0;
 Aproj = 1;
 Zproj = 1;
 //Kr(36,84)
@@ -78,7 +78,7 @@ Zproj = 1;
 
 
 Atarg = 9;//184;//84;
-Ztarg = 4;//74;//36;
+Ztarg = 4;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
@@ -392,8 +392,11 @@ double maxPathInNucleus = 0;
 			//if(hardping->_finalState->at(ih).isHadron())fileDrellYan<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().px()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().py()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().pz()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().e()<<" "<<hardping->_finalState->at(ih).p();
 
 			fileDrellYan<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).p();
-			//if(hardping->_finalState->at(ih).isHadron()||1)cout<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().px()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().py()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().pz()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().e()<<" "<<hardping->_finalState->at(ih).p();
-			//cin>>ch;
+			if(hardping->_finalState->at(ih).isHadron()||1)cout<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().px()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().py()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().pz()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().e()<<" "<<hardping->_finalState->at(ih).p();
+			cout<<"tau "<<hardping->_finalState->at(ih).tau()<<endl;
+			cout<<"y "<<hardping->_finalState->at(ih).y()<<endl;
+
+			cin>>ch;
 			//cout<< hardping->_finalState->at(ih).getTransferredCM4Momentum().px()<<endl;
 			//cout<< hardping->_finalState->at(ih).getTransferredCM4Momentum().py()<<endl;
 			//cout<< hardping->_finalState->at(ih).getTransferredCM4Momentum().pz()<<endl;

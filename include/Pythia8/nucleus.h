@@ -41,6 +41,7 @@
 #define unchargedPionMass 0.13497666
 #define chargedKaonMass   0.49367716
 #define unchargedKaonMass 0.49761424
+#define nucleonMass (protonMass + neutronMass)/2.
 //#include <cmath>
 #include "Pythia.h"
 #include "timer.h"
@@ -327,10 +328,11 @@ public:
 	double getInitialProjectileLabMomentum(void){
 		return this->pz();
 	}
-	double getRestMass(void){
+	double getRestMass(int id = 0){
 
-
-		switch (abs(this->id())) {
+		if(id == 0)id =this->id();
+		id = abs(id);
+		switch (id) {
 		case 2212:
 
 		  return protonMass;
@@ -484,6 +486,112 @@ public:
 		 if(_verbose)cout<<"px2 = "<<px2<<" py2 = "<<py2<<" pz2 = "<<pz2<<endl;
 		 if(_verbose)cout<<"x2 = "<<x2<<" y2 = "<<y2<<" z2 = "<<z2<<endl;
 
+	}
+	double getEcm(){
+		double mProjectile = 0, mTarget = 0;
+		double s = 0;
+		mProjectile = this->getRestMass();
+		mTarget = this->getRestMass(this->getIdscatteringParticle());
+		s = mProjectile*mProjectile + 2*mTarget*this->e() + mTarget*mTarget;
+
+		return sqrt(s);
+	}
+	void recalculateXBjorken(int targetAtomicNumber){
+
+		double kEnergyLoss = 0;
+		double newEnergy = 0;
+		double x1New = 0;
+		double x1Old = 0;
+		double x2New = 0;
+		double x2Old = 0;
+		double energyMin = 0;
+		double energyCM  = 0;
+		double minHatMass = 2;// todo дописанно руками. переписать по нормальному.
+		//double
+		kEnergyLoss = _kEnergyLoss;
+		newEnergy = this->p().e() - kEnergyLoss;
+		kEnergyLoss = sqrt(2*nucleonMass*nucleonMass );
+		double tau = this->tau();
+		double y   = this->y();
+		x1New = sqrt(tau)*exp(y);
+		x2New = sqrt(tau)*exp(-y);
+		energyCM = this->getEcm();
+
+		energyMin =0.5*minHatMass*minHatMass/(energyCM*x2New);
+		double rLMax = 0;
+		double ZMW0  = 0;
+		if(targetAtomicNumber == 9){
+			rLMax = 6.0;
+			ZMW0  = 0.622;
+		}else{
+			rLMax = 1.0;
+			ZMW0  = 0.248;
+		}
+		/*
+
+	         if (IHNT2(3) .eq. 9) then
+	            rLmax = 6.0D0
+	         else
+	            rLmax = 11.0D0
+	         endif
+	         HIPR1(77)=ZMW0()
+	         CALL HIFUN(8,0.0D0,rLmax,ZMWL)
+      if (IHNT2(3) .eq. 9) then
+         ZMW0=0.622D0
+      else
+         ZMW0=0.284D0
+      endif
+
+
+
+		if()
+		/*
+
+         rr = PYR(0)
+C         write(*,*)'W0=',HIPR1(77)
+         if (rr .le. HIPR1(77)) then
+            rE1 = rx1*rE
+C            write(*,*)'no stopping'
+         else
+110         rl = HIRND(8)
+            rdedz = HIPR1(73)
+            if (IHPR2(31) .eq. 3) then
+               rq2 = VINT(52)
+C               rdedz = rdedz + 2*PYALPS(rq2)*rq2/(3.14*41.32*HIPR1(78))
+               rdedz = rdedz + 2*PYALPS(rq2)*rq2/100*rq2/100*rq2/100*
+     &              rq2/100*rq2/100*rq2/100*rq2/100*rq2/100/HIPR1(78)
+            endif
+C            write(*,*)'dE/dz = ',rdedz
+            rE1 = rx1*rE-rdedz*rl
+
+            if ((rE1 .lt. rEmin) .and. (miss .lt. 50)) then
+C               write(*,*)'ZMSTOP: error'
+               miss=miss+1
+               goto 110
+            endif
+            if (miss.ge.50) then
+               write(*,*)'ZMSTOP: error 2'
+               rE1=rEmin
+            endif
+C            write(*,*)'Passed'
+         endif
+      endif
+
+
+      rx1 = rE1/rE
+
+      tau = rx1*rx2
+      yst = 0.5D0*dlog(rx1/rx2)
+
+      VINT(21)=tau
+      VINT(22)=yst
+      VINT(41)=rx1
+      VINT(42)=rx2
+
+      DADUM1=rx1
+
+      HIPR1(73)=DTEMP
+		 * */
 	}
 	void setAngles(double sinPhi,double cosPhi,double sinTheta,double cosTheta){
 		_sinPhi   = sinPhi;
@@ -925,6 +1033,13 @@ public:
 	void setEnergyLoss(double formationLength){
 		_energyLoss = formationLength;
 	}
+
+	double getKEnergyLoss(void){
+		return _kEnergyLoss;
+	}
+	void setKEnergyLoss(double energyLoss){
+		_kEnergyLoss = energyLoss;
+	}
 	//todo написать функцию, которая по индексу частицы в истории возвращала бы указатель на эту частицу.
 private:
 	vector <unsigned int> * _history;
@@ -965,6 +1080,7 @@ private:
 	double _sinPhi;
 	int _verbose;
 	double _sinY1, _cosY1, _sinX2, _cosX2;
+	double _kEnergyLoss;
 	//Rndm * _random;
 
 };
@@ -2498,8 +2614,8 @@ void finalOutput(void){
 		impactY = cos(phiImpact)*impactPar;
 
 		//suetindebug
-		//impactX = 0;
-		//impactY = 0;
+		impactX = 0;
+		impactY = 0;
 		return;
 
 	}
