@@ -59,6 +59,7 @@ extern ifstream pythia6Z0File;
 extern ifstream softCollisionsNumberInput;
 extern int nSoft;
 extern int verbose;
+extern double sNN;
 //using namespace starlightConstants;
 Timer time1;
 bool compare(int i,int j) { return ( i < j); }
@@ -109,7 +110,7 @@ Hardping::Hardping(nucleus projectileNucleus,
 	  _energyCut(0.1),
 	  _firstCall(true),
 	  _isScattering(false),
-	  _kEnergyLoss(1.7),
+	  _kEnergyLoss(2.5),
 	  _projectileNucleus(projectileNucleus),
 	  _targetNucleus(targetNucleus),
 	  _indexParticle(0),
@@ -478,6 +479,60 @@ Hardping::setVaribles(){
 
 
 
+}
+double nucleus::getZMWL(double r){
+
+	double a1 = 0, a2 = 0, a3 = 0, a4 = 0, a5 = 0;
+
+	if(this->A() == 9){
+		a1 = 0.32494;
+		a2 = 0.08492;
+		a3 = -0.09041;
+		a4 = 0.01718;
+		a5 = -9.90302*0.0001;
+	}else{
+		a1 = 0.10777;
+		a2 = 0.01857;
+		a3 = -0.00529;
+		a4 = 3.65116*0.0001;
+		a5 = -9.27407*0.000001;
+	}
+	double ZMWL = 0;
+	ZMWL = a1 + a2*r + a3*r*r + a4*r*r*r + a5*r*r*r*r;
+	return ZMWL;
+
+}
+double
+nucleus::ZMWLGaussIntegration5(double zMin, double zMax)
+{
+	//    JS      This code calculates the nuclear thickness function as per Eq. 4 in
+	//    Klein and Nystrand, PRC 60.
+	//    former DOUBLE PRECISION FUNCTION T(b)
+
+	// data for Gauss integration
+	double integralZMWL = 0;//impactParameter*impactParameter;
+//	ZMWL
+//	double nuclearThicness = 0.;
+	const unsigned int nmbPoints         = 5;
+	const double       xg[nmbPoints + 1] = {0., 0.1488743390, 0.4333953941, 0.6794095683,
+	                                        0.8650633667, 0.9739065285};
+	const double       ag[nmbPoints + 1] = {0., 0.2955242247, 0.2692667193, 0.2190863625,
+	                                        0.1494513492, 0.0666713443};
+
+	const double zRange = 0.5 * (zMax - zMin);
+	const double zMean  = 0.5 * (zMax + zMin);
+	double       sum    = 0;
+	for(unsigned int i = 1; i <= nmbPoints; ++i) {
+		double zsp    = zRange * xg[i] + zMean;
+		//double radius = sqrt(impactParameter2 + zsp * zsp);
+		sum          += ag[i] * getZMWL(zsp);
+		zsp           = zRange * (-xg[i]) + zMean;
+		//radius        = sqrt(impactParameter2 + zsp * zsp);
+		sum          += ag[i] * getZMWL(zsp);
+	}
+	integralZMWL = zRange * sum;
+	//_lastResultOfThicknessCalculation = nuclearThicness;
+	return integralZMWL;
 }
 
 //______________________________________________________________________________
@@ -2019,11 +2074,12 @@ char ch;
 						double pzZ0 = 0;
 						double eZ0 = 0;
 						double x1Z0 = 0;
+						double x2Z0 = 0;
 						double mZ0 = 0;
 						Vec4 tmpVec;
 						hardpingParticle tempPart;
 
-						pythia6Z0File>>idZ0>>x1Z0>>pxZ0>>pyZ0>>pzZ0>>eZ0>>ch>>mZ0>>ch;
+						pythia6Z0File>>idZ0>>x1Z0>>x2Z0>>pxZ0>>pyZ0>>pzZ0>>eZ0>>ch>>mZ0>>ch;
 						tmpVec.px(pxZ0);
 						tmpVec.py(pyZ0);
 						tmpVec.pz(pzZ0);
@@ -2043,7 +2099,7 @@ char ch;
 						//pythia->process.
 					//	cin>>ch;
 						particleA->setXBjorkenProjectile( x1Z0/*pythia->info.x1()*/);
-						particleA->setXBjorkenTarget( x1Z0    /*pythia->info.x2()*/);
+						particleA->setXBjorkenTarget( x2Z0    /*pythia->info.x2()*/);
 
 						// suetindebug end
 
@@ -2988,10 +3044,11 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 		double cosTheta = 0;
 		double pt_old = 0, pt_new = 0, px_old =0, py_old = 0,pz_old =0,pe_old =0, px_new = 0, py_new =0, pz_new = 0,pe_new = 0, deltaPt = 0;
 		double gamma = 0, betta = 0;
-		double x1 =0, x2 =0;
+		double x1 =0, x2 =0, x1New = 0;
 		double mDilepton = 0, mProjectile = 0, mTarget = 0;
 		double s = 0;
 		Vec4 vecMomentumZ0(0);
+		Vec4 vecA(0);
 
 		_indexOfDrellYanChain.clear();
 
@@ -3024,17 +3081,37 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 			mDilepton = pythia->event.at(i_pyEv+3).m();
 			mProjectile = particleA->getRestMass();
 			mTarget = particleA->getRestMass(particleA->getIdscatteringParticle());
-			s = mProjectile*mProjectile + 2*mTarget*particleA->e() + mTarget*mTarget;
+			sNN = mProjectile*mProjectile + 2*mTarget*particleA->e() + mTarget*mTarget;
 			particleA->tau(mDilepton*mDilepton/s);
 			particleA->setKEnergyLoss(_kEnergyLoss);
-			px_old = particleA->p().px();
-			py_old = particleA->p().py();
-			pz_old = particleA->p().pz();
-			pe_old = particleA->p().e();
+			px_old = pythia->event.at(i_pyEv+3).px();//particleA->p().px();
+			py_old = pythia->event.at(i_pyEv+3).py();
+			pz_old = pythia->event.at(i_pyEv+3).pz();
+			pe_old = pythia->event.at(i_pyEv+3).e();
 
+			vecMomentumZ0.px(px_old);
+			vecMomentumZ0.py(py_old);
+			vecMomentumZ0.pz(pz_old);
+			vecMomentumZ0.e(pe_old);
+		//	cout<<"mmZ "<<vecMomentumZ0.m2Calc()<<endl;
+		//	double s = particleA->getEcm()*particleA->getEcm();
+		//	cout<< "tau1  "<<vecMomentumZ0.m2Calc()/s<<endl;
+		//	cout<< "tau2  "<<particleA->getXBjorkenProjectile()*particleA->getXBjorkenTarget()<<endl;
+			tempHardpingParticle->p(vecMomentumZ0);
+			tempHardpingParticle->tau(particleA->getXBjorkenProjectile()*particleA->getXBjorkenTarget());
+			if(_verbose)cout<<"pZ in "<<tempHardpingParticle->p();
+
+		//	cout<<"mZ "<<tempHardpingParticle->m()<<endl;
+		//	cout<<"ecm "<<particleA->getEcm()<<endl;
+		//	cout<<"tau "<<tempHardpingParticle->m()*tempHardpingParticle->m()/particleA->getEcm()/particleA->getEcm()<<endl;
+		//	cout<<"tau2 "<<pythia->event.at(i_pyEv+3).tau()<<endl;
+		//	cout<<"tau3 "<<particleA->tau()<<endl;
 			//calculating 4-momentum of produced particles (hadrons & leptons) in central mass system of proj & targ nucleons:
-			gamma = pe_old/particleA->getRestMass(particleA->getIdscatteringParticle());
-			betta = pz_old/particleA->getRestMass(particleA->getIdscatteringParticle());
+			//gamma = pe_old/particleA->getRestMass(particleA->getIdscatteringParticle());
+			//betta = pz_old/particleA->getRestMass(particleA->getIdscatteringParticle());
+			gamma = sqrt(1+_initialParticle.getInitialProjectileLabMomentum()/protonMass/2);
+			betta = sqrt(1-1/gamma/gamma);
+			if(_verbose)cout<<"gamma 1 = "<<gamma<<" betta "<<betta<<endl;
 			px_new = px_old;
 			py_new = py_old;
 			pz_new = gamma*(pz_old - betta*pe_old);
@@ -3047,61 +3124,72 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 			x1 = particleA->getXBjorkenProjectile();
 			x2 = particleA->getXBjorkenTarget();
+			if(_verbose)cout<<"x1 "<<x1<<" x2 "<<x2<<endl;
 			gamma = (x1 + x2)/sqrt(x1*x2)/2.;
 			betta = sqrt(1-1./gamma/gamma);
 			if(x1 < x2)betta = - betta;
-
+			if(_verbose)cout<<"gamma 2 = "<<gamma<<" betta "<<betta<<endl;
 			px_new = px_old;
 			py_new = py_old;
 			pz_new = gamma*(pz_old - betta*pe_old);
 			pe_new = gamma*(pe_old - betta*pz_old);
 
+			px_old = px_new;
+			py_old = py_new;
+			pz_old = pz_new;
+			pe_old = pe_new;
+
+			vecMomentumZ0.px(px_old);
+			vecMomentumZ0.py(py_old);
+			vecMomentumZ0.pz(pz_old);
+			vecMomentumZ0.e(pe_old);
+
+			tempHardpingParticle->p(vecMomentumZ0);
+
+			x1New = tempHardpingParticle->recalculateXBjorken(&_targetNucleus,pythia);
+			if(_verbose)cout<<"x1New = "<<x1New<<endl;
+			px_new = px_old;
+			py_new = py_old;
+			pz_new = pz_old - (x1 - x1New)*pz_old;
+			pe_new = pe_old - (x1 - x1New)*pe_old;
+
+			gamma = (x1New +x2)/sqrt(x1New*x2)/2.;
+			betta = sqrt(1 - 1/gamma/gamma);
+
+			if(x1New < x2)betta = -betta;
+			if(_verbose)cout<<"gamma 3 = "<<gamma<<" betta "<<betta<<endl;
+			px_old = px_new;
+			py_old = py_new;
+			pz_old = pz_new;
+			pe_old = pe_new;
+
+			px_new = px_old;
+			py_new = py_old;
+			pz_new = gamma*(pz_old +betta*pe_old);
+			pe_new = gamma*(pe_old +betta*pz_old);
+
+			px_old = px_new;
+			py_old = py_new;
+			pz_old = pz_new;
+			pe_old = pe_new;
+
+			gamma = sqrt(1+_initialParticle.getInitialProjectileLabMomentum()/protonMass/2);
+			betta = sqrt(1-1/gamma/gamma);
+			if(_verbose)cout<<"gamma 4 = "<<gamma<<" betta "<<betta<<endl;
+			px_new = px_old;
+			py_new = py_old;
+			pz_new = gamma*(pz_old +betta*pe_old);
+			pe_new = gamma*(pe_old +betta*pz_old);
+
+
+			vecMomentumZ0.px(px_new);
+			vecMomentumZ0.py(py_new);
+			vecMomentumZ0.pz(pz_new);
+			vecMomentumZ0.e (pe_new);
+			tempHardpingParticle->p(vecMomentumZ0);
+		//	cout<<"pZ "<<tempHardpingParticle->p();
+		//	cin>>ch;
 			/*
-			 C(IAE) calculating 4-momentum of produced particles (hadrons & leptons)
-C(IAE) in central mass system of proj & targ nucleons:
-              DGA=DSQRT(1.0D0+HINT1(6)/HINT1(8)/2.0D0) ! parameter of lorenc boost: gamma = 1/sqrt(1-betta**2)
-              DBT=DSQRT(1.0D0-1.0D0/DGA/DGA)           ! parameter of lorenc boost: betta = v/c
-              DPX1=DPX0
-              DPY1=DPY0
-              DPZ1=DGA*(DPZ0-DBT*DPE0)
-              DPE1=DGA*(DPE0-DBT*DPZ0)
-
-C(IAE) calculating 4-momentum of produced particles (hadrons & leptons)
-C(IAE) in central mass system of 2 partons:
-              DGA=(DXFR1+DXFR2)/DSQRT(DXFR1*DXFR2)/2.0D0
-              DBT=DSQRT(1.0D0-1.0D0/DGA/DGA)
-              IF(DXFR1.LT.DXFR2) DBT=-DBT
-              DPX2=DPX1
-              DPY2=DPY1
-              DPZ2=DGA*(DPZ1-DBT*DPE1)
-              DPE2=DGA*(DPE1-DBT*DPZ1)
-
-C(IAE) calculatint 4-momentum of produced particles (hadrons & leptons)
-C(IAE) with energy losses
-C(IAE) in central mass system of 2 partons:
-              DPZ2=DPZ2-(DXFR1-DXFREL1)*DPZ2
-              DPE2=DPE2-(DXFR1-DXFREL1)*DPE2
-
-C(IAE) calculatint 4-momentum of produced particles (hadrons & leptons)
-C(IAE) with energy losses
-C(IAE) in central mass system of proj & targ nucleons:
-              DGA=(DXFREL1+DXFR2)/DSQRT(DXFREL1*DXFR2)/2.0D0
-              DBT=DSQRT(1.0D0-1.0D0/DGA/DGA)
-              IF(DXFREL1.LT.DXFR2) DBT=-DBT
-              DPX3=DPX2
-              DPY3=DPY2
-              DPZ3=DGA*(DPZ2+DBT*DPE2)
-              DPE3=DGA*(DPE2+DBT*DPZ2)
-
-C(IAE) calculatint 4-momentum of produced particles (hadrons & leptons)
-C(IAE) with energy losses
-C(IAE) in LAB frame:
-              DGA=DSQRT(1.0D0+HINT1(6)/HINT1(8)/2.0D0)
-              DBT=DSQRT(1.0D0-1.0D0/DGA/DGA)
-              DPX4=DPX3
-              DPY4=DPY3
-              DPZ4=DGA*(DPZ3+DBT*DPE3)
-              DPE4=DGA*(DPE3+DBT*DPZ3)
 
               PATT(I,1)=DPX4
               PATT(I,2)=DPY4
@@ -3134,7 +3222,7 @@ C(IAE) in LAB frame:
 			//cin>>ch;
 			//suetin debug
 
-
+			/*
 			px_old = pythia->event.at(i_pyEv+3).px();
 			py_old = pythia->event.at(i_pyEv+3).py();
 			pz_old = pythia->event.at(i_pyEv+3).pz();
@@ -3153,7 +3241,7 @@ C(IAE) in LAB frame:
 			if(_verbose)cout<<" p 1 "<<tempHardpingParticle->p();
 			if(_verbose)cout<<" phi "<<particleA->getPhiHardping()<<endl;
 			if(_verbose)cout<<" theta "<<particleA->getThetaHardping()<<endl;
-
+			*/
 			//tempHardpingParticle->p(vecMomentumZ0);
 			tempHardpingParticle->setPhiHardping(particleA->getPhiHardping());
 			tempHardpingParticle->setThetaHardping(particleA->getThetaHardping());

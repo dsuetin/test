@@ -18,6 +18,7 @@ std::string convertNumberOfEventsToString(unsigned int numEvent);
 double getRandomFromFile();
 double getFromWFile();
 double getFromBeFile();
+double sNN;
  Pythia* pythia8;
 
 
@@ -336,10 +337,12 @@ double maxPathInNucleus = 0;
 */
 //		cin>>ch;
 
-		cout<<"iop = "<<iop<<endl;
-		cout<<"22222222222222222222222222222222222222222 "<<endl;
+		if(verbose)cout<<"iop = "<<iop<<endl;
+		if(verbose)cout<<"22222222222222222222222222222222222222222 "<<endl;
 		//hardping = new Hardping(projectile,target);
 		hardping = (incidentParticle->id()/*incidentParticleId*/ == 0 )? new Hardping(projectile,target) : new Hardping(*incidentParticle,target);
+
+
 	/*	if(iop == 15){
 			cout<<"stop";
 
@@ -361,7 +364,7 @@ double maxPathInNucleus = 0;
 		//hardping->setVerbose(0);
 		//if(iop == 4338)hardping->setVerbose(1);
 		softCollisionsNumberInput>>intDummy>>nSoft;
-		cout<<"i = "<<intDummy<<" nSoft "<<nSoft<<endl;
+		//cout<<"i = "<<intDummy<<" nSoft "<<nSoft<<endl;
 	//	cin>>ch;
 		hardping->hardping();
 	/*	do{
@@ -393,10 +396,10 @@ double maxPathInNucleus = 0;
 
 			fileDrellYan<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).p();
 			if(hardping->_finalState->at(ih).isHadron()||1)cout<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().px()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().py()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().pz()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().e()<<" "<<hardping->_finalState->at(ih).p();
-			cout<<"tau "<<hardping->_finalState->at(ih).tau()<<endl;
-			cout<<"y "<<hardping->_finalState->at(ih).y()<<endl;
+			if(verbose)cout<<"tau "<<hardping->_finalState->at(ih).tau()<<endl;
+			if(verbose)cout<<"y "<<hardping->_finalState->at(ih).y()<<endl;
 
-			cin>>ch;
+		//	cin>>ch;
 			//cout<< hardping->_finalState->at(ih).getTransferredCM4Momentum().px()<<endl;
 			//cout<< hardping->_finalState->at(ih).getTransferredCM4Momentum().py()<<endl;
 			//cout<< hardping->_finalState->at(ih).getTransferredCM4Momentum().pz()<<endl;

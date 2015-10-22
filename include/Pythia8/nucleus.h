@@ -52,10 +52,13 @@ extern ofstream pathInNucleiOutput;
 extern ofstream softCollisionsNumberOutput;
 extern ofstream deltaPtOutput;
 extern  double getRandomFromFile();
+//extern  double getRandom();
+//extern  double ZMWLGaussIntegration5();
 //extern  const gsl_rng_type *gslRandomGeneratorType;
 //extern  gsl_rng *gslRandomGenerator;
 extern ifstream coordinateFile;
 extern int verbose;
+extern double sNN;
  //class Pythia8::Pythia;
 //This class holds the information for a target nucleus
 namespace Pythia8{
@@ -63,6 +66,81 @@ struct index {
   int i;
   int j;
 } ;
+
+class nucleus{
+public:
+	nucleus(const int Z, const int A);
+	~nucleus(){};
+	int    Z              () const { return _Z;                     }  ///< returns atomic number of nucleus
+	int    A              () const { return _A;                     }  ///< returns nucleon number of nucleus
+
+	double getNuclearDensity(const double r) const
+	{ return (_A < 10) ? nuclearGaussDensity(r) : nuclearWoodSaxonDensity(r);}
+	double renormalizedNuclearThicknessGauss12(double impactParameter, double zMin, double zMax)const;
+	double renormalizedNuclearThicknessGauss5(double impactParameter, double zMin, double zMax)const;
+	double ZMWLGaussIntegration5(double zMin, double zMax);
+	void setPrecisionOfNuclearThicknessCalculation(double precision){_precisionOfNuclearThicknessCalculation = precision;}
+	double getNuclearRadius  () const { return _r0 ; }
+	void setInitialProjectileLabMomentum(double pz){_initialProjectileLabMomentum = pz;};
+	double getInitialMomentum(void){return _initialProjectileLabMomentum;};
+	int getId(void){return _id;};
+	void setId(int id){_id = id;};
+	//double getRandom(void){ return _pythia->rndm.flat();}
+	std::string getNucleusName(){
+		std::string	ElementName;
+
+		switch (_Z) {
+				case 4:
+					ElementName = "Be";
+				  break;
+				case 26:
+					ElementName = "Fe";
+				  break;
+				case 74:
+					ElementName = "W";
+				  break;
+				case 1:
+					if(_A == 1)	ElementName = "p";
+					if(_A == 2)ElementName = "D";
+				  break;
+				case 7:
+					ElementName = "N";
+					break;
+				case 36:
+				  ElementName = "Kr";
+				  break;
+				default:
+				  cout<<"Error no found such element. "<<endl;
+				  ElementName = "";
+				  break;
+				}
+				return ElementName;
+
+	}
+
+private:
+	double woodSaxonSkinDepth() const { return 0.53;  }  ///< returns surface (0.53 fm for Au)
+	double woodSaxonRadius() const { return 1.2 * pow(_A, 1. / 3.); }  ///< returns Wood-Saxon nuclear radius [fm] (Fermi model)
+
+	double nuclearThicknessGauss5 (const double impactParameter, double zMin, double zMax) const;  ///< calculates nuclear thickness function for given distance b in impact parameter space (Eq. 4 in KN, PRC 60)
+	double nuclearThicknessGauss12(double impactParameter, double zMin, double zMax)const;
+	double getZMWL(double r);
+	//double ZMWLGaussIntegration5(double zMin, double zMax);
+	//	Pythia8::Pythia* _pythia;
+
+	int    _Z;                      ///< atomic number of nucleus
+	int    _A;                      ///< nucleon number of nucleus
+	double _r0;				// nuclear radius
+	double _rho0;
+	double _precisionOfNuclearThicknessCalculation;
+	double _initialProjectileLabMomentum;
+	int _id;
+	double nuclearWoodSaxonDensity(const double r) const
+	{ return 3./4.*_A/M_PIl/getNuclearRadius()/getNuclearRadius()/getNuclearRadius()/(1+M_PIl*M_PIl*woodSaxonSkinDepth()*woodSaxonSkinDepth()/getNuclearRadius()/getNuclearRadius())/(1. + exp((r - getNuclearRadius()) / woodSaxonSkinDepth())); } ///< Wood-Saxon nuclear density
+	double nuclearGaussDensity(const double r) const
+	{ return exp(-r*r/getNuclearRadius()/getNuclearRadius())*_A/M_PIl/getNuclearRadius()/getNuclearRadius()/getNuclearRadius()/2*M_2_SQRTPIl;}
+};
+
 //Pythia* pythia;
 class hardpingParticle : public Particle{
 public:
@@ -496,10 +574,12 @@ public:
 
 		return sqrt(s);
 	}
-	void recalculateXBjorken(int targetAtomicNumber){
-
+//	double getRandom(void){ return pythia->rndm.flat();}
+	double recalculateXBjorken(nucleus* targetNucleus,Pythia * py){
+		char ch;
 		double kEnergyLoss = 0;
 		double newEnergy = 0;
+		double oldEnergy = 0;
 		double x1New = 0;
 		double x1Old = 0;
 		double x2New = 0;
@@ -510,88 +590,96 @@ public:
 		//double
 		kEnergyLoss = _kEnergyLoss;
 		newEnergy = this->p().e() - kEnergyLoss;
+		oldEnergy = this->p().e();
 		kEnergyLoss = sqrt(2*nucleonMass*nucleonMass );
 		double tau = this->tau();
 		double y   = this->y();
 		x1New = sqrt(tau)*exp(y);
 		x2New = sqrt(tau)*exp(-y);
-		energyCM = this->getEcm();
-
+		//cout<<"cme "<<py->info.eCM()<<endl;
+		//cin>>ch;
+		energyCM = sNN;//this->getEcm();
+		//cout<<"tau "<<tau<<" y "<<y<<endl;
+		//cout<<" p "<<this->p();
+		//cout<<"x1New "<<x1New<<" x2New "<<x2New<<" newEnergy "<<newEnergy<<" oldEnergy "<<oldEnergy<<endl;
 		energyMin =0.5*minHatMass*minHatMass/(energyCM*x2New);
+		//cout<<" energyMin "<<energyMin<<endl;
 		double rLMax = 0;
+		double rLMin = 0;
 		double ZMW0  = 0;
-		if(targetAtomicNumber == 9){
+		double tempRandom = 0;
+		double randomLenght = 0;
+		double norm = 0;
+		if(targetNucleus->A() == 9){
 			rLMax = 6.0;
 			ZMW0  = 0.622;
 		}else{
-			rLMax = 1.0;
+			rLMax = 11.0;
 			ZMW0  = 0.248;
 		}
-		/*
+		norm = targetNucleus->ZMWLGaussIntegration5(rLMin,rLMax);
+		//cout<<"norm "<<norm<<endl;
+		double lenghtValue[200], lenghtProbability[200];
+		for(int i = 0; i < 201; i++){
+			lenghtValue[i] = rLMin + (rLMax - rLMin)*i/200.;
+			lenghtProbability[i] = targetNucleus->ZMWLGaussIntegration5(rLMin,lenghtValue[i])/norm;
 
-	         if (IHNT2(3) .eq. 9) then
-	            rLmax = 6.0D0
-	         else
-	            rLmax = 11.0D0
-	         endif
-	         HIPR1(77)=ZMW0()
-	         CALL HIFUN(8,0.0D0,rLmax,ZMWL)
-      if (IHNT2(3) .eq. 9) then
-         ZMW0=0.622D0
-      else
-         ZMW0=0.284D0
-      endif
-
-
-
-		if()
-		/*
-
-         rr = PYR(0)
-C         write(*,*)'W0=',HIPR1(77)
-         if (rr .le. HIPR1(77)) then
-            rE1 = rx1*rE
-C            write(*,*)'no stopping'
-         else
-110         rl = HIRND(8)
-            rdedz = HIPR1(73)
-            if (IHPR2(31) .eq. 3) then
-               rq2 = VINT(52)
-C               rdedz = rdedz + 2*PYALPS(rq2)*rq2/(3.14*41.32*HIPR1(78))
-               rdedz = rdedz + 2*PYALPS(rq2)*rq2/100*rq2/100*rq2/100*
-     &              rq2/100*rq2/100*rq2/100*rq2/100*rq2/100/HIPR1(78)
-            endif
-C            write(*,*)'dE/dz = ',rdedz
-            rE1 = rx1*rE-rdedz*rl
-
-            if ((rE1 .lt. rEmin) .and. (miss .lt. 50)) then
-C               write(*,*)'ZMSTOP: error'
-               miss=miss+1
-               goto 110
-            endif
-            if (miss.ge.50) then
-               write(*,*)'ZMSTOP: error 2'
-               rE1=rEmin
-            endif
-C            write(*,*)'Passed'
-         endif
-      endif
+			//cout<<"lenghtValue[i] "<<lenghtValue[i]<<" lenghtProbability[i] "<<lenghtProbability[i]<<endl;
+		}
+		int jLow = 0;
+		int jUp = 201;
+		int jMedium = 0;
+		int jIndex = 0;
+		int loopCount = 0;
 
 
-      rx1 = rE1/rE
+		tempRandom = py->rndm.flat();
+		if(tempRandom <= ZMW0){
+			newEnergy = x1New*oldEnergy;
 
-      tau = rx1*rx2
-      yst = 0.5D0*dlog(rx1/rx2)
 
-      VINT(21)=tau
-      VINT(22)=yst
-      VINT(41)=rx1
-      VINT(42)=rx2
+		}else{
 
-      DADUM1=rx1
+			do{
+				jLow = 0;
+				jUp = 201;
 
-      HIPR1(73)=DTEMP
-		 * */
+				//cout<<"jIndex1 "<<jIndex<<endl;
+				if(loopCount > 50){
+					newEnergy = energyMin;
+					break;
+				}
+				while(jUp - jLow > 1){
+					jMedium = (jLow + jUp)/2.;
+					tempRandom = py->rndm.flat();
+				//	cout<<"tempRandom "<<tempRandom<<endl;
+					if((lenghtProbability[200] > lenghtProbability[0]) == (tempRandom > lenghtProbability[jMedium])){
+						jLow = jMedium;
+					}else{
+						jUp  = jMedium;
+					}
+				}
+				jIndex = jLow;
+			//	cout<<"jIndex2 "<<jIndex<<endl;
+
+				if(jIndex < 0)jIndex = 0;
+				if(jIndex >= 200) jIndex = 199;
+				randomLenght = (lenghtValue[jIndex] + lenghtValue[jIndex+1])/2.;
+				//cout<<"randomLenght "<<randomLenght<<endl;
+				newEnergy = x1New*oldEnergy -_kEnergyLoss*randomLenght;
+				//cout<<" newEnergy111 "<<newEnergy<<endl;
+				loopCount++;
+				//cout<<
+			}while(newEnergy < energyMin);
+
+
+		}
+		//cout<<" newEnergy "<<newEnergy<<" oldEnergy "<<oldEnergy<<endl;
+		x1New = newEnergy/oldEnergy;
+		this->setXBjorkenProjectileRecalculated(x1New);
+		//todo не пересчитанны tau и быстрота
+		return x1New;
+
 	}
 	void setAngles(double sinPhi,double cosPhi,double sinTheta,double cosTheta){
 		_sinPhi   = sinPhi;
@@ -897,6 +985,12 @@ C            write(*,*)'Passed'
 	void setXBjorkenProjectile(double x1){
 		 _x1 = x1;
 	}
+	double getXBjorkenProjectileRecalculated(void){
+		return _x1Recalculated;
+	}
+	void setXBjorkenProjectileRecalculated(double x1){
+		 _x1Recalculated = x1;
+	}
 	double getXBjorkenTarget(void){
 		return _x2;
 	}
@@ -1057,6 +1151,7 @@ private:
 	Vec4 _transferredCM4Momentum;
 	double _virtualPhotonEnergy;
 	double _x1;
+	double _x1Recalculated;
 	double _x2;
 	double _hadronNucleonCrossSection;
 	double _preHadronNucleonCrossSection;
@@ -1083,76 +1178,6 @@ private:
 	double _kEnergyLoss;
 	//Rndm * _random;
 
-};
-class nucleus{
-public:
-	nucleus(const int Z, const int A);
-	~nucleus(){};
-	int    Z              () const { return _Z;                     }  ///< returns atomic number of nucleus
-	int    A              () const { return _A;                     }  ///< returns nucleon number of nucleus
-
-	double getNuclearDensity(const double r) const
-	{ return (_A < 10) ? nuclearGaussDensity(r) : nuclearWoodSaxonDensity(r);}
-	double renormalizedNuclearThicknessGauss12(double impactParameter, double zMin, double zMax)const;
-	double renormalizedNuclearThicknessGauss5(double impactParameter, double zMin, double zMax)const;
-	void setPrecisionOfNuclearThicknessCalculation(double precision){_precisionOfNuclearThicknessCalculation = precision;}
-	double getNuclearRadius  () const { return _r0 ; }
-	void setInitialProjectileLabMomentum(double pz){_initialProjectileLabMomentum = pz;};
-	double getInitialMomentum(void){return _initialProjectileLabMomentum;};
-	int getId(void){return _id;};
-	void setId(int id){_id = id;};
-	std::string getNucleusName(){
-		std::string	ElementName;
-
-		switch (_Z) {
-				case 4:
-					ElementName = "Be";
-				  break;
-				case 26:
-					ElementName = "Fe";
-				  break;
-				case 74:
-					ElementName = "W";
-				  break;
-				case 1:
-					if(_A == 1)	ElementName = "p";
-					if(_A == 2)ElementName = "D";
-				  break;
-				case 7:
-					ElementName = "N";
-					break;
-				case 36:
-				  ElementName = "Kr";
-				  break;
-				default:
-				  cout<<"Error no found such element. "<<endl;
-				  ElementName = "";
-				  break;
-				}
-				return ElementName;
-
-	}
-
-private:
-	double woodSaxonSkinDepth() const { return 0.53;  }  ///< returns surface (0.53 fm for Au)
-	double woodSaxonRadius() const { return 1.2 * pow(_A, 1. / 3.); }  ///< returns Wood-Saxon nuclear radius [fm] (Fermi model)
-
-	double nuclearThicknessGauss5 (const double impactParameter, double zMin, double zMax) const;  ///< calculates nuclear thickness function for given distance b in impact parameter space (Eq. 4 in KN, PRC 60)
-	double nuclearThicknessGauss12(double impactParameter, double zMin, double zMax)const;
-
-	//	Pythia8::Pythia* _pythia;
-
-	int    _Z;                      ///< atomic number of nucleus
-	int    _A;                      ///< nucleon number of nucleus
-	double _r0;				// nuclear radius
-	double _rho0;
-	double _precisionOfNuclearThicknessCalculation;
-	double _initialProjectileLabMomentum;
-	int _id;
-	double nuclearWoodSaxonDensity(const double r) const
-	{ return 3./4.*_A/M_PIl/getNuclearRadius()/getNuclearRadius()/getNuclearRadius()/(1+M_PIl*M_PIl*woodSaxonSkinDepth()*woodSaxonSkinDepth()/getNuclearRadius()/getNuclearRadius())/(1. + exp((r - getNuclearRadius()) / woodSaxonSkinDepth())); } ///< Wood-Saxon nuclear density
-	double nuclearGaussDensity(const double r) const
-	{ return exp(-r*r/getNuclearRadius()/getNuclearRadius())*_A/M_PIl/getNuclearRadius()/getNuclearRadius()/getNuclearRadius()/2*M_2_SQRTPIl;}
 };
 class producedParticlesInformation{
 public:
