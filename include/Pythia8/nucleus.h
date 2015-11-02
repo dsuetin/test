@@ -51,6 +51,7 @@
 extern ofstream pathInNucleiOutput;
 extern ofstream softCollisionsNumberOutput;
 extern ofstream deltaPtOutput;
+extern ofstream x1File;
 extern  double getRandomFromFile();
 //extern  double getRandom();
 //extern  double ZMWLGaussIntegration5();
@@ -59,6 +60,7 @@ extern  double getRandomFromFile();
 extern ifstream coordinateFile;
 extern int verbose;
 extern double sNN;
+extern double kEnergyLoss;
  //class Pythia8::Pythia;
 //This class holds the information for a target nucleus
 namespace Pythia8{
@@ -575,9 +577,10 @@ public:
 		return sqrt(s);
 	}
 //	double getRandom(void){ return pythia->rndm.flat();}
-	double recalculateXBjorken(nucleus* targetNucleus,Pythia * py){
+
+	double recalculateXBjorken(nucleus* targetNucleus,Pythia * py, double projectileLabEnergy){
 		char ch;
-		double kEnergyLoss = 0;
+		double kEnergyLossCM = 0;
 		double newEnergy = 0;
 		double oldEnergy = 0;
 		double x1New = 0;
@@ -587,23 +590,50 @@ public:
 		double energyMin = 0;
 		double energyCM  = 0;
 		double minHatMass = 2;// todo дописанно руками. переписать по нормальному.
-		//double
-		kEnergyLoss = _kEnergyLoss;
-		newEnergy = this->p().e() - kEnergyLoss;
-		oldEnergy = this->p().e();
-		kEnergyLoss = sqrt(2*nucleonMass*nucleonMass );
+
+		//aqrtkEnergyLoss = _kEnergyLoss;
+		if(_verbose)cout<<" kEnergyLoss1 = "<<kEnergyLoss<<endl;
+	//	newEnergy = projectileLabEnergy - kEnergyLoss;
+	//	oldEnergy = projectileLabEnergy;
+
+
+		oldEnergy = this->p().e();;
+		//oldEnergy = _initialParticle;//this->p().e();
+		if(_verbose)cout<<" newEnergy = "<<newEnergy<<" oldEnergy = "<<oldEnergy<<endl;
+		kEnergyLossCM = sqrt(2*nucleonMass*nucleonMass + 2*projectileLabEnergy*nucleonMass) - sqrt(2*nucleonMass*nucleonMass + 2*(projectileLabEnergy - kEnergyLoss)*nucleonMass);
+
+		newEnergy = this->p().e() - kEnergyLossCM;
+
+		if(_verbose)cout<<" kEnergyLoss = "<<kEnergyLossCM<<endl;
+//cin>>ch;
+
 		double tau = this->tau();
-		double y   = this->y();
+		//double y   = this->y();
+		if(_verbose)cout<<" x1 "<<this->getXBjorkenProjectile()<<endl;
+		if(_verbose)cout<<" x2 "<<this->getXBjorkenTarget()<<endl;
+
+		double y   = 0.5*log(this->getXBjorkenProjectile()/this->getXBjorkenTarget());
+		if(_verbose)cout<<" p rcx = "<<this->p();
+		cout.precision(12);
+		if(_verbose)cout<<"tau = "<<tau<<" y = "<<y<<endl;
+	//	y = 0.5*log((this->p().e()+this->p().pz())/(this->p().e()-this->p().pz()));
+	//	cout<<"tau = "<<tau<<" y = "<<y<<endl;
+
 		x1New = sqrt(tau)*exp(y);
 		x2New = sqrt(tau)*exp(-y);
+		if(abs(x1New) > 1 || abs(x2New) > 1){
+			cout<<"something, something dark side "<<endl;
+			cin>>ch;
+		}
 		//cout<<"cme "<<py->info.eCM()<<endl;
-		//cin>>ch;
+	//	cin>>ch;
 		energyCM = sNN;//this->getEcm();
 		//cout<<"tau "<<tau<<" y "<<y<<endl;
 		//cout<<" p "<<this->p();
-		//cout<<"x1New "<<x1New<<" x2New "<<x2New<<" newEnergy "<<newEnergy<<" oldEnergy "<<oldEnergy<<endl;
+		if(_verbose)cout<<"x1New "<<x1New<<" x2New "<<x2New<<" newEnergy "<<newEnergy<<" oldEnergy "<<oldEnergy<<endl;
 		energyMin =0.5*minHatMass*minHatMass/(energyCM*x2New);
-		//cout<<" energyMin "<<energyMin<<endl;
+		if(_verbose)cout<<" energyMin "<<energyMin<<endl;
+		//cin>>ch;
 		double rLMax = 0;
 		double rLMin = 0;
 		double ZMW0  = 0;
@@ -611,21 +641,23 @@ public:
 		double randomLenght = 0;
 		double norm = 0;
 		if(targetNucleus->A() == 9){
+			//cin>>ch;
 			rLMax = 6.0;
 			ZMW0  = 0.622;
 		}else{
 			rLMax = 11.0;
-			ZMW0  = 0.248;
+			ZMW0  = 0.284;
 		}
 		norm = targetNucleus->ZMWLGaussIntegration5(rLMin,rLMax);
-		//cout<<"norm "<<norm<<endl;
+		if(_verbose)cout<<"norm "<<norm<<endl;
 		double lenghtValue[200], lenghtProbability[200];
 		for(int i = 0; i < 201; i++){
 			lenghtValue[i] = rLMin + (rLMax - rLMin)*i/200.;
 			lenghtProbability[i] = targetNucleus->ZMWLGaussIntegration5(rLMin,lenghtValue[i])/norm;
 
-			//cout<<"lenghtValue[i] "<<lenghtValue[i]<<" lenghtProbability[i] "<<lenghtProbability[i]<<endl;
+			if(_verbose)cout<<"lenghtValue[i] "<<lenghtValue[i]<<" lenghtProbability[i] "<<lenghtProbability[i]<<endl;
 		}
+		//cin>>ch;
 		int jLow = 0;
 		int jUp = 201;
 		int jMedium = 0;
@@ -633,49 +665,65 @@ public:
 		int loopCount = 0;
 
 
-		tempRandom = py->rndm.flat();
+		tempRandom = getRandomFromFile();//py->rndm.flat();
 		if(tempRandom <= ZMW0){
 			newEnergy = x1New*oldEnergy;
-
+			if(_verbose)cout<<"first case "<<endl;
+			if(_verbose)cout<<"newEnergy "<<newEnergy<<" x1New "<<x1New<<" oldEnergy "<<oldEnergy<<endl;
+		//	if(_verbose)cout<<"tempRandom "<<tempRandom<<" ZMW0 "<<ZMW0<<" oldEnergy "<<oldEnergy<<endl;
 
 		}else{
 
 			do{
 				jLow = 0;
 				jUp = 201;
-
-				//cout<<"jIndex1 "<<jIndex<<endl;
+				tempRandom = getRandomFromFile();//py->rndm.flat();
+				if(_verbose)cout<<"jIndex1 "<<jIndex<<endl;
 				if(loopCount > 50){
 					newEnergy = energyMin;
 					break;
 				}
 				while(jUp - jLow > 1){
 					jMedium = (jLow + jUp)/2.;
-					tempRandom = py->rndm.flat();
-				//	cout<<"tempRandom "<<tempRandom<<endl;
-					if((lenghtProbability[200] > lenghtProbability[0]) == (tempRandom > lenghtProbability[jMedium])){
+					if(_verbose)cout<<"jMedium begin = "<<jMedium<<endl;
+
+					//tempRandom = 0.5993830;
+				//	cout<<"tempRandomFF "<<tempRandom<<endl;
+				//	cout<<"lenghtProbability[200] = "<<lenghtProbability[200]<<" lenghtProbability[0] "<<lenghtProbability[0]<<endl;
+					if(_verbose)cout<<"tempRandom =  "<<tempRandom<<" lenghtProbability[jMedium] "<<lenghtProbability[jMedium]<<endl;
+					if(/*(lenghtProbability[200] > lenghtProbability[0]) == */tempRandom > lenghtProbability[jMedium]){
 						jLow = jMedium;
 					}else{
 						jUp  = jMedium;
 					}
 				}
 				jIndex = jLow;
-			//	cout<<"jIndex2 "<<jIndex<<endl;
+				if(_verbose)cout<<"jIndex2 "<<jIndex<<endl;
 
 				if(jIndex < 0)jIndex = 0;
 				if(jIndex >= 200) jIndex = 199;
 				randomLenght = (lenghtValue[jIndex] + lenghtValue[jIndex+1])/2.;
-				//cout<<"randomLenght "<<randomLenght<<endl;
-				newEnergy = x1New*oldEnergy -_kEnergyLoss*randomLenght;
-				//cout<<" newEnergy111 "<<newEnergy<<endl;
+
+				if(_verbose)cout<<"randomLenght "<<randomLenght<<endl;
+				newEnergy = x1New*oldEnergy -kEnergyLossCM*randomLenght;
+				if(_verbose)cout<<" x1 "<<x1New<<" oldEnergy "<<oldEnergy<<" randomLenght "<<randomLenght<<" kEnergyLossTemp = "<<kEnergyLossCM<<endl;
 				loopCount++;
-				//cout<<
+				if(_verbose)cout<<" newEnergy = "<<newEnergy<<" energyMin = "<<energyMin<<endl;
 			}while(newEnergy < energyMin);
 
 
 		}
+
 		//cout<<" newEnergy "<<newEnergy<<" oldEnergy "<<oldEnergy<<endl;
 		x1New = newEnergy/oldEnergy;
+		//cout<<x1New<<" "<<randomLenght<<endl;
+		x1File<<x1New<<" "<<randomLenght<<endl;
+		if(_verbose)cout<<"newEnergy2 = "<<newEnergy<<" x1New "<<x1New<<" oldEnergy "<<oldEnergy<<endl;
+	//	cin>>ch;
+		if(x1New > 1){
+			cout<<"x1New > 1"<<endl;
+			cin>>ch;
+		}
 		this->setXBjorkenProjectileRecalculated(x1New);
 		//todo не пересчитанны tau и быстрота
 		return x1New;

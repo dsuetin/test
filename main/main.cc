@@ -38,12 +38,14 @@ double sNN;
  ofstream numberOfSoftCollisions;
  ofstream totalPathOutput;
  ofstream pythiaEventFile;
+ ofstream x1File;
  //suetin debug
  ifstream pythia6File;
  ifstream pythia6Z0File;
  ifstream coordinateFile;
  ifstream softCollisionsNumberInput;
  int verbose;
+ double kEnergyLoss;
  int nSoft;
  //const gsl_rng_type *gslRandomGeneratorType;
 // gsl_rng *gslRandomGenerator;
@@ -72,23 +74,26 @@ double initialProjectileLabMomentum = 800;//27.6;
 numEvent =  10;//00000;
    numEvent =  1000000;
    verbose = 0;
+   kEnergyLoss = 2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
 Aproj = 1;
 Zproj = 1;
 //Kr(36,84)
 //N(7,14)
 
 
-Atarg = 9;//184;//84;
-Ztarg = 4;//36;
+Atarg = 184;//84;
+Ztarg = 74;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
+ TString filenameX1 = "/home/guest/workspace4/h/Debug/06.10.2015/x1.txt";
  TString filenameZ0 = "/home/guest/workspace/pythia6/Debug/06.10.2015/pythia6DYevent.txt";
  //filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event_c++.txt";
  TString filenamePythiaEvent = "/home/guest/workspace4/h/Debug/29.07.2015/pythia6event.txt";
 pythia6File.open(filename,std::ifstream::binary);
 pythia6Z0File.open(filenameZ0,std::ifstream::binary);
 pythiaEventFile.open(filenamePythiaEvent,std::ofstream::binary);
+x1File.open(filenameX1,std::ofstream::binary);
 //pythiaEventFile.open(filename_initialParticlePythiaEvent);
 if(pythia6File.is_open()){
 	cout<<"ok"<<endl;
