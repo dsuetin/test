@@ -2388,7 +2388,7 @@ void setInitinalImpactAndIndex(hardpingParticle* particleA){
 //	cout<<" initial index particle "<<particleA->getHistory()->back()<<endl;
 	//cin>>ch;
 	_indexParticle++;
-	if(_verbose)cout<<"gsl_ran_gaussian "<<particleA->vProd();
+	if(_verbose)cout<<"coordinate initial = "<<particleA->vProd();
 
 	//cin>>ch;
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2687,8 +2687,9 @@ void finalOutput(void){
 		impactY = cos(phiImpact)*impactPar;
 
 		//suetindebug
-		impactX = 0;
-		impactY = 0;
+		//impactX = 0;
+		//impactY = 0;
+		//suetindebug end
 		return;
 
 	}

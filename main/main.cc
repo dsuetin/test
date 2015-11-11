@@ -72,17 +72,17 @@ double initialProjectileLabMomentum = 800;//27.6;
 //incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 
 numEvent =  10;//00000;
-   numEvent =  1000000;
+   numEvent =  100000000;
    verbose = 0;
-   kEnergyLoss = 2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
+   kEnergyLoss = 0;//2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
 Aproj = 1;
 Zproj = 1;
 //Kr(36,84)
 //N(7,14)
 
 
-Atarg = 184;//84;
-Ztarg = 74;//36;
+Atarg = 9;//184;//9;//184;//9;//184;//84;
+Ztarg = 4;//74;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
@@ -415,7 +415,7 @@ double maxPathInNucleus = 0;
 			if(hardping->_finalState->at(ih).isHadron())coordinateSoftOutput<<hardping->_finalState->at(ih).vProd().px()<<" "<<hardping->_finalState->at(ih).vProd().py()<<" "<<hardping->_finalState->at(ih).vProd().pz()<<" "<< dummy<<" "<<'('<<dummy<<')'<<endl;
 			cout.precision(17);
 			//cout<<hardping->_finalState->at(ih).pT()<<endl;
-			//cin>>ch;
+		//	cin>>ch;
 			if(hardping->_finalState->at(ih).isHadron())transverseMomentumFile<<iop<<" "<<hardping->_finalState->at(ih).pT()<<endl;
 			if(hardping->_finalState->at(ih).isHadron())numberOfSoftCollisions<<iop<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<endl;
 
@@ -433,14 +433,14 @@ double maxPathInNucleus = 0;
 			}
 			if(hardping->_finalState->at(ih).isHadron()){
 
-				cout<<"kopjj "<<sqrt(target.getNuclearRadius()*target.getNuclearRadius() - hardping->_finalState->at(ih).vProd().pT2()) - hardping->_finalState->at(ih).vProd().pz() - hardping->_finalState->at(ih).getTotalPathInNucleus()<<endl;
+				if(verbose)cout<<"kopjj "<<sqrt(target.getNuclearRadius()*target.getNuclearRadius() - hardping->_finalState->at(ih).vProd().pT2()) - hardping->_finalState->at(ih).vProd().pz() - hardping->_finalState->at(ih).getTotalPathInNucleus()<<endl;
 				maxPathInNucleus = (target.getNuclearRadius()*target.getNuclearRadius() > hardping->_finalState->at(ih).vProd().pT2() )? sqrt(target.getNuclearRadius()*target.getNuclearRadius() - hardping->_finalState->at(ih).vProd().pT2()) : 0;
 
 				/*if(hardping->_finalState->at(ih).getHadronEnergyFraction() < 0.1){
 					cout<<"i = "<<iop<<" z "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<endl;
 					cin>>ch;
 				}*/
-	 			cout<<" imp "<<hardping->_finalState->at(ih).vProd().pT()<<"  z coorf "<<hardping->_finalState->at(ih).vProd().pz()<<" maxPathInNucleus "<<maxPathInNucleus<<endl;
+				if(verbose)cout<<" imp "<<hardping->_finalState->at(ih).vProd().pT()<<"  z coorf "<<hardping->_finalState->at(ih).vProd().pz()<<" maxPathInNucleus "<<maxPathInNucleus<<endl;
 				if(maxPathInNucleus)cout<<maxPathInNucleus - hardping->_finalState->at(ih).vProd().pz() - hardping->_finalState->at(ih).getTotalPathInNucleus()<<endl;
 
 				//if(maxPathInNucleus)totalPathOutput<<maxPathInNucleus - hardping->_initialParticle.vProd().pz() /*- hardping->_finalState->at(ih).vProd().pz()/*- hardping->_finalState->at(ih).getTotalPathInNucleus()*/- hardping->_finalState->at(ih).getHadronFormationLength()- hardping->_finalState->at(ih).getPreHadronFormationLength()<<endl;
@@ -456,9 +456,9 @@ double maxPathInNucleus = 0;
 				if(maxPathInNucleus)cout<<"path2 " <<maxPathInNucleus - hardping->_finalState->at(ih).vProd().pz() +  hardping->_finalState->at(ih).getTotalPathInNucleus() - hardping->_finalState->at(ih).getHadronFormationLength()<<endl;
 				if(maxPathInNucleus)cout<<"path3 " <<hardping->_finalState->at(ih).getEnergyLoss()<<endl;
 			//	cin>>ch;
-				cout<<hardping->_finalState->at(ih).vProd().pz()<<" "<<hardping->_initialParticle.vProd().pz()<<" phfl "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<endl;
+				if(verbose)cout<<hardping->_finalState->at(ih).vProd().pz()<<" "<<hardping->_initialParticle.vProd().pz()<<" phfl "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<endl;
 				cout.precision(12);
-				cout<<"hfl "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" vfe "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<endl;
+				if(verbose)cout<<"hfl "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" vfe "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<endl;
 				if(hardping->_finalState->at(ih).getTotalPathInNucleus()){
 					cout<<"energy loss "<<hardping->_finalState->at(ih).getTotalPathInNucleus() - hardping->_finalState->at(ih).getHadronFormationLength()<<" totpath "<<hardping->_finalState->at(ih).getTotalPathInNucleus()<< endl;
 					cout<<" total path 2 "<<hardping->_finalState->at(ih).getTotalPathInNucleus()<<endl;
@@ -466,7 +466,7 @@ double maxPathInNucleus = 0;
 				}
 			//	cout<<"i = "<<iop<<" en lose "<<hardping->_finalState->at(ih).getEnergyLoss()<<endl;
 			//	cin>>ch;
-		if(hardping->_finalState->at(ih).getEnergyLoss()){
+		if(hardping->_finalState->at(ih).getEnergyLoss()&&verbose){
 			cout<<"i "<<iop<<endl;
 			cout<<"getEnergyLoss "<<hardping->_finalState->at(ih).getEnergyLoss()<<endl;
 			cout<<"p "<<hardping->_finalState->at(ih).p()<<" maxPathInNucleus "<<maxPathInNucleus<<" coord "<< hardping->_finalState->at(ih).vProd()<<endl;
