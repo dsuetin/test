@@ -52,6 +52,8 @@ extern ofstream pathInNucleiOutput;
 extern ofstream softCollisionsNumberOutput;
 extern ofstream deltaPtOutput;
 extern ofstream x1File;
+extern ofstream energyLossFile;
+
 extern  double getRandomFromFile();
 //extern  double getRandom();
 //extern  double ZMWLGaussIntegration5();
@@ -665,7 +667,9 @@ public:
 		int loopCount = 0;
 
 
-		tempRandom = getRandomFromFile();//py->rndm.flat();
+		tempRandom = py->rndm.flat();
+	//	tempRandom = getRandomFromFile();
+		cout<<"temp1 = "<<tempRandom<<endl;
 		if(tempRandom <= ZMW0){
 			newEnergy = x1New*oldEnergy;
 			if(_verbose)cout<<"first case "<<endl;
@@ -677,7 +681,9 @@ public:
 			do{
 				jLow = 0;
 				jUp = 201;
-				tempRandom = getRandomFromFile();//py->rndm.flat();
+				tempRandom = py->rndm.flat();
+		//		tempRandom = getRandomFromFile();
+				cout<<"temp1 2 = "<<tempRandom<<endl;
 				if(_verbose)cout<<"jIndex1 "<<jIndex<<endl;
 				if(loopCount > 50){
 					newEnergy = energyMin;
@@ -713,11 +719,13 @@ public:
 
 
 		}
-
+		energyLossFile<<randomLenght*kEnergyLoss<<endl;
+		//cin>>ch;
 		//cout<<" newEnergy "<<newEnergy<<" oldEnergy "<<oldEnergy<<endl;
 		x1New = newEnergy/oldEnergy;
 		//cout<<x1New<<" "<<randomLenght<<endl;
-		x1File<<x1New<<" "<<randomLenght<<endl;
+		//x1File<<x1New<<" "<<randomLenght<<endl;
+		//energyLossFile<<oldEnergy - newEnergy<<endl;
 		if(_verbose)cout<<"newEnergy2 = "<<newEnergy<<" x1New "<<x1New<<" oldEnergy "<<oldEnergy<<endl;
 	//	cin>>ch;
 		if(x1New > 1){
@@ -1685,7 +1693,7 @@ public:
 			particleA->pz(newPz);
 
 			if(_verbose)cout<<"m "<<particleA->m2()<<" p = "<<particleA->p()<<endl;
-		//	cin>>ch;
+	//	cin>>ch;
 			//suetin debug
 			/*
 			deltaP = particleA->pz() - sqrt(particleA->pz()*particleA->pz() + deltaE*deltaE - 2*deltaE*particleA->e() );
@@ -1764,6 +1772,7 @@ public:
 			_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(particleA->getIndexNumber()).i).at(_index->at(particleA->getIndexNumber()).j).setThetaHardping(particleA->getThetaHardping());
 			if(_verbose)cout<<" if sca part "<<particleA->getIdscatteringParticle()<<endl;
 			_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(particleA->getIndexNumber()).i).at(_index->at(particleA->getIndexNumber()).j).scatteringOnParticle(particleA->getIdscatteringParticle());
+			_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(particleA->getIndexNumber()).i).at(_index->at(particleA->getIndexNumber()).j).setSoftCollisionNumber(particleA->getSoftCollisionNumber());
 		//	cout<<" particle momentum after  energy loss "<<_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(i_init).i).at(_index->at(i_init).j).p();
 		}else{
 			//todo extrapolate to the nucleus
@@ -2035,7 +2044,9 @@ hardpingParticle* findHardParticle(/*hardpingParticle* particleA*/void){
 					particleA->setPhiHardping2(anglePhi);
 					particleA->setThetaHardping2(angleTheta);
 					particleA->setAngles(sinPhi, cosPhi, sinTheta, cosTheta);
+					if(_verbose)cout<<" getSoftCollisionNumber2 = "<<_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getSoftCollisionNumber()<<endl;
 					particleA->setSoftCollisionNumber(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getSoftCollisionNumber()-1);//минус 1, потому что одно мягкое стало жестким
+					if(_verbose)cout<<" getSoftCollisionNumber3 = "<<particleA->getSoftCollisionNumber()<<endl;
 					particleA->setEnergyLoss(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getEnergyLoss());
 
 					//double sinY1 = 0, cosY1 = 0, sinX2 = 0, cosX2 = 0;
@@ -2674,7 +2685,7 @@ void finalOutput(void){
 	//	double impactParameterMax = min(3*_targetNucleus.getNuclearRadius(),_maxZCoordinate + 6.06); // from Fortran version. 6.06 fm - is proton characteristic
 
 		//BB=DSQRT(BMIN**2+RAN(NSEED)*(BMAX**2-BMIN**2))
-
+		char ch;
 
 
 		double impactPar = sqrt(_impactParameterMin*_impactParameterMin + getRandom()*(_impactParameterMax*_impactParameterMax - _impactParameterMin*_impactParameterMin));
@@ -2685,10 +2696,11 @@ void finalOutput(void){
 		//cout<<" phi1 = "<<phiImpact<<endl;
 		impactX = sin(phiImpact)*impactPar;
 		impactY = cos(phiImpact)*impactPar;
-
+		if(_verbose)cout<<" impactPar = "<<impactPar<<" ix "<<impactX<<" iy "<<impactY<<endl;
+	//	cin>>ch;
 		//suetindebug
-		//impactX = 0;
-		//impactY = 0;
+	//	impactX = 0;
+	//	impactY = 0;
 		//suetindebug end
 		return;
 
