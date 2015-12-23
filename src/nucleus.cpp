@@ -804,6 +804,21 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
     double X,Y, YF;
    // double r = sqrt(_zPartonCoord*_zPartonCoord+impactParameter*impactParameter);
     double r = sqrt(zCoord*zCoord+impactParameter*impactParameter);
+    double delta = 0.01;
+
+    /*
+    for(int i = 0; i < 100000; i++ ){
+    	if(exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(i*delta,-_maxZCoordinate,integrationCoordinateBound))> 0.99){
+    		break;
+    	}
+
+
+    	P0 += (1 - exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(i*delta,-_maxZCoordinate,integrationCoordinateBound)))*delta;
+    }
+    //P0 = exp(-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(0,-_maxZCoordinate,integrationCoordinateBound));
+	cout<<"P0 = "<<P0/2/M_PIl<<" impactParameter = "<<impactParameter<<endl;
+   // cin>>ch;
+*/
   //  cout<<"impactParameter = "<<impactParameter<<" r = "<<r<<endl;
    // cin>>ch;
     do{
@@ -867,8 +882,8 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
          //   	cout<< "in cycle "<<endl;
                 temp1 = getRandom();
                 temp2 = getRandom();
-            // 	temp1 = getRandomFromFile();
-            // 	temp2 = getRandomFromFile();
+ //            	temp1 = getRandomFromFile();
+ //            	temp2 = getRandomFromFile();
 
                 X= xMaxP0*temp1;//getRandomFromFile();		// x is NOT coordinate
                 Y= yMaxP0*temp2;//getRandomFromFile();
@@ -952,8 +967,8 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
         	do{
             	temp1 = getRandom();
             	temp2 = getRandom();
-           //  	temp1 = getRandomFromFile();
-           // 	temp2 = getRandomFromFile();
+    //         	temp1 = getRandomFromFile();
+   //         	temp2 = getRandomFromFile();
             	if(_verbose)cout<<" temp1 = "<<temp1<<"  temp2 = "<<temp2<<endl;
 
             	X = xMinP + (xMaxP -xMinP)*temp1;//getRandomFromFile();//*getRandom();
@@ -1162,7 +1177,7 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 	int countLoop = 0;
 	cout.precision(12);
 	double absoluteNucleonMomentum = particleA->pAbs();
-	cout<<"abs "<<particleA->pAbs2()<<endl;
+	//cout<<"abs "<<particleA->pAbs2()<<endl;
 //	cin>>ch;
 	//double newTransverseMomentum =0.;
 	double B = 0.;
@@ -1211,7 +1226,7 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
     double probabilytyBound = 0;
     double probabilyty = 0;
     transverseMomentumMax = absoluteNucleonMomentum;
-    cout<<"B = "<<B<<" e = "<<M_El<<endl;
+    //cout<<"B = "<<B<<" e = "<<M_El<<endl;
     probabilytyMax = B/M_El;
 
 //suetindebug
@@ -1226,10 +1241,10 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 		newTransverseMomentum = transverseMomentumMax*tempRandom1;
 		probabilytyBound        = probabilytyMax*tempRandom2;
 		probabilyty = B*B*newTransverseMomentum*exp(-B*newTransverseMomentum);
-		if(_verbose)cout<<"temp1 = "<<tempRandom1<<" tempRandom2 = "<<tempRandom2<<" hui "<<B<<endl;
+		//if(_verbose)cout<<"temp1 = "<<tempRandom1<<" tempRandom2 = "<<tempRandom2<<" hui "<<B<<endl;
 		//newTransverseMomentum = -1./B*log(tempRandom1*tempRandom2);//(randomNumber*randomNumber);
 		//cout<<"newTransverseMomentum = "<<newTransverseMomentum<<endl;
-		if(_verbose)cout<<"transverseMomentumMax "<<transverseMomentumMax<<" probabilytyMax "<<probabilytyMax<<" probabilytyBound "<<probabilytyBound<<" probabilyty "<<probabilyty<<endl;
+		//if(_verbose)cout<<"transverseMomentumMax "<<transverseMomentumMax<<" probabilytyMax "<<probabilytyMax<<" probabilytyBound "<<probabilytyBound<<" probabilyty "<<probabilyty<<endl;
 		countLoop++;
 		if(countLoop >= 10 ){
 			probabilytyBound = probabilytyBound/2.;
@@ -1237,7 +1252,7 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 		}
 
 	//	cin>>ch;
-	}while(probabilytyBound > probabilyty);
+	}while((probabilytyBound > probabilyty)&&1);
 
 	//suetindebug end
 
@@ -1264,7 +1279,7 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 
 	//if(_verbose)cout<<"theta = "<<theta<<endl;
 	//if(_verbose)cout<<"phi   = "<<phi<<endl;
-	if(_verbose)cout<<" momentum  before  rotate   = "<<particleA->p()<<endl;
+	//if(_verbose)cout<<" momentum  before  rotate   = "<<particleA->p()<<endl;
 	//if(_verbose)cout<<" 3coordinate before rotation = "<<particleA->vProd()<<endl;
 //	particleA->setAngles();
 
@@ -1286,8 +1301,8 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 	//tempRandom1 = getRandomFromFile();
 
 	anglePhi = 2.*M_PIl*tempRandom1;//getRandom();//getRandom();
-	if(_verbose)cout<<"temp1 = "<<tempRandom1<<endl;
-	if(_verbose)cout<<" phi = "<<anglePhi<<" new momentum = "<<newTransverseMomentum<<endl;
+	//if(_verbose)cout<<"temp1 = "<<tempRandom1<<endl;
+	//if(_verbose)cout<<" phi = "<<anglePhi<<" new momentum = "<<newTransverseMomentum<<endl;
 	//cout<<" anglePhi "<<anglePhi<<" newTransverseMomentum ="<<newTransverseMomentum<<endl;
 	double pxNew = 0, pyNew = 0, pzNew = 0, pe =0;
 	double pxOld = 0, pyOld = 0, pzOld = 0;
@@ -1299,7 +1314,7 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 	pyNew = newTransverseMomentum * sin(anglePhi);
 
 	pzNew = sqrt(absoluteNucleonMomentum * absoluteNucleonMomentum - newTransverseMomentum * newTransverseMomentum);
-	if(_verbose)cout<<"pxNEW = "<<pxNew<<" pyNEW = "<<pyNew<<" pzNEW = "<<pzNew<<endl;
+	//if(_verbose)cout<<"pxNEW = "<<pxNew<<" pyNEW = "<<pyNew<<" pzNEW = "<<pzNew<<endl;
 	pe = particleA->e();
 	pxOld = particleA->px();
 	pyOld = particleA->py();
@@ -1363,11 +1378,11 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 	//suetin debug 09/10/2015
 		//particleA->getAngles(sinPhi, cosPhi, sinTheta, cosTheta);
 	//suetin debug 09/10/2015 end
-	cout.precision(12);
-	if(_verbose)cout<<"cosPhi = "<<cosPhi<<" sinPhi = "<<sinPhi<<endl;
-	if(_verbose)cout<<" sinTheta = "<<sinTheta<<" cosTheta = "<<cosTheta<<endl;
+	//cout.precision(12);
+	//if(_verbose)cout<<"cosPhi = "<<cosPhi<<" sinPhi = "<<sinPhi<<endl;
+	//if(_verbose)cout<<" sinTheta = "<<sinTheta<<" cosTheta = "<<cosTheta<<endl;
 //	if(_verbose)cout<<" Theta = "<<particleA->getThetaHardping()<<" Phi = "<<particleA->getPhiHardping()<<endl;
-	if(_verbose)cout<<" Theta = "<<asin(sinTheta)<<" Phi = "<<asin(sinPhi)<<endl;
+	//if(_verbose)cout<<" Theta = "<<asin(sinTheta)<<" Phi = "<<asin(sinPhi)<<endl;
 //	px = particleA->p().px();
 //	py = particleA->p().py();
 //	pz = particleA->p().pz();
@@ -1375,7 +1390,7 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 	//px = px;
 	// momentum rotation;
 
-	if(_verbose)cout<<"  particleA current momentum "<<particleA->p();
+	//if(_verbose)cout<<"  particleA current momentum "<<particleA->p();
 	px1 = pxNew;
     py1 = pyNew*cosTheta + pzNew*sinTheta;
     pz1 =-pyNew*sinTheta + pzNew*cosTheta;
@@ -1393,7 +1408,7 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
     //tempVector.reset();
     //cout<<"after px = "<<px<<" py "<<py<<" pz = "<<pz<<endl;
     tempVector.p(px1,py1,pz1,pe);
-    if(_verbose)cout<<" tempVector after 1 rotation "<<tempVector.px()<<" "<<tempVector.py()<<" "<<tempVector.pz()<<" "<<tempVector.e()<<endl;
+    //if(_verbose)cout<<" tempVector after 1 rotation "<<tempVector.px()<<" "<<tempVector.py()<<" "<<tempVector.pz()<<" "<<tempVector.e()<<endl;
   //  tempVectorCoord.p(xc,yc,zc,0);
    // particleA->p(tempVector);
    // particleA->vProd(tempVectorCoord);
@@ -1414,7 +1429,7 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
     //cout<< " px = "<<px<<" py = "<<py<<" pz = "<<pz<<endl;
     //pz =-py*cosTheta + pz*cosTheta;
     tempVector.p(px2,py2,pz2,pe);
-    if(_verbose) cout<<" tempVector after 2 rotation "<<tempVector.px()<<" "<<tempVector.py()<<" "<<tempVector.pz()<<" "<<tempVector.e()<<endl;
+    //if(_verbose) cout<<" tempVector after 2 rotation "<<tempVector.px()<<" "<<tempVector.py()<<" "<<tempVector.pz()<<" "<<tempVector.e()<<endl;
     particleA->p(tempVector);
 
 //	if(_verbose)cout<<"cosPhi = "<<cosPhi<<" sinPhi = "<<sinPhi<<endl;
@@ -1432,9 +1447,9 @@ Hardping::getNewPtInitialState(hardpingParticle * particleA ,int type){
 	 sinTheta = sqrt(pxOld*pxOld+pyOld*pyOld)/absoluteNucleonMomentum;
 	 cosTheta = pzOld/absoluteNucleonMomentum;
 
-	if(_verbose)cout<<"cosPhi2 = "<<cosPhi<<" sinPhi2 = "<<sinPhi<<endl;
-	if(_verbose)cout<<" sinTheta2 = "<<sinTheta<<" cosTheta2 = "<<cosTheta<<endl;
-	if(_verbose)cout<<" Theta = "<<asin(sinTheta)<<" Phi = "<<asin(sinPhi)<<endl;
+	//if(_verbose)cout<<"cosPhi2 = "<<cosPhi<<" sinPhi2 = "<<sinPhi<<endl;
+	//if(_verbose)cout<<" sinTheta2 = "<<sinTheta<<" cosTheta2 = "<<cosTheta<<endl;
+	//if(_verbose)cout<<" Theta = "<<asin(sinTheta)<<" Phi = "<<asin(sinPhi)<<endl;
 	particleA->setAngles2();
    // tempVectorCoord.p(xc,yc,zc,0);
    // particleA->vProd(tempVectorCoord);
@@ -2176,7 +2191,7 @@ if(_verbose)cout<<"getSoftCollisionNumber = "<<particleA->getSoftCollisionNumber
 //					/cout<<"sn af"<<particleA->getSoftCollisionNumber()<<endl;
 					//cin>>ch;
 					particleA->increaseHardCollisionNumber();
-					cout<<"particleA history size = "<<particleA->getHistory()->size()<<endl;
+					//cout<<"particleA history size = "<<particleA->getHistory()->size()<<endl;
 					if(_verbose)cout<<" particleA = "<<particleA->getHistory()->back()<<" have a hard collision "<<endl;
 
 
@@ -2196,7 +2211,7 @@ if(_verbose)cout<<"getSoftCollisionNumber = "<<particleA->getSoftCollisionNumber
 				if(particleA->isSoft()){
 					//suetin debug
 					particleA->increaseSoftCollisionNumber();
-					cout<<"getSoftCollisionNumber hui= "<<particleA->getSoftCollisionNumber()<<endl;
+				//	cout<<"getSoftCollisionNumber hui= "<<particleA->getSoftCollisionNumber()<<endl;
 					//suetin debug end
 					_softInteractionSummaryCount++;
 					//cout<<"particleA history size = "<<particleA->getHistory()->size()<<endl;
@@ -2217,7 +2232,8 @@ if(_verbose)cout<<"getSoftCollisionNumber = "<<particleA->getSoftCollisionNumber
 				if(_verbose)cout<<" phi1 "<<particleA->getPhiHardping()<<endl;
 				if(_verbose)cout<<" theta1 "<<particleA->getThetaHardping()<<endl;
 			//	cin>>ch;
-				cout<<"getSoftCollisionNumber hui= "<<particleA->getSoftCollisionNumber()<<endl;
+			//	cout<<"getSoftCollisionNumber hui= "<<particleA->getSoftCollisionNumber()<<endl;
+				//cout<<"el === "<<particleA->getEnergyLoss()<<" p = "<<particleA->p().e()<<endl;
 				//cin>>ch;
 				saveParticle4VectorsAfterEnergyLoss(particleA);
 				if(_verbose)cout<<"p2 "<<particleA->p();
@@ -2828,8 +2844,8 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				tempHardpingParticle->setSoftCollisionNumber(particleA->getSoftCollisionNumber());
 				tempHardpingParticle->setHardCollisionNumber(particleA->getHardCollisionNumber());
 				tempHardpingParticle->setEnergyLoss(particleA->getEnergyLoss());
-				if(_verbose)cout<<"particleA->getEnergyLoss() "<<particleA->getEnergyLoss()<<endl;
-			//	cin>>ch;
+				if(_verbose)cout<<"particleA->getEnergyLoss() "<<particleA->getEnergyLoss()<<" "<<tempHardpingParticle->getEnergyLoss()<<endl;
+				//cin>>ch;
 				if(_verbose)cout<<"before "<<tempHardpingParticle->p();
 				tempHardpingParticle->vProd(vecCoordinate);
 
@@ -2913,7 +2929,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 						//preHadronFormationLength = 1.;//todo suetin debug
 						if(_verbose)cout<<"form pre hardron lenght "<<preHadronFormationLength<<endl;
 
-						cout<<"vfe "<<tempHardpingParticle->getVirtualPhotonEnergy()<<endl;
+						if(_verbose)cout<<"vfe "<<tempHardpingParticle->getVirtualPhotonEnergy()<<endl;
 						formationLenghtOutput<<z<<" "<<formationLength<<" "<<preHadronFormationLength<<endl;
 						//formationLenghtOutput<<z<<" "<<formationLength<<" "<<preHadronFormationLength<<endl;
 						if (preHadronFormationLength <= 0 || preHadronFormationLength > 100){
@@ -3046,7 +3062,8 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 
 			//	cout<<" 111"<< tempHardpingParticle->p();
 				_generations->at(numberOfGeneration).getMatrix()->at(i_init).push_back(*tempHardpingParticle);// = *particle;
-
+				//cout<<"fdf ene r ff ="<<_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().getEnergyLoss()<<endl;
+				//cin>>ch;
 			//	_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().id(particleA->id());
 				if(_verbose)cout<<" producted particle "<<_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().id()<<" at index "<<_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().getHistory()->back()<<endl;
 
@@ -3060,7 +3077,7 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 				_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().rot(-theta,0);
 				cout<<"icoord 2=   "<<_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().p()<<endl;
 				cout<<" coord 2=   "<<_generations->at(numberOfGeneration).getMatrix()->at(i_init).back().vProd()<<endl;*/
-				cout<<"is Hadron end prepare new gen "<<tempHardpingParticle->isHadron();// = *particle;
+				if(_verbose)cout<<"is Hadron end prepare new gen "<<tempHardpingParticle->isHadron();// = *particle;
 				//cin>>ch;
 				delete tempHardpingParticle;
 				return true;
@@ -3246,15 +3263,23 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 			vecMomentumZ0.e(pe_old);
 
 			tempHardpingParticle->p(vecMomentumZ0);
+			if(_verbose)cout<<"Ene loos = "<<particleA->getEnergyLoss()<<" e "<<particleA->p().e()<<endl;
+	//		cin>>ch;
+			//suetin debug
 
-			x1New = tempHardpingParticle->recalculateXBjorken(&_targetNucleus,pythia,_initialParticle.e());
+			x1New = tempHardpingParticle->recalculateXBjorken(&_targetNucleus,pythia,_initialParticle.e(),particleA->getEnergyLoss());
+		//	x1New =
+			//suetin debug end
 			if(_verbose)cout<<"x1New = "<<x1New<<endl;
-			//cin>>ch;
+
+		//	cin>>ch;
 			px_new = px_old;
 			py_new = py_old;
 			pz_new = pz_old - (x1 - x1New)*pz_old;
 			pe_new = pe_old - (x1 - x1New)*pe_old;
-
+			//suetin debug
+				if(x1New <= 0)return false;
+			//suetin debug end
 			gamma = (x1New +x2)/sqrt(x1New*x2)/2.;
 			if(gamma <= 1)gamma=1.0000000000001;// иначе бетта равна нулю.
 			betta = sqrt(1 - 1/gamma/gamma);

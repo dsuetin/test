@@ -40,6 +40,7 @@ double sNN;
  ofstream pythiaEventFile;
  ofstream x1File;
  ofstream energyLossFile;
+ ofstream energyLossFile2;
  //suetin debug
  ifstream pythia6File;
  ifstream pythia6Z0File;
@@ -60,7 +61,7 @@ std::ostringstream numberToStringConverter;
 ofstream fileDrellYan;
 ofstream transverseMomentumFile;
 std::string transverseMomentumFilename;
-std::string outputFilename,softCollisionsNumberFilename, randomGeneratorStateFilename,formationLenghtFilename,impactParameterBeforeFilename, pathInNucleusFilename, coordinateSoftFilename, coordinateHardFilename, targetElementName,projectileElementName, probabilityOutputFilename, deltaPtOutputFilename , x1OutputFilename;
+std::string outputFilename,softCollisionsNumberFilename, randomGeneratorStateFilename,formationLenghtFilename,impactParameterBeforeFilename, pathInNucleusFilename, coordinateSoftFilename, coordinateHardFilename, targetElementName,projectileElementName, probabilityOutputFilename, deltaPtOutputFilename , x1OutputFilename,x1OutputFilename2;
 std::string incidentParticlePtFilename;
 std::string initialProjectileLabMomentumString;
 std::string numberOfSoftCollisionsFilename;
@@ -73,7 +74,7 @@ double initialProjectileLabMomentum = 800;//27.6;
 //incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 
 numEvent =  100000000;
- //  numEvent =  10;//0;
+   //numEvent =  11;//0;
    verbose = 0;
    kEnergyLoss = 2.5;//2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
 Aproj = 1;
@@ -82,8 +83,8 @@ Zproj = 1;
 //N(7,14)
 
 
-Atarg = 184;//9;//184;//84;
-Ztarg = 74;//74;//36;
+Atarg = 184;//84;
+Ztarg =74;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
@@ -217,6 +218,7 @@ numberOfSoftCollisionsFilename  = outputFilename.substr(0,outputFilename.find_la
 totalPathFilename				= outputFilename.substr(0,outputFilename.find_last_of("."));
 transverseMomentumFilename      =  outputFilename.substr(0,outputFilename.find_last_of("."));
 x1OutputFilename                =  outputFilename.substr(0,outputFilename.find_last_of("."));
+x1OutputFilename2                =  outputFilename.substr(0,outputFilename.find_last_of("."));
 //cout<<randomGeneratorStateFileName<<endl;
 
 randomGeneratorStateFilename += "_randomGeneratorState";
@@ -246,6 +248,8 @@ transverseMomentumFilename      += "_transverseMomentum";
 transverseMomentumFilename      += ".txt";
 x1OutputFilename				+= "_energyLoss";
 x1OutputFilename				+= ".txt";
+x1OutputFilename2				+= "_energyLoss2";
+x1OutputFilename2				+= ".txt";
 const char * constCharStringTransverseMomentumFilename  =  transverseMomentumFilename.c_str();
 const char * constCharStringFilename     		    =  outputFilename.c_str();
 const char * constCharStringPathInNucleusFilename   = pathInNucleusFilename.c_str();
@@ -261,6 +265,7 @@ const char * constIncidentParticlePtFilename 	  = incidentParticlePtFilename.c_s
 const char * constNumberOfSoftCollisionsFilename	  = numberOfSoftCollisionsFilename.c_str();
 const char * constTotalPathFilename	  				  = totalPathFilename.c_str();
 const char * constEnergyLossFilename	  			  = x1OutputFilename.c_str();
+const char * constEnergyLossFilename2	  			  = x1OutputFilename2.c_str();
 deltaPtOutput.open(constDeltaPtOutputFilename);
 coordinateSoftOutput.open(constCharStringCoordinateSoftFilename);
 coordinateHardOutput.open(constCharStringCoordinateHardFilename);
@@ -275,6 +280,7 @@ numberOfSoftCollisions.open(constNumberOfSoftCollisionsFilename);
 totalPathOutput.open(constTotalPathFilename);
 transverseMomentumFile.open(constCharStringTransverseMomentumFilename);
 energyLossFile.open(constEnergyLossFilename);
+energyLossFile2.open(constEnergyLossFilename2);
 if(fileDrellYan.is_open()){
 	cout<<"all right file "<<constCharStringFilename<<" is opened "<<endl;
 //	cin>>ch;
@@ -310,6 +316,13 @@ if(energyLossFile.is_open()){
 	cout<<"all not right file "<<constEnergyLossFilename<<" is not opened "<<endl;
 //	cin>>ch;
 }
+if(energyLossFile2.is_open()){
+	cout<<"all right file "<<constEnergyLossFilename2<<" is opened "<<endl;
+//	cin>>ch;
+}else{
+	cout<<"all not right file "<<constEnergyLossFilename2<<" is not opened "<<endl;
+//	cin>>ch;
+}
 double maxPathInNucleus = 0;
 	//cout<<convertNumberOfEventsToString(numEvent);
 	//return 0;
@@ -340,10 +353,10 @@ double maxPathInNucleus = 0;
 
 //	  	_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
-		if(iop == 53679){
-			cout<<"iop = "<<iop<<endl;
+		if(iop == 11){
+			//cout<<"iop = "<<iop<<endl;
 			cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "<<endl;
-
+			//verbose = 1;
 	//		cin>>ch;
 		}
 /*
@@ -413,7 +426,7 @@ double maxPathInNucleus = 0;
 			}
 			//if(hardping->_finalState->at(ih).isHadron())fileDrellYan<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().px()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().py()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().pz()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().e()<<" "<<hardping->_finalState->at(ih).p();
 			//cout.precision(14);
-			fileDrellYan<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).p();
+			fileDrellYan<<iop<<" "<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).p();
 			if(hardping->_finalState->at(ih).isHadron()||1)cout<<iop<<"huiii"<<hardping->_finalState->at(ih).id()<<" "<<hardping->_finalState->at(ih).getSoftCollisionNumber()<<" "<<hardping->_finalState->at(ih).getEnergyLoss()<<" "<<hardping->_finalState->at(ih).getPreHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getHadronFormationLength()<<" "<<hardping->_finalState->at(ih).getVirtualPhotonEnergy()<<" "<<hardping->_finalState->at(ih).getHadronEnergyFraction()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().px()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().py()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().pz()<<" "<< hardping->_finalState->at(ih).getTransferred4Momentum().e()<<" "<<hardping->_finalState->at(ih).p();
 			if(verbose)cout<<"tau "<<hardping->_finalState->at(ih).tau()<<endl;
 			if(verbose)cout<<"y "<<hardping->_finalState->at(ih).y()<<endl;

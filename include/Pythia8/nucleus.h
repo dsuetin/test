@@ -53,6 +53,7 @@ extern ofstream softCollisionsNumberOutput;
 extern ofstream deltaPtOutput;
 extern ofstream x1File;
 extern ofstream energyLossFile;
+extern ofstream energyLossFile2;
 
 extern  double getRandomFromFile();
 //extern  double getRandom();
@@ -580,7 +581,7 @@ public:
 	}
 //	double getRandom(void){ return pythia->rndm.flat();}
 
-	double recalculateXBjorken(nucleus* targetNucleus,Pythia * py, double projectileLabEnergy){
+	double recalculateXBjorken(nucleus* targetNucleus,Pythia * py, double projectileLabEnergy, double protonEnergyLoss = 0){
 		char ch;
 		double kEnergyLossCM = 0;
 		double newEnergy = 0;
@@ -629,12 +630,16 @@ public:
 		}
 		//cout<<"cme "<<py->info.eCM()<<endl;
 	//	cin>>ch;
-		energyCM = sNN;//this->getEcm();
+		energyCM = sqrt(sNN);//this->getEcm();
+		energyCM = sNN;
 		//cout<<"tau "<<tau<<" y "<<y<<endl;
 		//cout<<" p "<<this->p();
 		if(_verbose)cout<<"x1New "<<x1New<<" x2New "<<x2New<<" newEnergy "<<newEnergy<<" oldEnergy "<<oldEnergy<<endl;
+
 		energyMin =0.5*minHatMass*minHatMass/(energyCM*x2New);
-		if(_verbose)cout<<" energyMin "<<energyMin<<endl;
+		energyMin = -1000.00000000000000000000000001;
+
+		if(_verbose)cout<<" energyMin "<<energyMin<<" minHatMass = "<<minHatMass<<" energyCM = "<<energyCM<<" x2New = "<<x2New<<endl;
 		//cin>>ch;
 		double rLMax = 0;
 		double rLMin = 0;
@@ -657,7 +662,7 @@ public:
 			lenghtValue[i] = rLMin + (rLMax - rLMin)*i/200.;
 			lenghtProbability[i] = targetNucleus->ZMWLGaussIntegration5(rLMin,lenghtValue[i])/norm;
 
-			if(_verbose)cout<<"lenghtValue[i] "<<lenghtValue[i]<<" lenghtProbability[i] "<<lenghtProbability[i]<<endl;
+			//if(_verbose)cout<<"lenghtValue[i] "<<lenghtValue[i]<<" lenghtProbability[i] "<<lenghtProbability[i]<<endl;
 		}
 		//cin>>ch;
 		int jLow = 0;
@@ -669,8 +674,8 @@ public:
 
 		tempRandom = py->rndm.flat();
 	//	tempRandom = getRandomFromFile();
-		cout<<"temp1 = "<<tempRandom<<endl;
-		if(tempRandom <= ZMW0){
+		if(_verbose)cout<<"temp1 = "<<tempRandom<<endl;
+		if(/*tempRandom <= ZMW0*/ /*protonEnergyLoss == */0){
 			newEnergy = x1New*oldEnergy;
 			if(_verbose)cout<<"first case "<<endl;
 			if(_verbose)cout<<"newEnergy "<<newEnergy<<" x1New "<<x1New<<" oldEnergy "<<oldEnergy<<endl;
@@ -679,11 +684,13 @@ public:
 		}else{
 
 			do{
+
+
 				jLow = 0;
 				jUp = 201;
 				tempRandom = py->rndm.flat();
-		//		tempRandom = getRandomFromFile();
-				cout<<"temp1 2 = "<<tempRandom<<endl;
+	//			tempRandom = getRandomFromFile();
+				if(_verbose)cout<<"temp1 2 = "<<tempRandom<<endl;
 				if(_verbose)cout<<"jIndex1 "<<jIndex<<endl;
 				if(loopCount > 50){
 					newEnergy = energyMin;
@@ -709,19 +716,31 @@ public:
 				if(jIndex < 0)jIndex = 0;
 				if(jIndex >= 200) jIndex = 199;
 				randomLenght = (lenghtValue[jIndex] + lenghtValue[jIndex+1])/2.;
-
+				//energyLossFile2<<randomLenght*kEnergyLoss<<endl;
 				if(_verbose)cout<<"randomLenght "<<randomLenght<<endl;
+
+				//suentin debug
+				randomLenght = protonEnergyLoss;
+				if(_verbose)cout<<"randomLenght222 "<<randomLenght<<endl;
+				//cin>>ch;
+				//suentin debug end
+
+
 				newEnergy = x1New*oldEnergy -kEnergyLossCM*randomLenght;
 				if(_verbose)cout<<" x1 "<<x1New<<" oldEnergy "<<oldEnergy<<" randomLenght "<<randomLenght<<" kEnergyLossTemp = "<<kEnergyLossCM<<endl;
 				loopCount++;
 				if(_verbose)cout<<" newEnergy = "<<newEnergy<<" energyMin = "<<energyMin<<endl;
-			}while(newEnergy < energyMin);
+			}while(/*newEnergy < energyMin*/0);
 
 
 		}
-		energyLossFile<<randomLenght*kEnergyLoss<<endl;
+		//cout<<"energy loss = "<<this->getEnergyLoss()<<endl;
+		//cout<<this->p().e()<<endl;
 		//cin>>ch;
-		//cout<<" newEnergy "<<newEnergy<<" oldEnergy "<<oldEnergy<<endl;
+		energyLossFile<<randomLenght*kEnergyLoss<<endl;
+		if(_verbose)cout<<" energyLossFile = "<<randomLenght*kEnergyLoss<<endl;
+		//cin>>ch;
+		//if(_verbose)cout<<" newEnergy "<<newEnergy<<" oldEnergy "<<oldEnergy<<endl;
 		x1New = newEnergy/oldEnergy;
 		//cout<<x1New<<" "<<randomLenght<<endl;
 		//x1File<<x1New<<" "<<randomLenght<<endl;
@@ -1773,6 +1792,7 @@ public:
 			if(_verbose)cout<<" if sca part "<<particleA->getIdscatteringParticle()<<endl;
 			_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(particleA->getIndexNumber()).i).at(_index->at(particleA->getIndexNumber()).j).scatteringOnParticle(particleA->getIdscatteringParticle());
 			_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(particleA->getIndexNumber()).i).at(_index->at(particleA->getIndexNumber()).j).setSoftCollisionNumber(particleA->getSoftCollisionNumber());
+			_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(particleA->getIndexNumber()).i).at(_index->at(particleA->getIndexNumber()).j).setEnergyLoss(particleA->getEnergyLoss());
 		//	cout<<" particle momentum after  energy loss "<<_generations->at(numberOfGeneration-1).getMatrix()->at(_index->at(i_init).i).at(_index->at(i_init).j).p();
 		}else{
 			//todo extrapolate to the nucleus
@@ -1797,6 +1817,9 @@ public:
 
 
 	  	particleA->rotateBackHardping();// необходимо развернуть пучок вдоль z, чтобы корректно работала prepareNewGeneration
+
+
+
 //		cout<<"saveParticle4VectorsAfterEnergyLoss3 = "<<particleA->p();
 		//cout<<" in saveParticle4VectorsAfterEnergyLoss end"<<endl;
 	//	cin>>ch;
@@ -1898,7 +1921,7 @@ unsigned int getIndexHardOfHardCollision(void){
 					if(_verbose)cout<< "randomPossitionOfHardScattering = "<< randomPossitionOfHardScattering<<" index of hard scattering = "<< *_softCollisionIterator<<endl;
 					_indexOfHardCollosion = *_softCollisionIterator;
 			//		cout<<"_indexOfHardCollosion = "<<_indexOfHardCollosion<<endl;
-			//		cin>>ch;
+				//	cin>>ch;
 					if(_verbose)cout<< " is bad = "<< isBad(_indexOfHardCollosion)<<endl;
 				}while(isBad(_indexOfHardCollosion));
 			}//end of else _vertexOfInteraction->size() == 1
@@ -2006,6 +2029,8 @@ hardpingParticle* findHardParticle(/*hardpingParticle* particleA*/void){
 				for(int i =0; i< _generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->size(); i++){
 				//	cout<<_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->at(i)<<endl;
 				}
+			//	cout<<"indexOfGeneration = "<<indexOfGeneration<<" initialParticleIndex = "<<initialParticleIndex<<" producedParticleIndex = "<<producedParticleIndex<<endl;
+			//	cout<<"el = "<<_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getEnergyLoss()<<endl;
 				if(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->back() ==
 						_indexOfHardCollosion){
 				//	cin>>ch;
@@ -2021,9 +2046,9 @@ hardpingParticle* findHardParticle(/*hardpingParticle* particleA*/void){
 					pythia->event.remove(pythia->event.size()-1,pythia->event.size()-1);
 					if(_verbose)pythia->event.list();
 					for(int i = 0; i < _generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->size();i++){
-							cout<<_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->at(i)<<" ";
+						if(_verbose)cout<<_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getHistory()->at(i)<<" ";
 					}
-					cout<<endl;
+					if(_verbose)cout<<endl;
 					//cin>>ch;
 					//particleA->
 					//particleA->p(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).p());
@@ -2047,20 +2072,23 @@ hardpingParticle* findHardParticle(/*hardpingParticle* particleA*/void){
 					if(_verbose)cout<<" getSoftCollisionNumber2 = "<<_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getSoftCollisionNumber()<<endl;
 					particleA->setSoftCollisionNumber(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getSoftCollisionNumber()-1);//минус 1, потому что одно мягкое стало жестким
 					if(_verbose)cout<<" getSoftCollisionNumber3 = "<<particleA->getSoftCollisionNumber()<<endl;
+//					cout<<"indexOfGeneration = "<<indexOfGeneration<<" initialParticleIndex = "<<initialParticleIndex<<" producedParticleIndex = "<<producedParticleIndex<<endl;
+//					cout<<"el = "<<_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getEnergyLoss()<<endl;
 					particleA->setEnergyLoss(_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getEnergyLoss());
-
+					if(_verbose)cout<<"el == "<<particleA->getEnergyLoss()<<endl;
+					//cin>>ch;
 					//double sinY1 = 0, cosY1 = 0, sinX2 = 0, cosX2 = 0;
 					//_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getTrigonometricFunctions(sinY1,cosY1,sinX2,cosX2);
 
 					_generations->at(indexOfGeneration).getMatrix()->at(initialParticleIndex).at(producedParticleIndex).getTrigonometricFunctions(sinPhi, cosPhi, sinTheta, cosTheta);
 					particleA->setTrigonometricFunctions(sinPhi, cosPhi, sinTheta, cosTheta);
-					cout<<"trig "<<sinPhi<<" "<<cosPhi<<" "<<sinTheta<<" "<<cosTheta<<endl;
+					if(_verbose)cout<<"trig "<<sinPhi<<" "<<cosPhi<<" "<<sinTheta<<" "<<cosTheta<<endl;
 				//	cin>>ch;
-					cout<<"size "<<particleA->getHistory()->size()<<endl;
+					if(_verbose)cout<<"size "<<particleA->getHistory()->size()<<endl;
 					for(int i = 0; i < particleA->getHistory()->size(); i++ ){
-						cout<<particleA->getHistory()->at(i)<<" ";
+						if(_verbose)cout<<particleA->getHistory()->at(i)<<" ";
 					}
-					cout<<endl;
+					if(_verbose)cout<<endl;
 				//	cin>>ch;
 					if(_verbose)cout<<"particleA->isHadron() "<<particleA->isHadron()<<" id "<<particleA->id()<<endl;
 					if(_verbose)cout<<"particleA->vProd()    "<<particleA->vProd();
@@ -2075,9 +2103,10 @@ hardpingParticle* findHardParticle(/*hardpingParticle* particleA*/void){
 */
 					//todo may be add some new parameter
 					if(_verbose)cout<<" particleA = "<<particleA->p()<<" idb "<<particleA->getIdscatteringParticle()<<endl;
+				//	cin>>ch;
 					return particleA;
 					//exit = true;
-				//	cin>>ch;
+
 					break;
 				}// end of if getHistory()->back() ==_indexOfHardCollosion
 			//	cout<<"1"<<endl;
@@ -2157,6 +2186,8 @@ bool ifNoHardCollisionHappened(unsigned int numberOfGeneration/*, hardpingPartic
 				if(getIndexHardOfHardCollision()){
 					//when we get particle she is oriented along initial z direction
 					particleA = findHardParticle();
+
+					//cin>>ch;
 					/*
 					cout<<"size "<<particleA->getHistory()->size()<<endl;
 					for(int i = 0; i < particleA->getHistory()->size(); i++ ){
@@ -2215,6 +2246,8 @@ bool ifNoHardCollisionHappened(unsigned int numberOfGeneration/*, hardpingPartic
 						particleA->setTrigonometricFunctions(sinPhi, cosPhi, sinTheta, cosTheta);
 						particleA->setSoftCollisionNumber(_initialParticle.getSoftCollisionNumber());
 						particleA->setEnergyLoss(_initialParticle.getEnergyLoss());
+						//cout<<"here i am "<<endl;
+						//cin>>ch;
 				}
 				//cout<<"is h soft to hard "<<particleA->isHadron()<<endl;
 			//	cin>>ch;
@@ -2224,6 +2257,8 @@ bool ifNoHardCollisionHappened(unsigned int numberOfGeneration/*, hardpingPartic
 
 				_generations->at(numberOfGeneration-1).getMatrix()->at(0).push_back(*particleA);//at(0).push_back(*particleA);
 				if(_verbose)cout<<" new generation = "<< _generations->at(numberOfGeneration-1).getMatrix()->at(0).at(0).p();
+				if(_verbose)cout<<" new energy loss = "<< _generations->at(numberOfGeneration-1).getMatrix()->at(0).at(0).getEnergyLoss();
+				//cin>>ch;
 			}// end of if(_generations->at(numberOfGeneration-1).getMatrix()->size() == 0 && _hardInteractionCount == 0)
 	delete particleA;
 	return _softToHard;
@@ -2699,7 +2734,7 @@ void finalOutput(void){
 		if(_verbose)cout<<" impactPar = "<<impactPar<<" ix "<<impactX<<" iy "<<impactY<<endl;
 	//	cin>>ch;
 		//suetindebug
-	//	impactX = 0;
+	//	impactX = 1;
 	//	impactY = 0;
 		//suetindebug end
 		return;
