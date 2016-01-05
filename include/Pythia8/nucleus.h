@@ -1209,6 +1209,108 @@ public:
 	void setKEnergyLoss(double energyLoss){
 		_kEnergyLoss = energyLoss;
 	}
+	void recalculateParticleMomentum(hardpingParticle* particleA){//пересчитывает 4-х импульс частицы с учетом энергитических потерь в начальном состоянии
+		char ch;
+		double incidentParticleEnergyLoss = particleA->getEnergyLoss();
+
+
+		if(abs(this->id())< 23)return;
+		if(!this->isFinal())return;
+		if(incidentParticleEnergyLoss == 0)return;
+		double pathInNucleus = incidentParticleEnergyLoss/kEnergyLoss;
+		double incidentParticleEnergy = particleA->p().e() + incidentParticleEnergyLoss;
+		double x1 = particleA->getXBjorkenProjectile();
+		double x2 = particleA->getXBjorkenTarget();
+		double projectileNucleonMass = this->getRestMass(particleA->id());
+		double targetNucleonMass     = this->getRestMass(particleA->getIdscatteringParticle());
+		double gamma = sqrt(1+incidentParticleEnergy/targetNucleonMass/2.);
+		double betta = sqrt(1-1/gamma/gamma);
+		double pt_old = 0, pt_new = 0, px_old =0, py_old = 0,pz_old =0,pe_old =0, px_new = 0, py_new =0, pz_new = 0,pe_new = 0, deltaPt = 0;
+		double kEnergyLossCM = sqrt(projectileNucleonMass*projectileNucleonMass + targetNucleonMass*targetNucleonMass + 2*incidentParticleEnergy*targetNucleonMass) - sqrt(projectileNucleonMass*projectileNucleonMass + targetNucleonMass*targetNucleonMass + 2*(incidentParticleEnergy - kEnergyLoss)*targetNucleonMass);
+		double x1Recalculated = (x1*this->e() - kEnergyLossCM*pathInNucleus)/this->e();
+		this->setXBjorkenProjectileRecalculated(x1Recalculated);
+		//get particle momentum
+		px_old = this->px();
+		py_old = this->py();
+		pz_old = this->pz();
+		pe_old = this->e();
+
+		//calculating 4-momentum of produced particles (hadrons & leptons) in central mass system of proj & targ nucleons:
+		px_new = px_old;
+		py_new = py_old;
+		pz_new = gamma*(pz_old - betta*pe_old);
+		pe_new = gamma*(pe_old - betta*pz_old);
+		if(_verbose)cout<<"p1 = "<<px_new<<" "<<py_new<<" "<<pz_new<<" "<<pe_new<<endl;
+		//C(IAE) calculating 4-momentum of produced particles (hadrons & leptons) in central mass system of 2 partons:
+		px_old = px_new;
+		py_old = py_new;
+		pz_old = pz_new;
+		pe_old = pe_new;
+		//tempHardpingParticle->setXBjorkenProjectile(x1);
+		//tempHardpingParticle->setXBjorkenTarget(x2);
+		if(_verbose)cout<<"x1 "<<x1<<" x2 "<<x2<<endl;
+		//if(x1 == x2)x1+=0.000000001; // иначе гамма равна единице
+		gamma = (x1 + x2)/sqrt(x1*x2)/2.;
+		if(gamma <= 1)gamma=1.0000000000001;// иначе бетта равна нулю.
+		betta = sqrt(1-1./gamma/gamma);
+		if(x1 < x2)betta = - betta;
+		if(_verbose)cout<<"gamma 2 = "<<gamma<<" betta "<<betta<<endl;
+		px_new = px_old;
+		py_new = py_old;
+		pz_new = gamma*(pz_old - betta*pe_old);
+		pe_new = gamma*(pe_old - betta*pz_old);
+		if(_verbose)cout<<"p2 = "<<px_new<<" "<<py_new<<" "<<pz_new<<" "<<pe_new<<endl;
+		px_old = px_new;
+		py_old = py_new;
+		pz_old = pz_new;
+		pe_old = pe_new;
+
+
+		px_new = px_old;
+		py_new = py_old;
+		pz_new = pz_old - (x1 - x1Recalculated)*pz_old;
+		pe_new = pe_old - (x1 - x1Recalculated)*pe_old;
+
+		if(x1 - x1Recalculated <= 0)return;
+
+		gamma = (x1Recalculated +x2)/sqrt(x1Recalculated*x2)/2.;
+		if(gamma <= 1)gamma=1.0000000000001;// иначе бетта равна нулю.
+		betta = sqrt(1 - 1/gamma/gamma);
+		if(_verbose)cout<<"su = "<<x1Recalculated +x2<<" mu "<<sqrt(x1Recalculated*x2)<<endl;
+		if(x1Recalculated < x2)betta = -betta;
+		if(_verbose)cout<<"gamma 3 = "<<gamma<<" betta "<<betta<<endl;
+		px_old = px_new;
+		py_old = py_new;
+		pz_old = pz_new;
+		pe_old = pe_new;
+
+		if(_verbose)cout<<"p3 = "<<px_new<<" "<<py_new<<" "<<pz_new<<" "<<pe_new<<endl;
+
+		px_new = px_old;
+		py_new = py_old;
+		pz_new = gamma*(pz_old +betta*pe_old);
+		pe_new = gamma*(pe_old +betta*pz_old);
+
+		px_old = px_new;
+		py_old = py_new;
+		pz_old = pz_new;
+		pe_old = pe_new;
+
+		gamma = sqrt(1+ incidentParticleEnergy/targetNucleonMass/2.);
+		if(gamma <= 1)gamma=1.0000000000001;// иначе бетта равна нулю.
+		betta = sqrt(1-1/gamma/gamma);
+		if(_verbose)cout<<"gamma 4 = "<<gamma<<" betta "<<betta<<endl;
+		px_new = px_old;
+		py_new = py_old;
+		pz_new = gamma*(pz_old +betta*pe_old);
+		pe_new = gamma*(pe_old +betta*pz_old);
+
+		if(_verbose)cout<<"p4 = "<<px_new<<" "<<py_new<<" "<<pz_new<<" "<<pe_new<<endl;
+		Vec4 particle4Momentum(px_old,py_old,pz_old,pe_old);
+		this->p(particle4Momentum);
+		return;
+
+	}
 	//todo написать функцию, которая по индексу частицы в истории возвращала бы указатель на эту частицу.
 private:
 	vector <unsigned int> * _history;

@@ -57,11 +57,13 @@ extern ofstream energyLossFile;
 //suetin debug;
 extern ifstream pythia6File;
 extern ifstream pythia6Z0File;
+extern ifstream pythia8ParticleFile;
 extern ifstream softCollisionsNumberInput;
 extern int nSoft;
 extern int verbose;
 extern double sNN;
 extern double kEnergyLoss;
+extern bool quickVersion;
 //using namespace starlightConstants;
 Timer time1;
 bool compare(int i,int j) { return ( i < j); }
@@ -2116,9 +2118,15 @@ if(_verbose)cout<<"getSoftCollisionNumber = "<<particleA->getSoftCollisionNumber
 				//	cin>>ch;
 					if(particleA->isHadron()){ //dsuetin debug
 						//suetin debug
-						pythiaNextFlag = pythia->next();
+						if(!quickVersion){
+							pythiaNextFlag = pythia->next();
+						}else{
+							if(_verbose)pythia->event.list();
+							pythiaNextFlag = 1;
+						}
+
 						//suetin debug end
-						if(_verbose)pythia->event.list();
+
 
 						// suetindebug
 
@@ -2396,10 +2404,19 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 		pEB = particleB->e();
 		if(_verbose)cout<<" A particle momentum in initialization "<<particleA->p()<<" id B particle = "<<particleB->id()<<endl;
 		if(_verbose)cout<<" hard processes "<<particleA->isHard()<<"  soft processes "<<particleA->isSoft()<<endl;
+
+		double EPythia6 = 0,pxPythia6 = 0,pyPythia6 = 0, pzPythia6 = 0;
+		int idPythia6 = 0;
+		double hadronFormLenght = 0, preHadronFormLenght = 0, virtualPhotonEnergy = 0, virtualPhotonEnergyOld = 0;
+		double Qxcm = 0, Qycm = 0,Qzcm = 0,Qecm = 0;
+		double Qx = 0, Qy = 0,Qz = 0,Qe = 0;
+		Vec4 Q = 0;
+		int statusCode = 0;
+		int countParticles = 0;
+		int dummy = 0;
 		if(particleA->isLepton()){
 
-			double EPythia6 = 0,pxPythia6 = 0,pyPythia6 = 0, pzPythia6 = 0;
-			int idPythia6 = 0;
+
 			TString filename = "/home/guest/workspace4/h/pythia6Event";//.txt;
 
 			stringstream ss;
@@ -2444,9 +2461,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 
 			pythia->event.append(partB);
 */
-			int statusCode = 0;
-			int countParticles = 0;
-			int dummy = 0;
+
 			//todo suetin debug
 			pythia->event.append(partB);
 			pythia->event.append(partB);
@@ -2518,17 +2533,14 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 		//end suetin debug
 		//	cin>>ch;
 
-			double hadronFormLenght = 0, preHadronFormLenght = 0, virtualPhotonEnergy = 0, virtualPhotonEnergyOld = 0;
-			double Qxcm = 0, Qycm = 0,Qzcm = 0,Qecm = 0;
-			double Qx = 0, Qy = 0,Qz = 0,Qe = 0;
-			Vec4 Q = 0;
+
 			//todo suetin debug
 
 			do{
 
 // поставить *_
 				 pythia6File>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>Qx>>Qy>>Qz>>virtualPhotonEnergy;
-				 if(_verbose||1)cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<" Qx = "<<Qx<<" Qy = "<<Qy<<" Qz = "<<Qz<<" Qe = "<<Qe<<endl;
+				 if(_verbose)cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<" Qx = "<<Qx<<" Qy = "<<Qy<<" Qz = "<<Qz<<" Qe = "<<Qe<<endl;
 			//	cout<<" id "<<idPythia6<<endl;
 				 Q.px(Qx);
 				 Q.py(Qy);
@@ -2613,7 +2625,11 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 		//	_hardInteractionCount++;
 		//	cin>>ch;
 			return 1;
-		}
+		}// end (isLepton)
+
+
+
+
 		//pythia->settings.resetAll();
 		if(!_verbose){
 			pythia->readString("Init:showProcesses = off");
@@ -2647,13 +2663,56 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 
 		}
 
-	//	pythia->readString("PhaseSpace:pTHatMin = 3.0");
-
-	//	pythia->readString("PhaseSpace:mHatMin = 80.");
-	//	pythia->readString("PhaseSpace:mHatMax = 120.");
-
 
 		if(particleA->isHard()){
+
+			//pythia->event.clear();
+
+			if(particleA->isHadron() && quickVersion){
+				pythia->event.remove(pythia->event.size()-1,pythia->event.size()-1); // удалить последнюю частицу в списке
+
+				do{
+
+							     pythia8ParticleFile>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>Qx>>Qy>>Qz>>virtualPhotonEnergy;
+								 if(_verbose)cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<" Qx = "<<Qx<<" Qy = "<<Qy<<" Qz = "<<Qz<<" Qe = "<<Qe<<endl;
+							//	cout<<" id "<<idPythia6<<endl;
+								 Q.px(Qx);
+								 Q.py(Qy);
+								 Q.pz(Qz);
+								 Q.e(virtualPhotonEnergy);
+							 	//cin>>ch;
+
+							 	if(idPythia6 == 0)continue;
+								countParticles++;
+								//todo suetin debug
+								if(countParticles <= 3 &&0 ){ //suetin change
+									statusCode = 0; // not final state
+								}else{
+									statusCode = 1; // final state
+								}
+								partB.px(pxPythia6);
+								partB.py(pyPythia6);
+								partB.pz(pzPythia6);
+								partB.e ( EPythia6);
+								partB.id(idPythia6);
+								partB.m(sqrt(EPythia6*EPythia6 - pxPythia6*pxPythia6 - pyPythia6*pyPythia6 - pzPythia6*pzPythia6));
+								partB.status(statusCode);
+						 		pythia->event.append(partB);
+								if(_verbose)cout<<"id = "<<idPythia6<<" p= "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<endl;
+						//		cin>>ch;
+					 		//	particleA->setPreHadronFormationLength(preHadronFormLenght);
+							//	particleA->setHadronFormationLength(hadronFormLenght);
+								particleA->setVirtualPhotonEnergy(virtualPhotonEnergy);
+								//suetin change
+								particleA->setTransferred4Momentum(Q);
+								cout<<"Q "<<particleA->getTransferred4Momentum().px()<<" "<<particleA->getTransferred4Momentum().py()<<" "<<particleA->getTransferred4Momentum().pz()<<" "<<particleA->getTransferred4Momentum().e()<<endl;
+								//suetin change end
+							//	cin>>ch;
+						}while( idPythia6 != 0 /*!_pythia6File->eof()*/ );
+				pythia->event.list();
+				cin>>ch;
+					return 1;
+			}
 
 			// pythia->readString("SoftQCD:all = off");
 
@@ -2987,7 +3046,16 @@ bool Hardping::prepareNewGeneration(hardpingParticle* particleA,int i_pyEv){
 						if(_verbose)cout<<"form lenght "<<preHadronFormationLength<<endl;
 
 */
+						pythia->event.list();
+						cout<<"path in nucleus "<<particleA->getEnergyLoss()<<endl;
+						for(int i = 0; i < pythia->event.size(); i++){
+						//	z =
+						}
+						cin>>ch;
+					//	DZA(I)=2.0D0*DSQRT(PATT(i,1)**2.0D0+PATT(i,2)**2.0D0)
+					//	     &                   /DSQRT(DXFREL1*DXFR2*HINT1(1)*HINT1(1))
 
+					//	cin>>ch;
 						tempHardpingParticle->setVirtualPhotonEnergy(particleA->getVirtualPhotonEnergy());
 						tempHardpingParticle->setTransferredCM4Momentum(particleA->getTransferredCM4Momentum());
 						tempHardpingParticle->setTransferred4Momentum(particleA->getTransferred4Momentum());

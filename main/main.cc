@@ -44,10 +44,12 @@ double sNN;
  //suetin debug
  ifstream pythia6File;
  ifstream pythia6Z0File;
+ ifstream pythia8ParticleFile;
  ifstream coordinateFile;
  ifstream softCollisionsNumberInput;
- int verbose;
+ int verbose = 0;
  double kEnergyLoss;
+ bool quickVersion = false;
  int nSoft;
  //const gsl_rng_type *gslRandomGeneratorType;
 // gsl_rng *gslRandomGenerator;
@@ -72,7 +74,7 @@ int Aproj = 0, Zproj = 0, Atarg = 0, Ztarg = 0, incidentParticleId = 0;
 double initialProjectileLabMomentum = 800;//27.6;
 
 //incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
-
+quickVersion = true;
 numEvent =  100000000;
    //numEvent =  11;//0;
    verbose = 0;
@@ -91,12 +93,15 @@ Ztarg =4;//36;
  TString filenameX1 = "/home/guest/workspace4/h/Debug/06.10.2015/x1.txt";
  TString filenameZ0 = "/home/guest/workspace/pythia6/Debug/06.10.2015/pythia6DYevent.txt";
          filenameZ0 = "/home/guest/workspace4/Pythia8/Debug/12.11.2015/p_p_800GeV_DY_ZO.txt";
+ TString filenameQuick = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
+
  //filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event_c++.txt";
  TString filenamePythiaEvent = "/home/guest/workspace4/h/Debug/29.07.2015/pythia6event.txt";
 pythia6File.open(filename,std::ifstream::binary);
 pythia6Z0File.open(filenameZ0,std::ifstream::binary);
 pythiaEventFile.open(filenamePythiaEvent,std::ofstream::binary);
 x1File.open(filenameX1,std::ofstream::binary);
+pythia8ParticleFile.open(filenameQuick,std::ofstream::binary);
 //pythiaEventFile.open(filename_initialParticlePythiaEvent);
 if(pythia6File.is_open()){
 	cout<<"ok"<<endl;
@@ -107,6 +112,11 @@ if(pythia6Z0File.is_open()){
 	cout<<"ok"<<endl;
 }else{
 	cout<<"hui"<<endl;
+}
+if(pythia8ParticleFile.is_open()){
+	cout<<"ok"<<endl;
+}else{
+	cout<<"hui, file pythia8ParticleFile do not open "<<endl;
 }
 int dummy = 0,idPythia6;
 double pxPythia6,pyPythia6,pzPythia6,EPythia6;
