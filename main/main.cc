@@ -77,7 +77,7 @@ double initialProjectileLabMomentum = 800;//27.6;
 quickVersion = true;
 numEvent =  100000000;
    //numEvent =  11;//0;
-   verbose = 0;
+   verbose = 1;
    kEnergyLoss = 2.5;//2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
 Aproj = 1;
 Zproj = 1;
@@ -85,8 +85,8 @@ Zproj = 1;
 //N(7,14)
 
 
-Atarg = 184;//9;//184;//84;
-Ztarg = 74;//36;
+Atarg = 9;//184;//9;//184;//84;
+Ztarg = 4;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
@@ -363,7 +363,7 @@ double maxPathInNucleus = 0;
 
 //	  	_randomFile.open("/home/guest/workspace4/h/randomNumbersFile.txt"/*"/home/guest/workspace4/Hardping_newold/randomSeq.txt"*/);
 
-		if(iop == 11){
+		if(iop == 81){
 			//cout<<"iop = "<<iop<<endl;
 			cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! "<<endl;
 			//verbose = 1;
