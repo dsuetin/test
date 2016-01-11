@@ -78,7 +78,7 @@ quickVersion = true;
 numEvent =  100000000;
    //numEvent =  11;//0;
    verbose = 0;
-   kEnergyLoss = 7.5;//2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
+   kEnergyLoss = 2.5;//2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
 Aproj = 1;
 Zproj = 1;
 //Kr(36,84)
@@ -86,7 +86,7 @@ Zproj = 1;
 
 
 Atarg = 9;//184;//84;
-Ztarg =4;//36;
+Ztarg = 4;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";

@@ -2092,7 +2092,8 @@ if(_verbose)cout<<"getSoftCollisionNumber = "<<particleA->getSoftCollisionNumber
 
 				}
 
-
+			//	cout<<"x1 = = = "<<particleA->getXBjorkenProjectile()<<" x2 = "<<particleA->getXBjorkenTarget()<<endl;
+			//	cin>>ch;
 				if(particleA->isSoft() ){
 					if(_verbose)cout<<" iam in particleA->isSoft() && _fortranHardping"<<endl;
 					if(_fortranHardping){
@@ -2141,11 +2142,12 @@ if(_verbose)cout<<"getSoftCollisionNumber = "<<particleA->getSoftCollisionNumber
 						double mZ0 = 0;
 						Vec4 tmpVec;
 						hardpingParticle tempPart;
-
+/*
 						x1Z0 = pythia->info.x1();
 						x2Z0 = pythia->info.x2();
 						particleA->setXBjorkenProjectile( x1Z0);
 						particleA->setXBjorkenTarget( x2Z0    );
+*/
 						if(_verbose)cout<<"x1 = "<<x1Z0<<" x2 = "<<x2Z0<<endl;
 						//cin>>ch;
 
@@ -2669,11 +2671,15 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 			//pythia->event.clear();
 
 			if(particleA->isHadron() && quickVersion){
+				double x1 = 0, x2 = 0;
 				pythia->event.remove(pythia->event.size()-1,pythia->event.size()-1); // удалить последнюю частицу в списке
 
-				do{
 
-							     pythia8ParticleFile>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>Qx>>Qy>>Qz>>virtualPhotonEnergy;
+				//suetin debug
+				//do{
+				//suetin debug end
+							    // pythia8ParticleFile>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>Qx>>Qy>>Qz>>virtualPhotonEnergy;
+						pythia6Z0File>>idPythia6>>x1>>x2>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>ch>>Qx>>ch;
 								 if(_verbose)cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<" Qx = "<<Qx<<" Qy = "<<Qy<<" Qz = "<<Qz<<" Qe = "<<Qe<<endl;
 							//	cout<<" id "<<idPythia6<<endl;
 								 Q.px(Qx);
@@ -2682,7 +2688,7 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 								 Q.e(virtualPhotonEnergy);
 							 	//cin>>ch;
 
-							 	if(idPythia6 == 0)continue;
+							 //	if(idPythia6 == 0)continue; //suetin debug
 								countParticles++;
 								//todo suetin debug
 								if(countParticles <= 3 &&0 ){ //suetin change
@@ -2706,11 +2712,21 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 								//suetin change
 								particleA->setTransferred4Momentum(Q);
 								cout<<"Q "<<particleA->getTransferred4Momentum().px()<<" "<<particleA->getTransferred4Momentum().py()<<" "<<particleA->getTransferred4Momentum().pz()<<" "<<particleA->getTransferred4Momentum().e()<<endl;
+
+								particleA->setXBjorkenProjectile(x1);
+								particleA->setXBjorkenTarget(x2);
+
 								//suetin change end
 							//	cin>>ch;
-						}while( idPythia6 != 0 /*!_pythia6File->eof()*/ );
+
+
+								//suetin debug
+				//		}while( idPythia6 != 0 /*!_pythia6File->eof()*/ );
+								//suetin debug end
+
 				pythia->event.list();
-				cin>>ch;
+				//cout<<"x1 = = = "<<particleA->getXBjorkenProjectile()<<" x2 = "<<particleA->getXBjorkenTarget()<<endl;
+				//cin>>ch;
 					return 1;
 			}
 
@@ -3243,12 +3259,13 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 		_indexOfDrellYanChain.clear();
 
-	//	px_old = particleA->px();
-	//	py_old = particleA->py();
-	//	pz_old = particleA->pz();
+//		px_old = particleA->px();
+//		py_old = particleA->py();
+//		pz_old = particleA->pz();
 
 		cout.precision(10);
 	//	cout<<"findDrellYanPairs px  "<<px_old<<" findDrellYanPairs py  = "<<py_old<<" findDrellYanPairsp pz  = "<<pz_old<<endl;
+	//	cin>>ch;
 
 		//cout << "particleA->theta() "<<particleA->theta()<<" particleA->phi() "<<particleA->phi()<<endl;
 
@@ -3270,7 +3287,7 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 */
 
-			/*
+
 			px_old = pythia->event.at(i_pyEv+3).px();//particleA->p().px();
 			py_old = pythia->event.at(i_pyEv+3).py();
 			pz_old = pythia->event.at(i_pyEv+3).pz();
@@ -3385,6 +3402,7 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 			//suetin debug
 
 			x1New = tempHardpingParticle->recalculateXBjorken(&_targetNucleus,pythia,_initialParticle.e(),particleA->getEnergyLoss());
+			particleA->setXBjorkenProjectileRecalculated(x1New);
 		//	x1New =
 			//suetin debug end
 			if(_verbose)cout<<"x1New = "<<x1New<<endl;
@@ -3466,6 +3484,9 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 			//suetin debug
 			//vecMomentum.pz(vecMomentum.pz()*particleA->getXBjorkenProjectile());
 			vecMomentum.pz(vecMomentum.pz()*tempHardpingParticle->getXBjorkenProjectileRecalculated());
+
+			if(_verbose)cout<<"getXBjorkenProjectileRecalculated = = "<<particleA->getXBjorkenProjectileRecalculated()<<endl;
+		//	cin>>ch;
 			//vecMomentum.pz(vecMomentum.pz()*particleA->getXBjorkenProjectileRecalculated());
 			//suetin debug end
 			vecMomentum.py(vecMomentum.py());
@@ -3501,7 +3522,9 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 			tempHardpingParticle->rotateHardping();
 			if(_verbose)cout<<" p 2 "<<tempHardpingParticle->p();
-		//	cin>>ch;
+			cout.precision(10);
+			if(_verbose)cout<<" 1: x1&&x1R  "<<tempHardpingParticle->getXBjorkenProjectile()<<" "<<tempHardpingParticle->getXBjorkenProjectileRecalculated()<<endl;
+//			cin>>ch;
 
 
 
@@ -3509,13 +3532,13 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 			_finalState->push_back(*tempHardpingParticle);
 			return true;
-*/
+
 			//suetin debug end
 
 			double t1,t2,t3,t4;
 			particleA->getTrigonometricFunctions(t1,t2,t3,t4);
-			if(_verbose)cout<<"t1234 3 "<<t1<<" "<<t2<<" "<<t3<<" "<<t4<<endl;
-		//	cin>>ch;
+	//		if(_verbose)cout<<"t1234 3 "<<t1<<" "<<t2<<" "<<t3<<" "<<t4<<endl;
+	//		cin>>ch;
 	//		cout<<"phi = "<<particleA->getPhiHardping()<<" theta = "<<particleA->getThetaHardping()<<endl;
 /*
 			if(_targetNucleus.A()==184){
@@ -3528,7 +3551,7 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 			py_old = particleA->py();
 			pz_old = particleA->pz();
 			//cout.precision(10);
-			if(_verbose)cout<<"px A = "<<px_old<<" py A = "<<py_old<<" pz A = "<<pz_old<<endl;
+	//		if(_verbose)cout<<"px A = "<<px_old<<" py A = "<<py_old<<" pz A = "<<pz_old<<endl;
 
 
 //			cout<<"getting pt "<<particleA->pT()-ptMother<<" pt mother "<<ptMother<<endl;
@@ -3551,7 +3574,7 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 	//		cin>>ch;
 
 		//	cout<<"_softInteractionCount = "<<_softInteractionCount<<endl;
-			if(_verbose)cout<<"Z0 WAS BORNED !!!"<<endl;
+		//	if(_verbose)cout<<"Z0 WAS BORNED !!!"<<endl;
 			/*int id = pythia->event.at(pythia->event.at(i_pyEv+3).mother1()).id();
 			if(id == 23){
 				cout<<"true leptone"<<endl;
@@ -3564,12 +3587,12 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 			//find line of Z0 which decays on mu+mu-
 			do{
-				if(_verbose)cout<<" Z0 cycle "<<endl;
+			//	if(_verbose)cout<<" Z0 cycle "<<endl;
 				lineDaughter1 = pythia->event.at(motherLine1).daughter1();
 				lineDaughter2 = pythia->event.at(motherLine1).daughter2();
 				idDaughter1 = pythia->event.at(lineDaughter1).id();
 				idDaughter2 = pythia->event.at(lineDaughter2).id();
-				if(_verbose){
+				if(_verbose&&0){
 					cout<<" lineDaughter1 =  "<<lineDaughter1<<endl;
 					cout<<" idDaughter1 =  "<<idDaughter1<<endl;
 					cout<<" lineDaughter2 =  "<<lineDaughter2<<endl;
@@ -3580,32 +3603,32 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 				if(idDaughter1 == idDaughter2 && idDaughter1 == 23){
 					motherLine1 = lineDaughter1;
 					_indexOfDrellYanChain.push_back(lineDaughter1);
-					if(_verbose)cout<< "motherLine = "<<motherLine1<<endl;
+				//	if(_verbose)cout<< "motherLine = "<<motherLine1<<endl;
 				}
-				if(_verbose)cout<<"pythia->event.at(motherLine1).id() = "<<pythia->event.at(motherLine1).id()<<endl;
+			//	if(_verbose)cout<<"pythia->event.at(motherLine1).id() = "<<pythia->event.at(motherLine1).id()<<endl;
 				//cin>>lll;
 
 			}while(idDaughter1 == 23);
 
 			motherLine2 = motherLine1;
 			do{
-				if(_verbose)cout<<" lepton cycle "<<endl;
+			//	if(_verbose)cout<<" lepton cycle "<<endl;
 				lineDaughter1 = pythia->event.at(motherLine1).daughter1();
 				lineDaughter2 = pythia->event.at(motherLine2).daughter2();
 				if(pythia->event.at(motherLine1).id() != 23){
 
 					lineDaughter12 = pythia->event.at(motherLine1).daughter2();
 					if(lineDaughter1 == lineDaughter12){
-						if(_verbose)cout<<" all right lineDaughter1 == lineDaughter12 "<<endl;
+				//		if(_verbose)cout<<" all right lineDaughter1 == lineDaughter12 "<<endl;
 					}else{
 
 						if (abs(pythia->event.at(lineDaughter1).id()) == 13){
-							if(_verbose)cout<<" pythia->event.at(lineDaughter1).id() = "<<pythia->event.at(lineDaughter1).id()<<endl;
+				//			if(_verbose)cout<<" pythia->event.at(lineDaughter1).id() = "<<pythia->event.at(lineDaughter1).id()<<endl;
 						}
 
 						if (abs(pythia->event.at(lineDaughter12).id()) == 13){
 							lineDaughter1 = lineDaughter12;
-							if(_verbose)cout<<" pythia->event.at(lineDaughter12).id() = "<<pythia->event.at(lineDaughter12).id()<<endl;
+					//		if(_verbose)cout<<" pythia->event.at(lineDaughter12).id() = "<<pythia->event.at(lineDaughter12).id()<<endl;
 						}
 
 
@@ -3614,16 +3637,16 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 					lineDaughter22 = pythia->event.at(motherLine2).daughter1();
 					if(lineDaughter2 == lineDaughter22){
-						if(_verbose)cout<<" all right lineDaughter2 == lineDaughter22 "<<endl;
+				//		if(_verbose)cout<<" all right lineDaughter2 == lineDaughter22 "<<endl;
 					}else{
 
 						if (abs(pythia->event.at(lineDaughter2).id()) == 13){
-							if(_verbose)cout<<" pythia->event.at(lineDaughter2).id() = "<<pythia->event.at(lineDaughter2).id()<<endl;
+					//		if(_verbose)cout<<" pythia->event.at(lineDaughter2).id() = "<<pythia->event.at(lineDaughter2).id()<<endl;
 						}
 
 						if (abs(pythia->event.at(lineDaughter22).id()) == 13){
 							lineDaughter2 = lineDaughter22;
-							if(_verbose)cout<<" pythia->event.at(lineDaughter22).id() = "<<pythia->event.at(lineDaughter22).id()<<endl;
+					//		if(_verbose)cout<<" pythia->event.at(lineDaughter22).id() = "<<pythia->event.at(lineDaughter22).id()<<endl;
 						}
 
 
@@ -3638,7 +3661,7 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 				_indexOfDrellYanChain.push_back(lineDaughter2);
 
-				if(_verbose){
+				if(_verbose&&0){
 					cout<<" lineDaughter1 =  "<<lineDaughter1<<endl;
 					cout<<" idDaughter1 =  "<<idDaughter1<<endl;
 					cout<<" lineDaughter2 =  "<<lineDaughter2<<endl;
@@ -3652,10 +3675,10 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 			std::sort (_indexOfDrellYanChain.begin(),_indexOfDrellYanChain.end(),compare);
 
-			if(_verbose)cout<<" pythia->event.at(motherLine1) id "<<pythia->event.at(motherLine1).id()<<endl;
-			if(_verbose)cout<<" pythia->event.at(motherLine2) id "<<pythia->event.at(motherLine2).id()<<endl;
-			if(pythia->event.at(motherLine1).idAbs()==13
-					&& pythia->event.at(motherLine2).idAbs()==13){
+	//		if(_verbose)cout<<" pythia->event.at(motherLine1) id "<<pythia->event.at(motherLine1).id()<<endl;
+	//		if(_verbose)cout<<" pythia->event.at(motherLine2) id "<<pythia->event.at(motherLine2).id()<<endl;
+			if((pythia->event.at(motherLine1).idAbs()==13					//suetin debug
+					&& pythia->event.at(motherLine2).idAbs()==13)||true){
 
 				px_old = pythia->event.at(motherLine1).px() + pythia->event.at(motherLine2).px();
 				py_old = pythia->event.at(motherLine1).py() + pythia->event.at(motherLine2).py();
@@ -3666,27 +3689,66 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 			//	pz_old = sqrt(px_old*px_old +py_old*py_old);
 
+				//suetin debug 06.01.2016
+				px_old = pythia->event.at(3).px();
+				py_old = pythia->event.at(3).py();
+				pz_old = pythia->event.at(3).pz();
+				pe_old = pythia->event.at(3).e() ;
+
 				vecMomentumZ0.px(px_old);
 				vecMomentumZ0.py(py_old);
 				vecMomentumZ0.pz(pz_old);
 				vecMomentumZ0.e (pe_old);
 
+				tempHardpingParticle->p(vecMomentumZ0);
+				tempHardpingParticle->id(pythia->event.at(3).id());
+
+				//x1 = particleA->getXBjorkenProjectile();
+				//x2 = particleA->getXBjorkenTarget();
+				//cout<<"x1 = "<<x1<<" x2 = "<<x2<<endl;
+				//cin>>ch;
+				if(_verbose)cout<<"pZ0 before EL = "<<particleA->getEnergyLoss()<<" "<<tempHardpingParticle->p();
+
+
+				particleA->pz(800.00);
+				particleA->py(00.00);
+				particleA->px(00.00);
+			//	particleA->id(2212);
+				particleA->e(sqrt(particleA->m2() + particleA->pAbs2()));
+
+				cout.precision(12);
+				//if(_verbose)cout<<"pAm = = "<<particleA->m2() + particleA->pAbs2()<<endl;
+				if(_verbose)cout<<"pA = = "<<particleA->p()<<endl;
+				if(_verbose)cout<<"getXBjorkenProjectileRecalculated = = "<<particleA->getXBjorkenProjectileRecalculated()<<endl;
+
+				tempHardpingParticle->recalculateParticleMomentum(particleA);
+				if(_verbose)cout<<"pZ0 after EL = "<<tempHardpingParticle->p();
+
+				//suetin debug 06.01.2016 end
+
 
 				if(_verbose)cout<<px_old<<" "<<py_old<<" "<<pz_old<<" "<<pe_old<<" "<<endl;
 				//suetin debug
 				if(_verbose)cout<<" particle A p = "<<particleA->p();
-				particleA->rotateHardping(); //перешли в лабораторнуб сисему, чтобы перескитать углы
+				particleA->rotateHardping(); //перешли в лабораторнуб сисему, чтобы пересчитать углы
 				if(_verbose)cout<<" particle A p2 = "<<particleA->p();
 
 			//	cout<<"incident particle3 "<<particleA->p();
 				vecMomentum = particleA->p();
-				//cin>>ch;
+		//		cin>>ch;
 				//vecMomentum.pz(vecMomentum.pz()*particleA->getXBjorkenProjectile());
 			//	cout<<"x1 "<<tempHardpingParticle->getXBjorkenProjectile()<<endl;
 			//	cin>>ch;
 
-				vecMomentum.pz(vecMomentum.pz()*tempHardpingParticle->getXBjorkenProjectile());// укоротили вектор налетающей частицы до вектора партона, участвующего в жестком взаимодействии.
-				//vecMomentum.pz(vecMomentum.pz()*particleA->getXBjorkenProjectileRecalculated());
+				//suetin debug 06.01.2016
+				//vecMomentum.pz(vecMomentum.pz()*tempHardpingParticle->getXBjorkenProjectile());// укоротили вектор налетающей частицы до вектора партона, участвующего в жестком взаимодействии.
+				vecMomentum.pz(vecMomentum.pz()*particleA->getXBjorkenProjectileRecalculated());
+				if(_verbose)cout.precision(12);
+				if(_verbose)cout<<"x1 & x1R = "<<particleA->getXBjorkenProjectile()<<" "<<particleA->getXBjorkenProjectileRecalculated()<<endl;
+				if(_verbose)cout<<"x1 & x1R tempHardpingParticle = "<<tempHardpingParticle->getXBjorkenProjectile()<<" "<<tempHardpingParticle->getXBjorkenProjectileRecalculated()<<endl;
+
+			//	cin>> ch;
+				//suetin debug 06.01.2016 end
 				vecMomentum.py(vecMomentum.py());
 				vecMomentum.px(vecMomentum.px());
 				vecMomentum.e(sqrt(vecMomentum.pT2()+vecMomentum.pz()*vecMomentum.pz()+projectileMass*projectileMass));
@@ -3768,7 +3830,8 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 				py_old = tempHardpingParticle->py() ;
 				pz_old = tempHardpingParticle->pz() ;
 
-
+				if(_verbose)cout<<" 2: x1&&x1R  "<<tempHardpingParticle->getXBjorkenProjectile()<<" "<<tempHardpingParticle->getXBjorkenProjectileRecalculated()<<endl;
+			//	cin>>ch;
 /*
 				cout<<"px2 = "<<px_old<<" py2 = "<<py_old<<" pz2 = "<<pz_old<<endl;
 				cout<<"first lepton pt = "<<tempHardpingParticle->pT()<<endl;
@@ -3783,7 +3846,7 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 		//		cout<<"111111111111111"<<tempHardpingParticle->p();
 
 //				cout<<"final state size = "<<_finalState->back().p();
-			//	cin>>ch;
+				cin>>ch;
 	/*			*tempHardpingParticle = pythia->event.at(motherLine2);
 				cout.precision(10);
 				px_old = tempHardpingParticle->px();
