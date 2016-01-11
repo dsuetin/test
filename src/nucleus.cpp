@@ -3402,7 +3402,7 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 			//suetin debug
 
 			x1New = tempHardpingParticle->recalculateXBjorken(&_targetNucleus,pythia,_initialParticle.e(),particleA->getEnergyLoss());
-			particleA->setXBjorkenProjectileRecalculated(x1New);
+			//particleA->setXBjorkenProjectileRecalculated(x1New);
 		//	x1New =
 			//suetin debug end
 			if(_verbose)cout<<"x1New = "<<x1New<<endl;
