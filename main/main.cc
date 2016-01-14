@@ -77,7 +77,7 @@ double initialProjectileLabMomentum = 800;//27.6;
 quickVersion = true;
 numEvent =  100000000;
    //numEvent =  11;//0;
-   verbose = 1;
+   verbose = 0;
    kEnergyLoss = 2.5;//2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
 Aproj = 1;
 Zproj = 1;
@@ -85,8 +85,8 @@ Zproj = 1;
 //N(7,14)
 
 
-Atarg = 9;//184;//9;//184;//84;
-Ztarg = 4;//36;
+Atarg = 184;//84;
+Ztarg = 74;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
@@ -442,7 +442,7 @@ double maxPathInNucleus = 0;
 			if(verbose)cout<<"y "<<hardping->_finalState->at(ih).y()<<endl;
 
 
-			//cin>>ch;
+		//	cin>>ch;
 			//cout<< hardping->_finalState->at(ih).getTransferredCM4Momentum().px()<<endl;
 			//cout<< hardping->_finalState->at(ih).getTransferredCM4Momentum().py()<<endl;
 			//cout<< hardping->_finalState->at(ih).getTransferredCM4Momentum().pz()<<endl;

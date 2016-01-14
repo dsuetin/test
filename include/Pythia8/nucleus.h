@@ -1211,7 +1211,7 @@ public:
 	void setKEnergyLoss(double energyLoss){
 		_kEnergyLoss = energyLoss;
 	}
-	void recalculateParticleMomentum(hardpingParticle* particleA){//пересчитывает 4-х импульс частицы с учетом энергитических потерь в начальном состоянии
+	bool recalculateParticleMomentum(hardpingParticle* particleA){//пересчитывает 4-х импульс частицы с учетом энергитических потерь в начальном состоянии
 		char ch;
 		//cout<<"in recalculateParticleMomentum "<<endl;
 		double incidentParticleEnergyLoss = particleA->getEnergyLoss();
@@ -1222,7 +1222,7 @@ public:
 		if(incidentParticleEnergyLoss == 0){
 			this->setXBjorkenProjectileRecalculated(particleA->getXBjorkenProjectile());
 			particleA->setXBjorkenProjectileRecalculated(particleA->getXBjorkenProjectile());
-			return;
+			return true;
 		}else{
 			if(_verbose)cout<<"particle have energy loss before hard process "<<endl;
 		}
@@ -1285,7 +1285,8 @@ public:
 
 
 		double x1Recalculated = (x1*pe_old - kEnergyLossCM*pathInNucleus)/pe_old;
-		if(x1 - x1Recalculated <= 0)return;
+		if(x1Recalculated < 0)return false;
+		if(x1 - x1Recalculated <= 0)return false;
 		this->setXBjorkenProjectileRecalculated(x1Recalculated);
 		particleA->setXBjorkenProjectileRecalculated(x1Recalculated);
 
@@ -1328,7 +1329,7 @@ public:
 		if(_verbose)cout<<"Z0 momentum recalculated at 800GeV at LAB NN 2 "<<this->p();
 
 	//	cin>>ch;
-		return;
+		return true;
 
 	}
 	//todo написать функцию, которая по индексу частицы в истории возвращала бы указатель на эту частицу.
