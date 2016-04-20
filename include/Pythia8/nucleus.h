@@ -190,8 +190,8 @@ public:
 
 
 	{
-		_pythiaParticle = new Particle(0);
-		_history = new vector <unsigned int>;
+		//_pythiaParticle = new Particle(0);
+		//_history = new vector <unsigned int>;
 		_hadronNucleonCrossSection = 0;
 		_preHadronNucleonCrossSection = 0;
 
@@ -238,8 +238,8 @@ public:
 
 
 	{
-		_pythiaParticle = new Particle(0);
-		_history = new vector <unsigned int>;
+		//_pythiaParticle = new Particle(0);
+		//_history = new vector <unsigned int>;
 		_hadronNucleonCrossSection = 0;
 		_preHadronNucleonCrossSection = 0;
 
@@ -282,8 +282,8 @@ public:
 		  _cosX2(0)
 
 	{
-		_pythiaParticle = new Particle(0);
-		_history = new vector <unsigned int>;
+		//_pythiaParticle = new Particle(0);
+		//_history = new vector <unsigned int>;
 		_hadronNucleonCrossSection = 0;
 		double preHadronCrossSectionNucleon = 10;
 		double preHadronCrossSectionPiMeson = 7;
@@ -373,17 +373,17 @@ public:
 
 	//todo написать деструктор
 	vector <unsigned int> * getHistory(void){
-		return _history;
+		return &_history;
 	}
 	Particle* getPythiaParticle(void){
 
-		_pythiaParticle->id(this->id());
-		_pythiaParticle->p(this->p());
-		_pythiaParticle->vProd(this->vProd());
-		return _pythiaParticle;
+		_pythiaParticle.id(this->id());
+		_pythiaParticle.p(this->p());
+		_pythiaParticle.vProd(this->vProd());
+		return &_pythiaParticle;
 	}
 	void setPythiaParticleStatus(int status){
-		_pythiaParticle->status(status);
+		_pythiaParticle.status(status);
 	}
 	bool isHard(void){	return _hardInteraction;}
 	bool isSoft(void){	return _softInteraction;}
@@ -1334,7 +1334,8 @@ public:
 	}
 	//todo написать функцию, которая по индексу частицы в истории возвращала бы указатель на эту частицу.
 private:
-	vector <unsigned int> * _history;
+	//vector <unsigned int> * _history;
+	vector <unsigned int>  _history;
 	bool _hardInteraction;
 	bool _softInteraction;
 	bool _outOfNucleus;
@@ -1364,7 +1365,8 @@ private:
 	double _quarkNucleonCrossSection;
 	unsigned int _numberOfSoftCollisions;
 	unsigned int _numberOfHardCollisions;
-	Particle* _pythiaParticle;
+	//Particle* _pythiaParticle;
+	Particle _pythiaParticle;
 	double _totalPathInNucleus;
 	double _energyLoss;
 	double _cosTheta;
@@ -1740,6 +1742,12 @@ public:
 			return;
 		}
 		_generations->push_back(*_generation);
+		//cout<<"_generations size 2 "<<_generations->size()<<endl;
+		delete _generation;
+		//cout<<"_generations size 3 "<<_generations->size()<<endl;
+	//	cout<<"last gen "<<_generations->back().getMatrix()->at(0).at(0).p();
+		//delete _generations;
+	//	cin>>ch;
 		return;
 	}
 	int energyLoss(hardpingParticle* particleA, double zCoordinateOfCollisions){

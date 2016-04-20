@@ -43,7 +43,8 @@ double sNN;
  ofstream energyLossFile2;
  //suetin debug
  ifstream pythia6File;
- ifstream pythia6Z0File;
+ ifstream pythia6Z0pFile;
+ ifstream pythia6Z0nFile;
  ifstream pythia8ParticleFile;
  ifstream coordinateFile;
  ifstream softCollisionsNumberInput;
@@ -75,7 +76,7 @@ double initialProjectileLabMomentum = 800;//27.6;
 
 //incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 quickVersion = true;
-numEvent =  100000000;
+numEvent =  10000000;
    //numEvent =  11;//0;
    verbose = 0;
    kEnergyLoss = 2.5;//2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
@@ -85,20 +86,24 @@ Zproj = 1;
 //N(7,14)
 
 
-Atarg = 184;//84;
-Ztarg = 74;//36;
+Atarg = 56;//184;//9;//184;//84;
+Ztarg = 26;//74;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
  TString filenameX1 = "/home/guest/workspace4/h/Debug/06.10.2015/x1.txt";
- TString filenameZ0 = "/home/guest/workspace/pythia6/Debug/06.10.2015/pythia6DYevent.txt";
-         filenameZ0 = "/home/guest/workspace4/Pythia8/Debug/12.11.2015/p_p_800GeV_DY_ZO.txt";
+ TString filenameZ0p = "/home/guest/workspace/pythia6/Debug/06.10.2015/pythia6DYevent.txt";
+         filenameZ0p = "/home/guest/workspace4/Pythia8/Debug/12.11.2015/p_p_800GeV_DY_ZO.txt";
+
+  TString filenameZ0n = "/home/guest/workspace4/Pythia8/Debug/12.11.2015/p_n_800GeV_DY_ZO.txt";
+
  TString filenameQuick = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
 
  //filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event_c++.txt";
  TString filenamePythiaEvent = "/home/guest/workspace4/h/Debug/29.07.2015/pythia6event.txt";
 pythia6File.open(filename,std::ifstream::binary);
-pythia6Z0File.open(filenameZ0,std::ifstream::binary);
+pythia6Z0pFile.open(filenameZ0p,std::ifstream::binary);
+pythia6Z0nFile.open(filenameZ0n,std::ifstream::binary);
 pythiaEventFile.open(filenamePythiaEvent,std::ofstream::binary);
 x1File.open(filenameX1,std::ofstream::binary);
 pythia8ParticleFile.open(filenameQuick,std::ofstream::binary);
@@ -108,7 +113,12 @@ if(pythia6File.is_open()){
 }else{
 	cout<<"hui"<<endl;
 }
-if(pythia6Z0File.is_open()){
+if(pythia6Z0pFile.is_open()){
+	cout<<"ok"<<endl;
+}else{
+	cout<<"hui"<<endl;
+}
+if(pythia6Z0nFile.is_open()){
 	cout<<"ok"<<endl;
 }else{
 	cout<<"hui"<<endl;
@@ -426,7 +436,14 @@ double maxPathInNucleus = 0;
 
 		if(iop%100 == 0||1)cout<<"event number "<<iop<<endl;
 */
-
+		Vec4 summMomentum = 0;
+		double totalEnergy =0;
+		double absSystemMomentum =0;
+		for(unsigned int ih = 0; ih < hardping->_finalState->size(); ih++){
+			summMomentum += hardping->_finalState->at(ih).getSoftCollisionNumber();
+		totalEnergy = summMomentum.e();
+		absSystemMomentum = summMomentum.pAbs();
+		}
 		for(unsigned int ih = 0; ih < hardping->_finalState->size(); ih++){
 
 			cout.precision(3);
@@ -525,7 +542,9 @@ double maxPathInNucleus = 0;
 
 	}
 
-
+	delete particleA;
+	delete pythia8;
+	delete incidentParticle;
 }
 /*std::string getElementName(nucleus A){
 	std::string	ElementName;

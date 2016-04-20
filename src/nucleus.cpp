@@ -56,7 +56,8 @@ extern ofstream pythiaEventFile;
 extern ofstream energyLossFile;
 //suetin debug;
 extern ifstream pythia6File;
-extern ifstream pythia6Z0File;
+extern ifstream pythia6Z0pFile;
+extern ifstream pythia6Z0nFile;
 extern ifstream pythia8ParticleFile;
 extern ifstream softCollisionsNumberInput;
 extern int nSoft;
@@ -1572,7 +1573,7 @@ char ch;
 	Vec4 initialProjectile4Momentum(0), vecCoordinate(0),vecMomentum(0);
 
 
-	particleA = new hardpingParticle();
+	//particleA = new hardpingParticle();
 
 	if(_incidentParticle.id() == 0 ){// слуай, когда инициализируется ядром
 /*
@@ -1605,6 +1606,7 @@ char ch;
 
 
 	}else{
+		particleA = new hardpingParticle();
 		*particleA = _incidentParticle; // слуай, когда инициализируется частицей
 
 	}
@@ -1889,7 +1891,12 @@ if(_verbose)cout<<"getSoftCollisionNumber = "<<particleA->getSoftCollisionNumber
 					double maxHalfPathInNucleus =0;
 					// for initial particle remember coordinate of first collision
 					if(_firstCall){
-						if(!isScattering)return;
+						if(!isScattering){
+							delete particleA;
+							delete particleB;
+
+							return;//todo перед выходом освободить память для particleA & particleB
+						}
 						vecCoordinate.p(particleA->vProd());
 						if(!particleA->isLepton())vecCoordinate.pz(zCoordinateOfCollisions);// в случае, когда налетающая частица лептон, координата столкновения разыгрывается сразу, и ее z составляющая не меняется после вызова функции pathInNucleus2()
 						_initialParticle.vProd(vecCoordinate);
@@ -2289,7 +2296,12 @@ if(_verbose)cout<<"getSoftCollisionNumber = "<<particleA->getSoftCollisionNumber
 						/////////////////////////   Drell- Yan part    ////////////////////////////////////////////////////////
 						//Z0Ok = findDrellYanPairs( i_pyEv, particleA);
 						//cout<<" Z0Ok 0 = "<<Z0Ok<<endl;
-							if(findDrellYanPairs( i_pyEv, particleA))return;//continue;//return;
+							if(findDrellYanPairs( i_pyEv, particleA)){
+								delete particleA;
+								delete particleB;
+
+								return;//continue;//return;
+							}
 					}
 
 				/*	if(pythia->event.at(i_pyEv).id()==abs(13)){
@@ -2357,6 +2369,8 @@ if(_verbose)cout<<"getSoftCollisionNumber = "<<particleA->getSoftCollisionNumber
 
 	finalOutput();
 
+	delete particleA;
+	delete particleB;
 
 
 }
@@ -2682,7 +2696,14 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 				//do{
 				//suetin debug end
 							    // pythia8ParticleFile>>idPythia6>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>Qx>>Qy>>Qz>>virtualPhotonEnergy;
-						pythia6Z0File>>idPythia6>>x1>>x2>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>ch>>Qx>>ch;
+					//cout<<"idb = "<<particleB->id()<<endl;
+					//cin>>ch;
+				if(particleB->id() == 2212){
+
+						pythia6Z0pFile>>idPythia6>>x1>>x2>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>ch>>Qx>>ch;
+				}else{
+						pythia6Z0nFile>>idPythia6>>x1>>x2>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>ch>>Qx>>ch;
+				}
 								 if(_verbose)cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<" Qx = "<<Qx<<" Qy = "<<Qy<<" Qz = "<<Qz<<" Qe = "<<Qe<<endl;
 							//	cout<<" id "<<idPythia6<<endl;
 								 Q.px(Qx);
@@ -3940,5 +3961,6 @@ bool Hardping::findDrellYanPairs(int i_pyEv, hardpingParticle* particleA){
 
 		//	return true;
 		}
+		delete tempHardpingParticle;
 		return false;
 	}
