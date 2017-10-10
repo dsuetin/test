@@ -64,6 +64,7 @@ extern int nSoft;
 extern int verbose;
 extern double sNN;
 extern double kEnergyLoss;
+extern double quarkNucleonCrossSection;
 extern bool quickVersion;
 //using namespace starlightConstants;
 Timer time1;
@@ -728,7 +729,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
 	int numOfCollisions = 0;
 	int numCollisions = 0;
 //	cout<<"parA "<<particleA->vProd();
-	double hadronNucleonCrossSection = 25.0, preHadronNucleonCrossSection = 10.0, quarkNucleonCrossSection = 10.0;
+	double hadronNucleonCrossSection = 25.0, preHadronNucleonCrossSection = 10.0;
 
 
 	hadronNucleonCrossSection  = particleA->getHadronNucleonCrossSection();
@@ -736,7 +737,9 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
 	preHadronNucleonCrossSection = particleA->getPreHadronNucleonCrossSection();
 	hadronNucleonCrossSection = 25.0;
 	preHadronNucleonCrossSection = 10.0;
-	preHadronNucleonCrossSection = 10.0;
+	preHadronNucleonCrossSection = quarkNucleonCrossSection;
+	cout<<" quarkNucleonCrossSection = "<<quarkNucleonCrossSection<<endl;
+//	cin>>ch;
 	//hadronNucleonCrossSection = particleA->getHadronNucleonCrossSection();
 	//preHadronNucleonCrossSection = particleA->getPreHadronNucleonCrossSection();
 	if(_verbose)cout<<"id = "<<particleA->id()<<endl;
@@ -745,7 +748,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
 	//if(_verbose)cout<<" HadronFormationLength "<<particleA->getHadronFormationLength<<endl;
 	if(_verbose)cout<<"TotalPathInNucleus = "<<particleA->getTotalPathInNucleus()<<endl;
 //	cin>>ch;
-	quarkNucleonCrossSection = particleA->getQuarkNucleonCrossSection();
+//	quarkNucleonCrossSection = particleA->getQuarkNucleonCrossSection();
 	double impactParameter;
 	double path = 0.;
 	double totalPath =0;
@@ -829,10 +832,13 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
 
         do{
         	if(particleA->getSoftCollisionNumber() == 0 && particleA->isHadron()){
-        		hadronNucleonCrossSection = 10;
+        		hadronNucleonCrossSection = 30;
         	}else{
-        		hadronNucleonCrossSection = 10;
+        		hadronNucleonCrossSection = quarkNucleonCrossSection;
         	}
+
+        //	cout<<"preHadronNucleonCrossSection = "<<preHadronNucleonCrossSection<<endl;
+        //	cin>>ch;
         	if(_verbose)cout<<" r "<<r<<" xMaxP0 = "<<xMaxP0<<" impactParameter = "<<impactParameter<<endl;
             if (  true || zCoord < 0 ){ //todo хз какое сечение брать. скорее всего нужно брать полное
             	if(_verbose)cout<<"путь до конца ядра = "<<integrationCoordinateBound - zCoord<<endl;
@@ -856,7 +862,7 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             		 P0 = exp(-0.1*preHadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord,zCoord +leftHadronFormationLengtht)-0.1*hadronNucleonCrossSection*_targetNucleus.renormalizedNuclearThicknessGauss12(impactParameter,zCoord+leftHadronFormationLengtht,integrationCoordinateBound));//probability of zero scattering
             		 //probabilityOutput<<P0<<endl;
             		 cout.precision(16);
-            	//	 if(_verbose)cout<< "P0 combined  = "<<P0<<endl;
+            	//	 if(_verbose||1)cout<< "P0 combined  = "<<P0<<endl;
             	//	 cin>>ch;
             	}else{
            // 		cout<<"2impactParameter "<<impactParameter<< " zCoord = "<<zCoord<<" HIPR135 = "<<HIPR135<<endl;
@@ -867,9 +873,9 @@ Hardping::pathInNucleus2( hardpingParticle * particleA , double &zCoordinateOfCo
             		// cin>>ch;
             	}
             }
-            if(_verbose)cout<<" p0 = "<<P0<<endl;
-      //      cout<<"nsoft = "<<_softInteractionCount<<endl;
-        //    cin>>ch;
+            //if(_verbose||1)cout<<" p0 = "<<P0<<endl;
+         //   cout<<"hadronNucleonCrossSection = "<<hadronNucleonCrossSection<<endl;
+         //   cin>>ch;
             if(P0 == 0){
 
             	if(_verbose)cout<<"p0= 0 ;impactParameter = "<<impactParameter<<" zCoord = "<<zCoord<<endl;
@@ -1702,8 +1708,8 @@ char ch;
 					particleA->setInexNumber(i_init);
 					getParticleFromPreviousGeneration(particleA);//todo может сделать, чтобы лептоны сразу вылетали
 					cout.precision(12);
-					if(_verbose)cout<<"el "<<particleA->getEnergyLoss()<<endl;
-			//		cin>>ch;
+				//	if(_verbose||1)cout<<"el "<<particleA->getEnergyLoss()<<endl;
+					//cin>>ch;
 					if(numberOfGeneration == 2){
 						if(_verbose)cout<<"111"<<endl;
 					}
@@ -2703,6 +2709,8 @@ Hardping::pythiaInitialization( hardpingParticle * particleA ,hardpingParticle *
 						pythia6Z0pFile>>idPythia6>>x1>>x2>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>ch>>Qx>>ch;
 				}else{
 						pythia6Z0nFile>>idPythia6>>x1>>x2>>pxPythia6>>pyPythia6>>pzPythia6>>EPythia6>>ch>>Qx>>ch;
+					//	if(_verbose||1)cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<" Qx = "<<Qx<<" Qy = "<<Qy<<" Qz = "<<Qz<<" Qe = "<<Qe<<endl;
+					//	cin>>ch;
 				}
 								 if(_verbose)cout<<idPythia6<<" "<<pxPythia6<<" "<<pyPythia6<<" "<<pzPythia6<<" "<<EPythia6<<" "<<hadronFormLenght<<" "<<preHadronFormLenght<<" "<<virtualPhotonEnergy<<" Qx = "<<Qx<<" Qy = "<<Qy<<" Qz = "<<Qz<<" Qe = "<<Qe<<endl;
 							//	cout<<" id "<<idPythia6<<endl;

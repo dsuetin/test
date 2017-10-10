@@ -114,6 +114,15 @@ public:
 				case 36:
 				  ElementName = "Kr";
 				  break;
+
+				case 20:
+				  ElementName = "Ca";
+				  break;
+
+				case 6:
+				  ElementName = "C";
+				  break;
+
 				default:
 				  cout<<"Error no found such element. "<<endl;
 				  ElementName = "";
@@ -1797,12 +1806,12 @@ public:
 		if(_verbose)cout<<"after "<<particleA->getTotalPathInNucleus()<<endl;
 	//	cin>>ch;
 	}
-	if(_verbose)cout<<"totalPath "<<particleA->getTotalPathInNucleus()<<endl;
+	if(_verbose)cout<<"totalPath 2 "<<particleA->getTotalPathInNucleus()<<endl;
 	//    cin>>ch;
 			//pathInNucleiOutput<<deltaPath<<endl;
 		double	deltaE = deltaPath*_kEnergyLoss;
 		//suetin debug
-
+	//	cout<<_kEnergyLoss<<endl;
 	//	cin>>ch;
 		//
 			if(_verbose)cout<<"zCoordinateOfCollisions = "<<zCoordinateOfCollisions<<" zCoordinateOfCollisionsTemp = "<<zCoordinateOfCollisions<<" vecCoordinate.pz() = "<<particleA->vProd().pz()<<" deltaPath  = "<<deltaPath<<endl;

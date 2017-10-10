@@ -21,7 +21,6 @@ double getFromBeFile();
 double sNN;
  Pythia* pythia8;
 
-
  //huuuuuuuuuuuuuuui
  ifstream _randomFile;
  ifstream W_File;
@@ -50,6 +49,7 @@ double sNN;
  ifstream softCollisionsNumberInput;
  int verbose = 0;
  double kEnergyLoss;
+ double quarkNucleonCrossSection;
  bool quickVersion = false;
  int nSoft;
  //const gsl_rng_type *gslRandomGeneratorType;
@@ -57,7 +57,7 @@ double sNN;
 
 int main() {
 char ch;
-unsigned int numEvent = 100000000;
+unsigned int numEvent = 10000000;
 Timer time2;
 time2.start();
 std::ostringstream numberToStringConverter;
@@ -72,31 +72,35 @@ std::string totalPathFilename;
 
 int Aproj = 0, Zproj = 0, Atarg = 0, Ztarg = 0, incidentParticleId = 0;
 
-double initialProjectileLabMomentum = 800;//27.6;
+double initialProjectileLabMomentum = 120;//27.6;
 
 //incidentParticleId = -11;//если ноль вызает инициализацию ядро-ядро, если нет -частица-ядро.
 quickVersion = true;
-numEvent =  10000000;
+numEvent =  100000000;
    //numEvent =  11;//0;
    verbose = 0;
-   kEnergyLoss = 2.5;//2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
+   kEnergyLoss = 3.5;//2.5;//2.5;//2.5;//0.1;//0.1;//2.5;
+   quarkNucleonCrossSection = 10.;
 Aproj = 1;
 Zproj = 1;
 //Kr(36,84)
 //N(7,14)
 
 
-Atarg = 56;//184;//9;//184;//84;
-Ztarg = 26;//74;//36;
+Atarg = 2;//56;//184;//2;//40;//56;//184;//56;//9;//9;//184;//84;
+Ztarg = 1;//74;//20;//26;//74;//26;//36;
 //suetin debug
 
  TString filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
  TString filenameX1 = "/home/guest/workspace4/h/Debug/06.10.2015/x1.txt";
  TString filenameZ0p = "/home/guest/workspace/pythia6/Debug/06.10.2015/pythia6DYevent.txt";
+
+
+
          filenameZ0p = "/home/guest/workspace4/Pythia8/Debug/12.11.2015/p_p_800GeV_DY_ZO.txt";
-
+         filenameZ0p = "/run/media/guest/DATA/E866 PythiaData/p_p_120GeV_DY_ZO.txt";
   TString filenameZ0n = "/home/guest/workspace4/Pythia8/Debug/12.11.2015/p_n_800GeV_DY_ZO.txt";
-
+  	  	  filenameZ0n = "/run/media/guest/DATA/E866 PythiaData/p_n_120GeV_DY_ZO.txt";
  TString filenameQuick = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event6.txt";
 
  //filename = "/home/guest/workspace4/Hardping_newold/Debug/01.06.2015/pythia6event_c++.txt";
@@ -151,8 +155,6 @@ if(softCollisionsNumberInput.is_open()){
 //cin>>ch;
 numberToStringConverter << initialProjectileLabMomentum;
 initialProjectileLabMomentumString = numberToStringConverter.str();
-
-
 
 
 
